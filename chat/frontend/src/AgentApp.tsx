@@ -739,7 +739,7 @@ const AgentApp: React.FC = () => {
                         <Typography
                           variant="subtitle2"
                           sx={{
-                            color: '#000000',
+                            color: '#2196f3',
                             fontWeight: 'bold',
                             display: 'flex',
                             alignItems: 'center',
@@ -749,7 +749,7 @@ const AgentApp: React.FC = () => {
                         </Typography>
                         <IconButton
                           size="small"
-                          sx={{ color: '#000000' }}
+                          sx={{ color: '#2196f3' }}
                           onClick={(e) => {
                             e.stopPropagation()
                             handleToolToggle(messages.indexOf(message))
@@ -767,7 +767,7 @@ const AgentApp: React.FC = () => {
                         <Box
                           sx={{
                             mt: 1,
-                            backgroundColor: '#edd095',
+                            backgroundColor: '#2196f3',
                             borderRadius: '6px',
                             p: 1.5,
                             maxHeight: 'calc(100vh - 300px)',
@@ -832,7 +832,7 @@ const AgentApp: React.FC = () => {
                           bgcolor:
                             message.role === 'user'
                               ? 'primary.dark'
-                              : '#2a2a2a',
+                              : '#d6b46b',
                           borderRadius: '18px',
                           borderTopLeftRadius:
                             message.role === 'user' ? '18px' : '4px',
@@ -866,7 +866,7 @@ const AgentApp: React.FC = () => {
                                   <Typography
                                     variant="caption"
                                     sx={{
-                                      color: '#ff9800',
+                                      color: '#2196f3',
                                       fontWeight: 'bold',
                                     }}
                                   >
