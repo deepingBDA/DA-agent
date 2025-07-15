@@ -739,7 +739,7 @@ const AgentApp: React.FC = () => {
                         <Typography
                           variant="subtitle2"
                           sx={{
-                            color: '#2196f3',
+                            color: '#000000',
                             fontWeight: 'bold',
                             display: 'flex',
                             alignItems: 'center',
@@ -749,7 +749,7 @@ const AgentApp: React.FC = () => {
                         </Typography>
                         <IconButton
                           size="small"
-                          sx={{ color: '#2196f3' }}
+                          sx={{ color: '#000000' }}
                           onClick={(e) => {
                             e.stopPropagation()
                             handleToolToggle(messages.indexOf(message))
@@ -767,7 +767,7 @@ const AgentApp: React.FC = () => {
                         <Box
                           sx={{
                             mt: 1,
-                            backgroundColor: '#1e1e1e',
+                            backgroundColor: '#edd095',
                             borderRadius: '6px',
                             p: 1.5,
                             maxHeight: 'calc(100vh - 300px)',
