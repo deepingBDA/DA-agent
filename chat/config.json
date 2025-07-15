@@ -1,0 +1,37 @@
+{
+  "insight": {
+    "command": "python3",
+    "args": [
+      "/app/mcp/mcp_insight.py"
+    ],
+    "transport": "stdio"
+  },
+  "clickhouse": {
+    "command": "python3",
+    "args": [
+      "/app/mcp/mcp_clickhouse.py"
+    ],
+    "transport": "stdio"
+  },
+  "report": {
+    "command": "python3",
+    "args": [
+      "/app/mcp/mcp_report.py"
+    ],
+    "transport": "stdio"
+  },
+  "pos": {
+    "command": "python3",
+    "args": [
+      "/app/mcp/mcp_pos.py"
+    ],
+    "transport": "stdio"
+  },
+  "diagnose": {
+    "command": "python3",
+    "args": [
+      "/app/mcp/mcp_diagnose.py"
+    ],
+    "transport": "stdio"
+  }
+}

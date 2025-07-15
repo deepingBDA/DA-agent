@@ -1,0 +1,9 @@
+[submodule "mcp-use"]
+	path = mcp-use
+	url = https://github.com/mcp-use/mcp-use.git
+[submodule "reference-servers"]
+	path = reference-servers
+	url = https://github.com/smithery-ai/reference-servers.git
+[submodule "excel-mcp-server"]
+	path = excel-mcp-server
+	url = https://github.com/negokaz/excel-mcp-server.git

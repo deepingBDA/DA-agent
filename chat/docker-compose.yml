@@ -1,0 +1,55 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: mcp-nginx
+    ports:
+      - '8501:8501'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+  # 백엔드 서비스
+  backend:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: mcp-backend
+    volumes:
+      - ../:/app/mcp
+      - ./config.json:/app/config.json
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./files:/app/files
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
+      - CLICKHOUSE_PORT=${CLICKHOUSE_PORT}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+    restart: unless-stopped
+
+  # 프론트엔드 서비스
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+        - NPM_TOKEN=${NPM_TOKEN}
+    container_name: mcp-frontend
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+    environment:
+      - WATCHPACK_POLLING=true # 파일 시스템 이벤트 폴링 활성화 (WSL 환경 등에서 필요)
+      - CHOKIDAR_USEPOLLING=true # chokidar 폴링 방식 사용
+      - FAST_REFRESH=true # 빠른 새로고침 활성화
+      - WDS_SOCKET_PORT=0 # 웹소켓 포트 자동 설정
+    depends_on:
+      - backend
+    restart: unless-stopped

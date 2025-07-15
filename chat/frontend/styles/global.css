@@ -1,0 +1,121 @@
+/**
+  * We use this instead of `@tailwind base` because we didn't find a way
+  * of overriting the backgound-color added to buttons.
+  *
+  * https://github.com/tailwindlabs/tailwindcss/issues/6602
+  */
+
+@import './tailwind-base.css';
+
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'pretendard-kr';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/font/PretendardKR-Regular.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'pretendard-kr';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/font/PretendardKR-Medium.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'pretendard-kr';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/font/PretendardKR-Bold.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'pretendard-jp';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/font/PretendardJP-Regular.otf) format('otf');
+}
+
+@font-face {
+  font-family: 'pretendard-jp';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/font/PretendardJP-Medium.otf) format('otf');
+}
+
+@font-face {
+  font-family: 'pretendard-jp';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/font/PretendardJP-Bold.otf) format('otf');
+}
+
+html {
+  @apply font-pretendardkr;
+}
+
+@layer components {
+  .custom-tooltip-container {
+    @apply absolute z-[9999] w-max min-w-[140px] bg-black/90 flex rounded-[6px] pointer-events-none text-white leading-[1.4] whitespace-nowrap p-[16px] text-75 flex-col shadow-[0_2px_4px_rgba(0,0,0,0.25)];
+  }
+
+  .custom-tooltip-header {
+    @apply flex flex-col;
+  }
+
+  .custom-tooltip-date {
+    @apply mb-[8px] text-left;
+  }
+
+  .custom-tooltip-title {
+    @apply flex justify-between align-middle gap-[24px] mb-[16px] text-100;
+  }
+
+  .custom-tooltip-subtitle {
+    @apply text-75 max-w-[240px] whitespace-normal;
+  }
+
+  .custom-tooltip-contents {
+    @apply flex flex-col gap-[8px];
+  }
+
+  .custom-tooltip-contents-row {
+    @apply flex align-middle justify-between gap-[40px];
+  }
+
+  .custom-tooltip-contents-row-label {
+    @apply w-max max-w-[184px] whitespace-normal;
+  }
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+:lang(en-US),
+:lang(ko-KR) {
+  font-family: font-pretendardKr !important;
+}
+
+:lang(ja-JP) {
+  font-family: font-pretendardJp !important;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
