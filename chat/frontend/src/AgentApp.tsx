@@ -866,7 +866,7 @@ const AgentApp: React.FC = () => {
                                   <Typography
                                     variant="caption"
                                     sx={{
-                                      color: '#2196f3',
+                                      color: '#FFFFFF',
                                       fontWeight: 'bold',
                                     }}
                                   >
