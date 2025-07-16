@@ -43,9 +43,9 @@ CLICKHOUSE_PORT = os.getenv("CLICKHOUSE_PORT")
 CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
 CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
 
-model_name = "gpt-o4"
+model_name = "gpt-4o"
 model_max_tokens = {
-    "gpt-o4": 128000,
+    "gpt-4o": 128000,
 }
 
 db_list = {

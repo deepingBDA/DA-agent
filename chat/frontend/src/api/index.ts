@@ -170,7 +170,7 @@ export const sendMessage = async (
     // /api/chat 대신 /api/threads/{threadId}/query 엔드포인트 사용
     const response = await api.post(`/api/threads/${threadId}/query`, {
       query: queryContent,
-      model: 'gpt-o4', // 기본 모델
+      model: 'gpt-4o', // 기본 모델
       timeout_seconds: 120, // 기본 타임아웃
       recursion_limit: 100, // 기본 재귀 제한
     })
