@@ -44,8 +44,8 @@ const ChatPage: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS)
   const [availableModels, setAvailableModels] = useState<string[]>([
     'gpt-4o',
-    'gpt-o4-mini',
-    'gpt-o3',
+    'o4-mini',
+    'o3',
   ])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)

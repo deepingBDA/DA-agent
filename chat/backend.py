@@ -102,8 +102,8 @@ Guidelines:
 # 모델 토큰 정보
 OUTPUT_TOKEN_INFO = {
     "gpt-4o": {"max_tokens": 16384},
-    "gpt-o4-mini": {"max_tokens": 16384},
-    "gpt-o3": {"max_tokens": 16384},
+    "o4-mini": {"max_tokens": 16384},
+    "o3": {"max_tokens": 16384},
 }
 
 # 설정 로드 함수
