@@ -101,9 +101,8 @@ Guidelines:
 
 # 모델 토큰 정보
 OUTPUT_TOKEN_INFO = {
-    "gpt-4o": {"max_tokens": 16384},
-    "o4-mini": {"max_tokens": 16384},
-    "o3": {"max_tokens": 16384},
+    "gpt-4o": {"max_tokens": 16384, "temperature": 0.1},
+    "o3": {"max_tokens": 16384, "temperature": None},  # o3는 temperature 지원하지 않음
 }
 
 # 설정 로드 함수
@@ -259,11 +258,17 @@ async def initialize_agent(thread_id: str, model: str = "gpt-4o", mcp_config=Non
         tool_count = len(tools)  # 전역 변수에 할당
         
         # OpenAI 모델 사용
-        llm = ChatOpenAI(
-            model=model,
-            temperature=0.1,
-            max_tokens=OUTPUT_TOKEN_INFO[model]["max_tokens"],
-        )
+        model_info = OUTPUT_TOKEN_INFO[model]
+        llm_kwargs = {
+            "model": model,
+            "max_tokens": model_info["max_tokens"],
+        }
+        
+        # temperature가 설정되어 있는 경우만 추가 (o3는 temperature 지원하지 않음)
+        if model_info["temperature"] is not None:
+            llm_kwargs["temperature"] = model_info["temperature"]
+            
+        llm = ChatOpenAI(**llm_kwargs)
         
         agent = create_react_agent(
             llm,

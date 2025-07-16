@@ -44,7 +44,6 @@ const ChatPage: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS)
   const [availableModels, setAvailableModels] = useState<string[]>([
     'gpt-4o',
-    'o4-mini',
     'o3',
   ])
 

@@ -68,7 +68,7 @@ const AgentApp: React.FC = () => {
     currentModel: 'gpt-4o',
   })
   const [settings, setSettings] = useState({
-    models: ['gpt-4o', 'o4-mini', 'o3'],
+    models: ['gpt-4o', 'o3'],
     selectedModel: 'gpt-4o',
     timeoutSeconds: 300,
     recursionLimit: 100,
