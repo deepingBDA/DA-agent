@@ -68,7 +68,7 @@ const AgentApp: React.FC = () => {
     currentModel: 'gpt-4o',
   })
   const [settings, setSettings] = useState({
-    models: ['gpt-o3', 'gpt-o4-mini', 'gpt-4o'],
+    models: ['gpt-4o', 'gpt-o4-mini', 'gpt-o3'],
     selectedModel: 'gpt-4o',
     timeoutSeconds: 300,
     recursionLimit: 100,
@@ -317,7 +317,13 @@ const AgentApp: React.FC = () => {
 
     try {
       // API 호출로 응답 받아오기 (첨부 파일 경로 전달)
-      const response = await sendMessage(userInput, attachmentPath)
+      const response = await sendMessage(
+        userInput, 
+        attachmentPath,
+        settings.selectedModel,
+        settings.timeoutSeconds,
+        settings.recursionLimit
+      )
 
       // threadId가 없거나 변경된 경우 localStorage에서 최신 값 확인
       const currentThreadId = localStorage.getItem('threadId')

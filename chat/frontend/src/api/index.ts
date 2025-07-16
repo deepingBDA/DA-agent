@@ -151,6 +151,9 @@ export const uploadFile = async (file: File): Promise<string> => {
 export const sendMessage = async (
   message: string,
   attachmentPath?: string,
+  model: string = 'gpt-4o',
+  timeoutSeconds: number = 120,
+  recursionLimit: number = 100,
 ): Promise<any> => {
   try {
     // 스레드 ID가 없으면 새로 생성
@@ -170,9 +173,9 @@ export const sendMessage = async (
     // /api/chat 대신 /api/threads/{threadId}/query 엔드포인트 사용
     const response = await api.post(`/api/threads/${threadId}/query`, {
       query: queryContent,
-      model: 'gpt-4o', // 기본 모델
-      timeout_seconds: 120, // 기본 타임아웃
-      recursion_limit: 100, // 기본 재귀 제한
+      model: model, // 사용자 선택 모델
+      timeout_seconds: timeoutSeconds, // 사용자 설정 타임아웃
+      recursion_limit: recursionLimit, // 사용자 설정 재귀 제한
     })
 
     return response.data

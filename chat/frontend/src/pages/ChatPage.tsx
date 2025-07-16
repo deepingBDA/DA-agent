@@ -43,9 +43,9 @@ const ChatPage: React.FC = () => {
   const [toolInfo, setToolInfo] = useState<string | null>(null)
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS)
   const [availableModels, setAvailableModels] = useState<string[]>([
-    'gpt-o3',
-    'gpt-o4-mini',
     'gpt-4o',
+    'gpt-o4-mini',
+    'gpt-o3',
   ])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -119,7 +119,10 @@ const ChatPage: React.FC = () => {
 
     try {
       const response = await queryAgent(threadId, {
-        message: userMessage.content,
+        query: userMessage.content,
+        model: settings.model,
+        timeout_seconds: settings.timeout_seconds,
+        recursion_limit: settings.recursion_limit,
       })
 
       const assistantMessage: Message = {

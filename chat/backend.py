@@ -158,6 +158,7 @@ def save_config_to_json(config):
 mcp_clients = {}
 agents = {}
 conversation_histories = {}
+agent_models = {}  # 스레드별 사용 중인 모델 저장
 tool_count = 0  # 전역 변수로 tool_count 선언
 
 # 요청 및 응답 모델 정의
@@ -275,6 +276,7 @@ async def initialize_agent(thread_id: str, model: str = "gpt-4o", mcp_config=Non
         mcp_clients[thread_id] = client
         agents[thread_id] = agent
         conversation_histories[thread_id] = []
+        agent_models[thread_id] = model  # 현재 모델 저장
         
         return True
     except Exception as e:
@@ -569,11 +571,18 @@ async def query_agent(thread_id: str, request: QueryRequest, background_tasks: B
     """
     print(f"[POST] /api/threads/{thread_id}/query: {request.query}")
     # 스레드 ID가 제공되지 않은 경우 새로 생성
-    if not thread_id or thread_id not in agents:
-        # 새 스레드 ID 생성
-        if not thread_id:
-            thread_id = random_uuid()
-        
+    if not thread_id:
+        thread_id = random_uuid()
+    
+    # 에이전트가 없거나 모델이 변경된 경우 재초기화
+    need_init = (
+        thread_id not in agents or 
+        thread_id not in agent_models or 
+        agent_models.get(thread_id) != request.model
+    )
+    
+    if need_init:
+        print(f"에이전트 초기화/재초기화 필요: thread_id={thread_id}, model={request.model}")
         # 에이전트 초기화
         success = await initialize_agent(
             thread_id, 

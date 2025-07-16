@@ -13,7 +13,10 @@ export interface Thread {
 
 // 질의 요청 타입
 export interface QueryRequest {
-  message: string
+  query: string
+  model?: string
+  timeout_seconds?: number
+  recursion_limit?: number
 }
 
 // 질의 응답 타입
