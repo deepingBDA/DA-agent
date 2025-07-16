@@ -101,8 +101,8 @@ Guidelines:
 
 # 모델 토큰 정보
 OUTPUT_TOKEN_INFO = {
-    "gpt-4o": {"max_tokens": 16384},
-    "gpt-4o-mini": {"max_tokens": 16384},
+    "gpt-o4": {"max_tokens": 16384},
+    "gpt-o4-mini": {"max_tokens": 16384},
 }
 
 # 설정 로드 함수
@@ -172,7 +172,7 @@ class MessageResponse(BaseModel):
 class QueryRequest(BaseModel):
     query: str
     thread_id: Optional[str] = None
-    model: str = "gpt-4o"
+    model: str = "gpt-o4"
     timeout_seconds: int = 120
     recursion_limit: int = 100
 
@@ -228,7 +228,7 @@ app.add_middleware(
 app.mount("/uploads", StaticFiles(directory=ABSOLUTE_UPLOAD_DIR), name="uploads")
 
 # 에이전트 초기화 함수
-async def initialize_agent(thread_id: str, model: str = "gpt-4o", mcp_config=None):
+async def initialize_agent(thread_id: str, model: str = "gpt-o4", mcp_config=None):
     """
     MCP 세션과 에이전트를 초기화합니다.
 

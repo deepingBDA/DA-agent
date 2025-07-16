@@ -29,7 +29,7 @@ import ChatMessage from '../components/ChatMessage'
 import { Message, AppSettings } from '../types'
 
 const DEFAULT_SETTINGS: AppSettings = {
-  model: 'gpt-4o',
+  model: 'gpt-o4',
   timeout_seconds: 120,
   recursion_limit: 100,
 }
@@ -43,8 +43,8 @@ const ChatPage: React.FC = () => {
   const [toolInfo, setToolInfo] = useState<string | null>(null)
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS)
   const [availableModels, setAvailableModels] = useState<string[]>([
-    'gpt-4o',
-    'gpt-4o-mini',
+    'gpt-o4',
+    'gpt-o4-mini',
   ])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)

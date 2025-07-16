@@ -65,11 +65,11 @@ const AgentApp: React.FC = () => {
   const [newToolJson, setNewToolJson] = useState('')
   const [systemInfo, setSystemInfo] = useState({
     toolCount: 0,
-    currentModel: 'gpt-4o',
+    currentModel: 'gpt-o4',
   })
   const [settings, setSettings] = useState({
-    models: ['gpt-4o', 'gpt-4o-mini'],
-    selectedModel: 'gpt-4o',
+    models: ['gpt-o4', 'gpt-o4-mini'],
+    selectedModel: 'gpt-o4',
     timeoutSeconds: 300,
     recursionLimit: 100,
   })

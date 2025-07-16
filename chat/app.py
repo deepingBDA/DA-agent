@@ -183,8 +183,8 @@ Guidelines:
 """
 
 OUTPUT_TOKEN_INFO = {
-    "gpt-4o": {"max_tokens": 16000},
-    "gpt-4o-mini": {"max_tokens": 16000},
+    "gpt-o4": {"max_tokens": 16000},
+    "gpt-o4-mini": {"max_tokens": 16000},
 }
 
 # Initialize session state
@@ -197,7 +197,7 @@ if "session_initialized" not in st.session_state:
         120  # Response generation time limit (seconds), default 120 seconds
     )
     st.session_state.selected_model = (
-        "gpt-4o"  # Default model selection
+        "gpt-o4"  # Default model selection
     )
     st.session_state.recursion_limit = 100  # Recursion call limit, default 100
 
@@ -486,7 +486,7 @@ with st.sidebar:
 
     # Model selection feature
     # Create list of available models
-    available_models = ["gpt-4o", "gpt-4o-mini"]
+    available_models = ["gpt-o4", "gpt-o4-mini"]
 
     # Check OpenAI API key
     has_openai_key = os.environ.get("OPENAI_API_KEY") is not None

@@ -11,9 +11,9 @@ CLICKHOUSE_PORT = os.getenv("CLICKHOUSE_PORT")
 CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
 CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
 
-model_name = "gpt-4o"
+model_name = "gpt-o4"
 model_max_tokens = {
-    "gpt-4o": 128000,
+    "gpt-o4": 128000,
 }
 
 def num_tokens_from_string(string: str, model: str) -> int:
