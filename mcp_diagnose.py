@@ -425,22 +425,17 @@ def diagnose_exploratory_tendency(start_date: str, end_date: str) -> str:
     ),
     visitor_count AS (
         SELECT 
-            COUNT(*) AS total_unique_visitors
+            uniq(person_seq) AS total_unique_visitors
         FROM 
         (
             SELECT 
-                li.person_seq
+                r.person_seq
             FROM 
-                line_in_out_individual li 
-            LEFT JOIN 
-                line l ON li.triggered_line_id = l.id
+                raw r
+            JOIN detected_time dt ON r.person_seq = dt.person_seq
             WHERE
-                li.date BETWEEN '{start_date}' AND '{end_date}'
-                AND li.is_staff = false
-                AND l.entrance = 1
-                AND li.in_out = 'IN'
-            GROUP BY 
-                li.person_seq
+                r.date BETWEEN '{start_date}' AND '{end_date}'
+                AND dt.is_staff = false
         )
     ),
     total_sales AS (
