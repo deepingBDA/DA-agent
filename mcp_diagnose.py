@@ -65,7 +65,7 @@ SSH_PASSWORD = os.getenv("SSH_PASSWORD")
 _ssh_tunnel = None
 
 
-def get_clickhouse_client(database=None):
+def get_clickhouse_client(database="plusinsight"):
     """ClickHouse 클라이언트를 가져옵니다. SSH 터널링 지원."""
     global _ssh_tunnel
     
@@ -119,19 +119,19 @@ model_max_tokens = {
     "gpt-4o": 128000,
 }
 
-db_list = {
-    '갈매점': 'plusinsight_bgf_galmae',
-    '강북센터피스점':'plusinsight_bgf_gangbuk_centerpiece',
-    '강동센트럴점': 'plusinsight_bgf_gangdong_central',
-    '금천프라임점': 'plusinsight_bgf_geumcheon_prime',
-    '마천점': 'plusinsight_bgf_macheon',
-    '마천힐스테이트점': 'plusinsight_bgf_manchon_hillstate',
-    'BGF사옥점': 'plusinsight_bgf_saok',
-    '신촌르메이르점': 'plusinsight_bgf_sinchon_lemeilleur',
-    '수성캐슬점': 'plusinsight_bgf_suseong_castle',
-    '타워팰리스점': 'plusinsight_bgf_tower_palace',
-    '역삼점': 'plusinsight_bgf_yeoksam',
-}
+# db_list = {
+#     '갈매점': 'plusinsight_bgf_galmae',
+#     '강북센터피스점':'plusinsight_bgf_gangbuk_centerpiece',
+#     '강동센트럴점': 'plusinsight_bgf_gangdong_central',
+#     '금천프라임점': 'plusinsight_bgf_geumcheon_prime',
+#     '마천점': 'plusinsight_bgf_macheon',
+#     '마천힐스테이트점': 'plusinsight_bgf_manchon_hillstate',
+#     'BGF사옥점': 'plusinsight_bgf_saok',
+#     '신촌르메이르점': 'plusinsight_bgf_sinchon_lemeilleur',
+#     '수성캐슬점': 'plusinsight_bgf_suseong_castle',
+#     '타워팰리스점': 'plusinsight_bgf_tower_palace',
+#     '역삼점': 'plusinsight_bgf_yeoksam',
+# }
 
 def num_tokens_from_string(string: str, model: str) -> int:
     encoding = tiktoken.encoding_for_model(model)
@@ -145,13 +145,13 @@ def is_token_limit_exceeded(text: str, model: str, reserved_tokens: int = 1000) 
 
 mcp = FastMCP("diagnose")
 
-@mcp.tool()
-def get_db_name() -> str:
-    """편의점 이름과 데이터베이스 매핑 조회"""
-    answer = "편의점 이름과 데이터베이스 매핑"
-    for store, db in db_list.items():
-        answer += f"\n{store}: {db}"
-    return answer
+# @mcp.tool()
+# def get_db_name() -> str:
+#     """편의점 이름과 데이터베이스 매핑 조회"""
+#     answer = "편의점 이름과 데이터베이스 매핑"
+#     for store, db in db_list.items():
+#         answer += f"\n{store}: {db}"
+#     return answer
 
 @mcp.tool()
 def diagnose_avg_in(start_date: str, end_date: str) -> str:

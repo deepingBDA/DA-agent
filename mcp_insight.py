@@ -36,7 +36,7 @@ SSH_PASSWORD = os.getenv("SSH_PASSWORD")
 _ssh_tunnel = None
 
 
-def get_clickhouse_client(database=None):
+def get_clickhouse_client(database="plusinsight"):
     """ClickHouse 클라이언트를 가져옵니다. SSH 터널링 지원."""
     global _ssh_tunnel
     
