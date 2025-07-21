@@ -3,6 +3,11 @@ import clickhouse_connect
 import os
 from dotenv import load_dotenv
 import tiktoken
+import logging
+import sys
+import time
+from pathlib import Path
+from clickhouse_manager import get_clickhouse_client
 
 load_dotenv()
 
@@ -33,12 +38,7 @@ async def show_databases() -> str:
     try:
         """데이터베이스 목록을 조회한다"""
         # 클라이언트 생성
-        db = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD
-        )
+        db = get_clickhouse_client()
         query = "SHOW DATABASES"
         result = db.query(query.strip())
         answer = ""
@@ -60,13 +60,7 @@ async def show_tables(database: str) -> str:
     try:
         """테이블 목록을 조회한다"""
         # 클라이언트 생성
-        db = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database=database
-        )
+        db = get_clickhouse_client(database=database)
         query = "SHOW TABLES"
         result = db.query(query.strip())
         answer = ""
@@ -89,13 +83,7 @@ def execute_query(database: str, query: str) -> str:
         """데이터베이스에서 쿼리를 실행한다"""
         
         # 클라이언트 생성
-        db = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database=database
-        )
+        db = get_clickhouse_client(database=database)
 
         result = db.query(query.strip())
 

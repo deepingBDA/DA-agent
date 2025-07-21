@@ -10,6 +10,7 @@ from pathlib import Path
 
 from utils import create_transition_data
 from map_config import item2zone
+from clickhouse_manager import get_clickhouse_client
 
 # 로그 디렉토리 생성
 log_dir = Path("/app/logs")
@@ -209,13 +210,7 @@ order by category desc
     answer = ""
     for store, db in db_list.items():
         try:
-            client = clickhouse_connect.get_client(
-                host=CLICKHOUSE_HOST,
-                port=CLICKHOUSE_PORT,
-                username=CLICKHOUSE_USER,
-                password=CLICKHOUSE_PASSWORD,
-                database=db
-            )
+            client = get_clickhouse_client(database=db)
             result = client.query(query)
 
             if len(result.result_rows) > 0:
@@ -265,13 +260,7 @@ def diagnose_avg_sales(start_date: str, end_date: str) -> str:
     """
 
     try:
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database='cu_base'
-        )
+        client = get_clickhouse_client(database='cu_base')
         result = client.query(query)
 
         if len(result.result_rows) > 0:
@@ -365,14 +354,8 @@ SELECT *
 FROM final_zero_dates
 ORDER BY date;"""
 
-    try:
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database=database
-        )
+            try:
+            client = get_clickhouse_client(database=database)
         result = client.query(query)
 
         if len(result.result_rows) > 0:
@@ -425,17 +408,22 @@ def diagnose_exploratory_tendency(start_date: str, end_date: str) -> str:
     ),
     visitor_count AS (
         SELECT 
-            uniq(person_seq) AS total_unique_visitors
+            COUNT(*) AS total_unique_visitors
         FROM 
         (
             SELECT 
-                r.person_seq
+                li.person_seq
             FROM 
-                raw r
-            JOIN detected_time dt ON r.person_seq = dt.person_seq
+                line_in_out_individual li 
+            LEFT JOIN 
+                line l ON li.triggered_line_id = l.id
             WHERE
-                r.date BETWEEN '{start_date}' AND '{end_date}'
-                AND dt.is_staff = false
+                li.date BETWEEN '{start_date}' AND '{end_date}'
+                AND li.is_staff = false
+                AND l.entrance = 1
+                AND li.in_out = 'IN'
+            GROUP BY 
+                li.person_seq
         )
     ),
     total_sales AS (
@@ -457,7 +445,7 @@ def diagnose_exploratory_tendency(start_date: str, end_date: str) -> str:
     for store, db in db_list.items():
         store_answer = f"{store} - "
         try:
-            client = clickhouse_connect.get_client(
+            client = get_clickhouse_client(
                 host=CLICKHOUSE_HOST,
                 port=CLICKHOUSE_PORT,
                 username=CLICKHOUSE_USER,
@@ -586,7 +574,7 @@ END"""
         store_answer = f"{store}:"
 
         try:
-            client = clickhouse_connect.get_client(
+            client = get_clickhouse_client(
                 host=CLICKHOUSE_HOST,
                 port=CLICKHOUSE_PORT,
                 username=CLICKHOUSE_USER,
@@ -663,7 +651,7 @@ ORDER BY zone_name ASC
         store_answer = f"{store}:"
 
         try:
-            client = clickhouse_connect.get_client(
+            client = get_clickhouse_client(
                 host=CLICKHOUSE_HOST,
                 port=CLICKHOUSE_PORT,
                 username=CLICKHOUSE_USER,

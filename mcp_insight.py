@@ -3,6 +3,11 @@ import clickhouse_connect
 import os
 from dotenv import load_dotenv
 import tiktoken
+import logging
+import sys
+import time
+from pathlib import Path
+from clickhouse_manager import get_clickhouse_client
 
 from utils import create_transition_data
 from map_config import item2zone
@@ -87,7 +92,7 @@ def pickup_transition(database: str, start_date: str, end_date: str) -> int:
     ORDER BY
         transition_count DESC"""
 
-        client = clickhouse_connect.get_client(
+        client = get_clickhouse_client(
             host=CLICKHOUSE_HOST,
             port=CLICKHOUSE_PORT,
             username=CLICKHOUSE_USER,
@@ -127,7 +132,7 @@ def sales_funnel(database: str, start_date: str, end_date: str) -> str:
     ORDER BY pickup_rate DESC"""
 
         # 클라이언트 생성
-        db = clickhouse_connect.get_client(
+        db = get_clickhouse_client(
             host=CLICKHOUSE_HOST,
             port=CLICKHOUSE_PORT,
             username=CLICKHOUSE_USER,
@@ -184,7 +189,7 @@ ORDER BY
     total_people DESC
 LIMIT {limit}"""
 
-        client = clickhouse_connect.get_client(
+        client = get_clickhouse_client(
             host=CLICKHOUSE_HOST,
             port=CLICKHOUSE_PORT,
             username=CLICKHOUSE_USER,
@@ -326,7 +331,7 @@ ORDER BY
     visitor_count DESC,
     traffic_count DESC"""
 
-        client = clickhouse_connect.get_client(
+        client = get_clickhouse_client(
             host=CLICKHOUSE_HOST,
             port=CLICKHOUSE_PORT,
             username=CLICKHOUSE_USER,

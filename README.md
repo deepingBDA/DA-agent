@@ -18,16 +18,53 @@ cd chat
 bash build.sh # .env 파일을 생성한 다음에 해야함
 ```
 
-# MCP 서버용 환경 설정
+# MCP 서버 환경 설정
 
 `.env` 파일에 다음 변수를 설정:
 
-```
+```env
+# OPENAI API KEY
 OPENAI_API_KEY=your_api_key
-CLICKHOUSE_HOST=your_host
-CLICKHOUSE_PORT=your_port
-CLICKHOUSE_USER=your_username
-CLICKHOUSE_PASSWORD=your_password
+
+# SSH 터널링 (선택사항 - SSH_HOST가 있으면 자동으로 SSH 터널 사용)
+SSH_HOST=your-ssh-server.com
+SSH_PORT=22
+SSH_USERNAME=your-username
+SSH_PASSWORD=your-password
+
+# ClickHouse 데이터베이스 연결
+CLICKHOUSE_HOST=clickhouse
+CLICKHOUSE_PORT=9000
+CLICKHOUSE_USERNAME=default
+CLICKHOUSE_PASSWORD=your-password
+```
+
+## 설치
+
+```bash
+# 기본 패키지
+pip install -r requirements-backend.txt
+
+# SSH 터널링을 사용할 경우 추가 설치
+pip install sshtunnel paramiko
+```
+
+## ClickHouse Manager 사용 예시
+
+```python
+from clickhouse_manager import get_clickhouse_client
+
+# SSH 터널링 자동 판단 (SSH_HOST 환경변수 유무로 결정)
+client = get_clickhouse_client(database="cu_base")
+if client:
+    result = client.query("SELECT COUNT(*) FROM your_table")
+    rows = result.result_rows
+    
+# 강제로 직접 연결 사용
+client = get_clickhouse_client(database="cu_base", use_ssh=False)
+
+# 강제로 SSH 터널 사용
+client = get_clickhouse_client(database="cu_base", use_ssh=True)
 ```
 
 # MCP Diagnose

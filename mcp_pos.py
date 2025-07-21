@@ -7,6 +7,7 @@ import logging
 import sys
 import time
 from pathlib import Path
+from clickhouse_manager import get_clickhouse_client
 
 from utils import create_transition_data
 from map_config import item2zone
@@ -82,13 +83,7 @@ def sales_statistics(start_date: str, end_date: str) -> str:
     logger.info(param_log)
     
     try:
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database='cu_base'
-        )
+        client = get_clickhouse_client(database='cu_base')
 
         query = f"""
 WITH receipt_stats AS (
@@ -145,13 +140,7 @@ def receipt_ranking(start_date: str, end_date: str) -> str:
     logger.info(param_log)
     
     try:
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database='cu_base'
-        )
+        client = get_clickhouse_client(database='cu_base')
 
         query = f"""
 WITH receipt_total AS (
@@ -223,13 +212,7 @@ def sales_ranking(start_date: str, end_date: str) -> str:
     logger.info(param_log)
     
     try:
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database='cu_base'
-        )
+        client = get_clickhouse_client(database='cu_base')
 
         query = f"""
 WITH store_total AS (
@@ -301,13 +284,7 @@ def volume_ranking(start_date: str, end_date: str) -> str:
     logger.info(param_log)
     
     try:
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database='cu_base'
-        )
+        client = get_clickhouse_client()
 
         query = f"""
 WITH store_total AS (
@@ -379,13 +356,7 @@ def event_product_analysis(start_date: str, end_date: str) -> str:
     logger.info(param_log)
     
     try:
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database='cu_base'
-        )
+        client = get_clickhouse_client(database='cu_base')
 
         query = f"""
 WITH store_metrics AS (
@@ -478,13 +449,7 @@ FROM ranked_events
 WHERE rank <= 5
 ORDER BY store_nm, rank
 """
-        client = clickhouse_connect.get_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database='cu_base'
-        )
+        client = get_clickhouse_client(database='cu_base')
 
         result = client.query(query)
 
@@ -623,15 +588,9 @@ def co_purchase_trend(start_date: str, end_date: str) -> str:
     for target_store in db_list.keys():
         store_answer = f"{target_store}"
         try:
-            client = clickhouse_connect.get_client(
-                host=CLICKHOUSE_HOST,
-                port=CLICKHOUSE_PORT,
-                username=CLICKHOUSE_USER,
-                password=CLICKHOUSE_PASSWORD,
-                database='cu_base'
-            )
-            
-            logger.info(f"co_purchase_trend 호출됨: {target_store}, {start_date}, {end_date}")
+                    client = get_clickhouse_client(database='cu_base')
+        
+        logger.info(f"co_purchase_trend 호출됨: {target_store}, {start_date}, {end_date}")
 
             result = client.query(query.format(target_store=target_store, start_date=start_date, end_date=end_date))
 
