@@ -10,8 +10,6 @@ services:
       - frontend
       - backend
     restart: unless-stopped
-    networks:
-      - pi_network
 
   # 백엔드 서비스
   backend:
@@ -32,8 +30,6 @@ services:
       - CLICKHOUSE_USER=${CLICKHOUSE_USER}
       - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
     restart: unless-stopped
-    networks:
-      - pi_network
 
   # 프론트엔드 서비스
   frontend:
@@ -57,9 +53,3 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-    networks:
-      - pi_network
-
-networks:
-  pi_network:
-    external: true
