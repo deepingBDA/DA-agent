@@ -10,7 +10,14 @@ from pathlib import Path
 
 from utils import create_transition_data
 from map_config import item2zone
-from clickhouse_manager import get_clickhouse_client
+
+# SSH 터널링 관련 import
+try:
+    from sshtunnel import SSHTunnelForwarder
+    SSH_AVAILABLE = True
+except ImportError:
+    SSH_AVAILABLE = False
+    logging.warning("sshtunnel 패키지가 설치되어 있지 않습니다.")
 
 # 로그 디렉토리 생성
 log_dir = Path("/app/logs")
@@ -47,6 +54,65 @@ CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST")
 CLICKHOUSE_PORT = os.getenv("CLICKHOUSE_PORT")
 CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
 CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
+
+# SSH 설정
+SSH_HOST = os.getenv("SSH_HOST")
+SSH_PORT = int(os.getenv("SSH_PORT", "22"))
+SSH_USERNAME = os.getenv("SSH_USERNAME")
+SSH_PASSWORD = os.getenv("SSH_PASSWORD")
+
+# 전역 SSH 터널 관리
+_ssh_tunnel = None
+
+
+def get_clickhouse_client(database=None):
+    """ClickHouse 클라이언트를 가져옵니다. SSH 터널링 지원."""
+    global _ssh_tunnel
+    
+    # SSH 터널링이 필요한 경우
+    if SSH_AVAILABLE and SSH_HOST:
+        try:
+            # 기존 터널이 없거나 비활성 상태면 새로 생성
+            if not _ssh_tunnel or not _ssh_tunnel.is_active:
+                if _ssh_tunnel:
+                    _ssh_tunnel.stop()
+                
+                _ssh_tunnel = SSHTunnelForwarder(
+                    (SSH_HOST, SSH_PORT),
+                    ssh_username=SSH_USERNAME,
+                    ssh_password=SSH_PASSWORD,
+                    remote_bind_address=(CLICKHOUSE_HOST, int(CLICKHOUSE_PORT)),
+                    local_bind_address=("localhost", 0),
+                )
+                _ssh_tunnel.start()
+                logger.info(f"SSH 터널 생성: localhost:{_ssh_tunnel.local_bind_port}")
+            
+            # SSH 터널을 통해 연결
+            host = "localhost"
+            port = _ssh_tunnel.local_bind_port
+            
+        except Exception as e:
+            logger.error(f"SSH 터널 생성 실패: {e}, 직접 연결 시도")
+            host = CLICKHOUSE_HOST
+            port = int(CLICKHOUSE_PORT)
+    else:
+        # 직접 연결
+        host = CLICKHOUSE_HOST
+        port = int(CLICKHOUSE_PORT)
+    
+    try:
+        client = clickhouse_connect.get_client(
+            host=host,
+            port=port,
+            username=CLICKHOUSE_USER,
+            password=CLICKHOUSE_PASSWORD,
+            database=database,
+        )
+        logger.info(f"ClickHouse 연결 성공: {host}:{port}, db={database}")
+        return client
+    except Exception as e:
+        logger.error(f"ClickHouse 연결 실패: {e}")
+        return None
 
 model_name = "gpt-4o"
 model_max_tokens = {
@@ -354,15 +420,14 @@ SELECT *
 FROM final_zero_dates
 ORDER BY date;"""
 
-            try:
-            client = get_clickhouse_client(database=database)
+    try:
+        client = get_clickhouse_client(database=database)
         result = client.query(query)
 
         if len(result.result_rows) > 0:
             answer = "방문객수 데이터 이상한 날"
             for row in result.result_rows:
                 answer += f"\n{row}"
-
         else:
             answer = "이상 없습니다."
         
@@ -445,13 +510,7 @@ def diagnose_exploratory_tendency(start_date: str, end_date: str) -> str:
     for store, db in db_list.items():
         store_answer = f"{store} - "
         try:
-            client = get_clickhouse_client(
-                host=CLICKHOUSE_HOST,
-                port=CLICKHOUSE_PORT,
-                username=CLICKHOUSE_USER,
-                password=CLICKHOUSE_PASSWORD,
-                database=db
-            )
+            client = get_clickhouse_client(database=db)
             result = client.query(query.strip())
             
             if len(result.result_rows) > 0:
@@ -574,13 +633,7 @@ END"""
         store_answer = f"{store}:"
 
         try:
-            client = get_clickhouse_client(
-                host=CLICKHOUSE_HOST,
-                port=CLICKHOUSE_PORT,
-                username=CLICKHOUSE_USER,
-                password=CLICKHOUSE_PASSWORD,
-                database=db
-            )
+            client = get_clickhouse_client(database=db)
 
             result = client.query(query)
 
@@ -651,13 +704,7 @@ ORDER BY zone_name ASC
         store_answer = f"{store}:"
 
         try:
-            client = get_clickhouse_client(
-                host=CLICKHOUSE_HOST,
-                port=CLICKHOUSE_PORT,
-                username=CLICKHOUSE_USER,
-                password=CLICKHOUSE_PASSWORD,
-                database=db
-            )
+            client = get_clickhouse_client(database=db)
 
             result = client.query(query)
 

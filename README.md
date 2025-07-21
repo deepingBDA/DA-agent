@@ -49,23 +49,13 @@ pip install -r requirements-backend.txt
 pip install sshtunnel paramiko
 ```
 
-## ClickHouse Manager 사용 예시
+## MCP 서버 연결 방식
 
-```python
-from clickhouse_manager import get_clickhouse_client
+각 MCP 서버가 독립적으로 `.env` 파일에서 설정을 읽어 ClickHouse에 연결합니다:
 
-# SSH 터널링 자동 판단 (SSH_HOST 환경변수 유무로 결정)
-client = get_clickhouse_client(database="cu_base")
-if client:
-    result = client.query("SELECT COUNT(*) FROM your_table")
-    rows = result.result_rows
-    
-# 강제로 직접 연결 사용
-client = get_clickhouse_client(database="cu_base", use_ssh=False)
-
-# 강제로 SSH 터널 사용
-client = get_clickhouse_client(database="cu_base", use_ssh=True)
-```
+- SSH 설정이 있으면 자동으로 SSH 터널링 사용
+- SSH 설정이 없거나 실패하면 직접 연결
+- 각 프로세스별로 독립적인 터널 관리
 
 # MCP Diagnose
 
