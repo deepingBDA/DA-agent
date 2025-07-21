@@ -14,3 +14,5 @@ clickhouse_connect
 tiktoken
 pandas
 openpyxl
+sshtunnel
+paramiko
