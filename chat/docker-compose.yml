@@ -29,6 +29,10 @@ services:
       - CLICKHOUSE_PORT=${CLICKHOUSE_PORT}
       - CLICKHOUSE_USER=${CLICKHOUSE_USER}
       - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - SSH_HOST=${SSH_HOST}
+      - SSH_PORT=${SSH_PORT}
+      - SSH_USERNAME=${SSH_USERNAME}
+      - SSH_PASSWORD=${SSH_PASSWORD}
     restart: unless-stopped
 
   # 프론트엔드 서비스

@@ -28,14 +28,14 @@ OPENAI_API_KEY=your_api_key
 
 # SSH 터널링 (선택사항 - SSH_HOST가 있으면 자동으로 SSH 터널 사용)
 SSH_HOST=your-ssh-server.com
-SSH_PORT=22
+SSH_PORT=your-ssh-port
 SSH_USERNAME=your-username
 SSH_PASSWORD=your-password
 
 # ClickHouse 데이터베이스 연결
-CLICKHOUSE_HOST=clickhouse
-CLICKHOUSE_PORT=9000
-CLICKHOUSE_USERNAME=default
+CLICKHOUSE_HOST=your-host
+CLICKHOUSE_PORT=your-port
+CLICKHOUSE_USER=your-username
 CLICKHOUSE_PASSWORD=your-password
 ```
 
