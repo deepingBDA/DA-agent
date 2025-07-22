@@ -437,6 +437,7 @@ ORDER BY date;"""
 
     # log answer
     logger.info(f"check_zero_visits 답변: {answer}")
+    logger.info(f"answer type : {type(answer)}")
 
     return answer
 
@@ -455,6 +456,8 @@ def diagnose_purchase_conversion_rate(start_date: str, end_date: str) -> str:
     answer = f"구매전환율 = (판매 건수 / 방문객 수) * 100 % 라는 공식이야. 일평균 방문객 수를 조회하고, 일평균 판매 건수를 조회해서, 구매전환율을 추정해줘. 구매전환율이 100%를 넘으면 방문객 수가 잘못 측정된거야. 참고해."
     answer += f"\n일평균 방문객 수: {avg_in_result}"
     answer += f"\n일평균 판매 건수: {avg_sales_result}"
+
+    logger.info(f"answer type : {type(answer)}")
     
     return answer
 

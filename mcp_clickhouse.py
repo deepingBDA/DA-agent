@@ -25,7 +25,7 @@ CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
 
 # SSH 설정
 SSH_HOST = os.getenv("SSH_HOST")
-SSH_PORT = int(os.getenv("SSH_PORT"))
+SSH_PORT = int(os.getenv("SSH_PORT", "22"))
 SSH_USERNAME = os.getenv("SSH_USERNAME")
 SSH_PASSWORD = os.getenv("SSH_PASSWORD")
 
@@ -50,7 +50,7 @@ def get_clickhouse_client(database="plusinsight"):
                     ssh_username=SSH_USERNAME,
                     ssh_password=SSH_PASSWORD,
                     remote_bind_address=(CLICKHOUSE_HOST, int(CLICKHOUSE_PORT)),
-                    local_bind_address=("localhost"),
+                    local_bind_address=("localhost", 0),
                 )
                 _ssh_tunnel.start()
                 print(f"SSH 터널 생성: localhost:{_ssh_tunnel.local_bind_port}")

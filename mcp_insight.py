@@ -192,13 +192,7 @@ def sales_funnel(database: str, start_date: str, end_date: str) -> str:
     ORDER BY pickup_rate DESC"""
 
         # 클라이언트 생성
-        db = get_clickhouse_client(
-            host=CLICKHOUSE_HOST,
-            port=CLICKHOUSE_PORT,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database=database
-        )
+        db = get_clickhouse_client(database=database)
 
         result = db.query(query.strip())
 
