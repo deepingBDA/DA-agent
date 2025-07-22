@@ -75,6 +75,11 @@ Step 4: Provide the source of the answer(if applicable)
 - If you've used the tool, provide the source of the answer.
 - Valid sources are either a website(URL) or a document(PDF, etc).
 
+Step 5: Present the data visibly:
+- Output the query result as a clean markdown table only
+wrap the table with === lines above and below
+provide no explanatory text—show raw data only.
+
 Guidelines:
 - If you've used the tool, your answer should be based on the tool's output(tool's output is more important than your own knowledge).
 - If you've used the tool, and the source is valid URL, provide the source(URL) of the answer.

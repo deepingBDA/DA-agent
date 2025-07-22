@@ -852,12 +852,15 @@ const AgentApp: React.FC = () => {
                         <CardContent>
                           {message.role === 'assistant' ? (
                             <>
-                              <ReactMarkdown
-                                remarkPlugins={[remarkMath]}
-                                rehypePlugins={[rehypeKatex]}
-                              >
+                              <Box sx={{ 
+                                typography: 'body1',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-word',
+                                fontFamily: 'monospace, "Noto Sans KR", sans-serif',
+                                lineHeight: 1.6
+                              }}>
                                 {message.content}
-                              </ReactMarkdown>
+                              </Box>
                               {message.referencedToolId && (
                                 <Box
                                   sx={{
@@ -883,13 +886,14 @@ const AgentApp: React.FC = () => {
                             </>
                           ) : (
                             <>
-                              <Box sx={{ typography: 'body1' }}>
-                                <ReactMarkdown
-                                  remarkPlugins={[remarkMath]}
-                                  rehypePlugins={[rehypeKatex]}
-                                >
-                                  {message.content}
-                                </ReactMarkdown>
+                              <Box sx={{ 
+                                typography: 'body1',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-word',
+                                fontFamily: 'monospace, "Noto Sans KR", sans-serif',
+                                lineHeight: 1.6
+                              }}>
+                                {message.content}
                               </Box>
                               {message.attachmentPath && (
                                 <Box

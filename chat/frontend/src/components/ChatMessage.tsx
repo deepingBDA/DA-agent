@@ -6,7 +6,6 @@ import {
   KeyboardArrowUp as ExpandIcon,
 } from '@mui/icons-material'
 import { Paper, Typography, Box, IconButton, Collapse } from '@mui/material'
-import ReactMarkdown from 'react-markdown'
 
 interface ChatMessageProps {
   role: 'user' | 'assistant' | 'assistant_tool'
@@ -56,8 +55,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           </Typography>
         </Box>
 
-        <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-          <ReactMarkdown>{content}</ReactMarkdown>
+        <Box sx={{ 
+          whiteSpace: 'pre-wrap', 
+          wordBreak: 'break-word',
+          fontFamily: 'monospace, "Noto Sans KR", sans-serif'
+        }}>
+          <Typography 
+            variant="body1" 
+            component="div"
+            sx={{ 
+              whiteSpace: 'pre-wrap',
+              fontFamily: 'inherit',
+              lineHeight: 1.6
+            }}
+          >
+            {content}
+          </Typography>
         </Box>
 
         {toolInfo && (
@@ -82,26 +95,30 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </Box>
 
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-              <Paper
-                variant="outlined"
+              <Box
                 sx={{
                   mt: 1,
-                  p: 1,
-                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                  fontSize: '0.8rem',
-                  overflowX: 'auto',
+                  p: 2,
+                  backgroundColor: 'grey.50',
+                  borderRadius: 1,
+                  fontFamily: 'monospace',
+                  fontSize: '0.875rem',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'auto',
                 }}
               >
-                <pre
-                  style={{
-                    margin: 0,
+                <Typography 
+                  variant="body2"
+                  component="pre"
+                  sx={{ 
+                    fontFamily: 'inherit',
                     whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
+                    margin: 0
                   }}
                 >
                   {toolInfo}
-                </pre>
-              </Paper>
+                </Typography>
+              </Box>
             </Collapse>
           </Box>
         )}
