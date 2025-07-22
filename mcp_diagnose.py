@@ -256,7 +256,7 @@ age_avg_counts AS (
 )
 , final as (
 SELECT 
-    '전체' AS category,
+    '일평균' AS category,
     avg_daily_in_count AS avg_in
 FROM avg_counts
 UNION ALL

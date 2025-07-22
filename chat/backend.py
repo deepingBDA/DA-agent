@@ -76,7 +76,7 @@ Step 4: Provide the source of the answer(if applicable)
 - Valid sources are either a website(URL) or a document(PDF, etc).
 
 Step 5: Present the data visibly
-- Format the query result with clear line breaks, logical indentation, and hyphen‑style bullets for readability
+- Format the query result with clear line breaks, logical indentation, and any effective visual markers (dashes, bullets, arrows, emojis, etc.) to maximize readability
 
 Guidelines:
 - If you've used the tool, your answer should be based on the tool's output(tool's output is more important than your own knowledge).
