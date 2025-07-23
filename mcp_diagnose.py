@@ -772,6 +772,188 @@ ORDER BY zone_name ASC
 
     return answer
 
+@mcp.tool()
+def diagnose_avg_in_excel(start_date: str, end_date: str) -> str:
+    """일평균 방문객 수 진단 (엑셀 복붙용 TSV 형태)"""
+    # 파라미터 기록
+    param_log = f"diagnose_avg_in_excel 호출됨: start_date={start_date}, end_date={end_date}"
+    logger.info(param_log)
+    
+    query = f"""
+        WITH
+        df AS (
+            SELECT
+                li.date AS visit_date,
+                li.timestamp,
+                li.person_seq AS visitor_id,
+                if(toDayOfWeek(li.date) IN (1,2,3,4,5), 'weekday', 'weekend') AS day_type,
+                multiIf(
+                    toHour(li.timestamp) IN (22,23,0,1), '22-01',
+                    toHour(li.timestamp) BETWEEN 2  AND 5 , '02-05',
+                    toHour(li.timestamp) BETWEEN 6  AND 9 , '06-09',
+                    toHour(li.timestamp) BETWEEN 10 AND 13, '10-13',
+                    toHour(li.timestamp) BETWEEN 14 AND 17, '14-17',
+                    '18-21'
+                ) AS time_range,
+                multiIf(
+                    dt.age BETWEEN 0  AND  9 , '10대 미만',
+                    dt.age BETWEEN 10 AND 19, '10대',
+                    dt.age BETWEEN 20 AND 29, '20대',
+                    dt.age BETWEEN 30 AND 39, '30대',
+                    dt.age BETWEEN 40 AND 49, '40대',
+                    dt.age BETWEEN 50 AND 59, '50대',
+                    dt.age >= 60           , '60대 이상',
+                    'Unknown'
+                ) AS age_group,
+                if(dt.gender = '0', '남성', if(dt.gender='1','여성','Unknown')) AS gender
+            FROM line_in_out_individual li
+            LEFT JOIN detected_time dt ON li.person_seq = dt.person_seq
+            LEFT JOIN line          l  ON li.triggered_line_id = l.id
+            WHERE li.date BETWEEN '{start_date}' AND '{end_date}'
+              AND li.is_staff = 0
+              AND li.in_out   = 'IN'
+              AND l.entrance  = 1
+        ),
+        daily_all     AS (SELECT visit_date, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date),
+        avg_all       AS (SELECT toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_all),
+        daily_dayType AS (SELECT visit_date, day_type, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, day_type),
+        avg_dayType   AS (SELECT day_type, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_dayType GROUP BY day_type),
+        daily_gender  AS (SELECT visit_date, gender, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, gender),
+        avg_gender    AS (SELECT gender, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_gender GROUP BY gender),
+        daily_age     AS (SELECT visit_date, age_group, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, age_group),
+        avg_age       AS (SELECT age_group, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_age GROUP BY age_group),
+        rank_age      AS (SELECT *, row_number() OVER (ORDER BY avg_cnt DESC) AS rk FROM avg_age),
+        overall_cnt   AS (SELECT avg_cnt AS cnt FROM avg_all),
+        range_cnt AS (
+            SELECT day_type, time_range, uniqExact(visitor_id) AS visit_cnt
+            FROM df GROUP BY day_type, time_range
+        ),
+        tot_cnt   AS (SELECT day_type, sum(visit_cnt) AS total_cnt FROM range_cnt GROUP BY day_type),
+        range_pct AS (
+            SELECT r.day_type, r.time_range, r.visit_cnt,
+                   toUInt64(round(r.visit_cnt / t.total_cnt * 100)) AS pct
+            FROM range_cnt r JOIN tot_cnt t USING(day_type)
+        ),
+        rank_slot AS (
+            SELECT *, row_number() OVER (PARTITION BY day_type ORDER BY pct DESC) AS rk
+            FROM range_pct
+        ),
+        final AS (
+            SELECT '일평균' AS section, '전체' AS label,
+                   avg_cnt AS value_cnt, CAST(NULL AS Nullable(UInt64)) AS value_pct, 0 AS ord
+            FROM avg_all
+            UNION ALL
+            SELECT '일평균', '평일', avg_cnt, CAST(NULL AS Nullable(UInt64)), 1
+            FROM avg_dayType WHERE day_type='weekday'
+            UNION ALL
+            SELECT '일평균', '주말', avg_cnt, CAST(NULL AS Nullable(UInt64)), 2
+            FROM avg_dayType WHERE day_type='weekend'
+            UNION ALL
+            SELECT '성별경향', gender, avg_cnt,
+                   toUInt64(round(avg_cnt / (SELECT cnt FROM overall_cnt) * 100)) AS value_pct,
+                   10 + if(gender='남성',0,1) AS ord
+            FROM avg_gender WHERE gender IN ('남성','여성')
+            UNION ALL
+            SELECT '연령대경향',
+                   concat(toString(rk),'위_',age_group) AS label,
+                   avg_cnt,
+                   toUInt64(round(avg_cnt / (SELECT cnt FROM overall_cnt) * 100)) AS value_pct,
+                   20 + rk AS ord
+            FROM rank_age WHERE rk<=3
+            UNION ALL
+            SELECT '시간대경향',
+                   concat('평일_',toString(rk),'_',time_range) AS label,
+                   visit_cnt, pct, 30 + rk
+            FROM rank_slot WHERE day_type='weekday' AND rk<=3
+            UNION ALL
+            SELECT '시간대경향',
+                   concat('주말_',toString(rk),'_',time_range),
+                   visit_cnt, pct, 40 + rk
+            FROM rank_slot WHERE day_type='weekend' AND rk<=3
+        )
+        SELECT section, label, value_cnt, value_pct
+        FROM final
+        ORDER BY ord
+    """
+
+    answer = ""
+    for store, db in db_list.items():
+        try:
+            client = get_clickhouse_client(database=db)
+            result = client.query(query)
+
+            if len(result.result_rows) > 0:
+                # 섹션별로 데이터 분류
+                sections = {
+                    '일평균': [],
+                    '성별경향': [],
+                    '연령대경향': [],
+                    '시간대경향': []
+                }
+                
+                for row in result.result_rows:
+                    section, label, value_cnt, value_pct = row
+                    sections[section].append((label, value_cnt, value_pct))
+                
+                # 시간대 명칭 매핑
+                time_names = {
+                    '22-01': '심야',
+                    '02-05': '새벽',
+                    '06-09': '아침',
+                    '10-13': '낮',
+                    '14-17': '오후',
+                    '18-21': '저녁'
+                }
+                
+                # TSV 형태로 하드코딩된 포맷 생성
+                store_answer = f"=== {store} (엑셀 복붙용) ===\n"
+                tsv_lines = []
+                
+                # 1. 일평균 방문객수
+                for label, cnt, _ in sections['일평균']:
+                    tsv_lines.append(f"{label}\t{cnt}명\t")
+                
+                # 2. 성별경향
+                for label, cnt, pct in sections['성별경향']:
+                    gender_display = 'M' if label == '남성' else 'F'
+                    tsv_lines.append(f"{gender_display}\t\t{pct}%")
+                
+                # 3. 연령대별 순위
+                for label, cnt, pct in sections['연령대경향']:
+                    rank = label.split('위_')[0]
+                    age_group = label.split('위_')[1]
+                    tsv_lines.append(f"{rank}\t{age_group}\t{pct}%")
+                
+                # 4. 시간대별 순위 (평일)
+                weekday_slots = [item for item in sections['시간대경향'] if '평일_' in item[0]]
+                for label, cnt, pct in weekday_slots:
+                    rank = label.split('_')[1]
+                    time_range = label.split('_')[2]
+                    time_name = time_names.get(time_range, time_range)
+                    tsv_lines.append(f"{rank}\t{time_name}({time_range})\t{pct}%")
+                
+                # 5. 시간대별 순위 (주말)
+                weekend_slots = [item for item in sections['시간대경향'] if '주말_' in item[0]]
+                for label, cnt, pct in weekend_slots:
+                    rank = label.split('_')[1]
+                    time_range = label.split('_')[2]
+                    time_name = time_names.get(time_range, time_range)
+                    tsv_lines.append(f"{rank}\t{time_name}({time_range})\t{pct}%")
+                
+                store_answer += "\n".join(tsv_lines)
+                answer += f"\n{store_answer}\n"
+                
+            else:
+                answer += f"\n{store} 데이터가 없습니다."
+            
+        except Exception as e:
+            answer += f"\n{store} 데이터 조회 오류: {e}"
+
+    # log answer
+    logger.info(f"diagnose_avg_in_excel 답변: {answer}")
+
+    return answer
+
 if __name__ == "__main__":
     print("FastMCP 서버 시작 - diagnose", file=sys.stderr)
     try:
