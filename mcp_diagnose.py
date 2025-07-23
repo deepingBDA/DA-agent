@@ -255,8 +255,8 @@ final AS (
 )
 SELECT section, label, value_cnt, value_pct
 FROM final
-ORDER BY ord;
-    """
+ORDER BY ord
+"""
 
     answer = ""
     for store, db in db_list.items():
@@ -265,11 +265,19 @@ ORDER BY ord;
             result = client.query(query)
 
             if len(result.result_rows) > 0:
-                store_answer = f"{store} - "
+                store_answer = f"{store}\n"
+                current_section = None
                 for row in result.result_rows:
-                    store_answer += f"{row[0]}: {row[1]}, "
-
-                answer += f"\n{store_answer[:-2]}"
+                    section, label, value_cnt, value_pct = row
+                    if section != current_section:
+                        store_answer += f"{section}\n"
+                        current_section = section
+                    if value_pct is None:
+                        store_answer += f"  {label}: {value_cnt}\n"
+                    else:
+                        store_answer += f"  {label}: {value_cnt} ({value_pct}%)\n"
+                
+                answer += f"\n{store_answer}"
             else:
                 answer += f"\n{store} 데이터가 없습니다."
             
