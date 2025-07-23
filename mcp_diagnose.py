@@ -163,99 +163,99 @@ def diagnose_avg_in(start_date: str, end_date: str) -> str:
     
     query = f"""
         WITH
-        df AS (
-            SELECT
-                li.date AS visit_date,
-                li.timestamp,
-                li.person_seq AS visitor_id,
-                if(toDayOfWeek(li.date) IN (1,2,3,4,5), 'weekday', 'weekend')                     AS day_type,
-                multiIf(
-                    toHour(li.timestamp) IN (22,23,0,1), '22-01',
-                    toHour(li.timestamp) BETWEEN 2  AND 5 , '02-05',
-                    toHour(li.timestamp) BETWEEN 6  AND 9 , '06-09',
-                    toHour(li.timestamp) BETWEEN 10 AND 13, '10-13',
-                    toHour(li.timestamp) BETWEEN 14 AND 17, '14-17',
-                    '18-21'
-                ) AS time_range,
-                multiIf(
-                    dt.age BETWEEN 0  AND  9 , '10대 미만',
-                    dt.age BETWEEN 10 AND 19, '10대',
-                    dt.age BETWEEN 20 AND 29, '20대',
-                    dt.age BETWEEN 30 AND 39, '30대',
-                    dt.age BETWEEN 40 AND 49, '40대',
-                    dt.age BETWEEN 50 AND 59, '50대',
-                    dt.age >= 60           , '60대 이상',
-                    'Unknown'
-                ) AS age_group,
-                if(dt.gender = '0', '남성', if(dt.gender='1','여성','Unknown'))                   AS gender
-            FROM line_in_out_individual li
-            LEFT JOIN detected_time dt ON li.person_seq = dt.person_seq
-            LEFT JOIN line          l  ON li.triggered_line_id = l.id
-            WHERE li.date BETWEEN '{start_date}' AND '{end_date}'
-            AND li.is_staff = 0
-            AND li.in_out   = 'IN'
-            AND l.entrance  = 1
-        ),
-        daily_all     AS (SELECT visit_date, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date),
-        avg_all       AS (SELECT toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_all),
-        daily_dayType AS (SELECT visit_date, day_type, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, day_type),
-        avg_dayType   AS (SELECT day_type, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_dayType GROUP BY day_type),
-        daily_gender  AS (SELECT visit_date, gender, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, gender),
-        avg_gender    AS (SELECT gender, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_gender GROUP BY gender),
-        daily_age     AS (SELECT visit_date, age_group, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, age_group),
-        avg_age       AS (SELECT age_group, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_age GROUP BY age_group),
-        rank_age      AS (SELECT *, row_number() OVER (ORDER BY avg_cnt DESC) AS rk FROM avg_age),
-        overall_cnt   AS (SELECT avg_cnt AS cnt FROM avg_all),
-        range_cnt AS (
-            SELECT day_type, time_range, uniqExact(visitor_id) AS visit_cnt
-            FROM df GROUP BY day_type, time_range
-        ),
-        tot_cnt   AS (SELECT day_type, sum(visit_cnt) AS total_cnt FROM range_cnt GROUP BY day_type),
-        range_pct AS (
-            SELECT r.day_type, r.time_range, r.visit_cnt,
-                toUInt64(round(r.visit_cnt / t.total_cnt * 100)) AS pct
-            FROM range_cnt r JOIN tot_cnt t USING(day_type)
-        ),
-        rank_slot AS (
-            SELECT *, row_number() OVER (PARTITION BY day_type ORDER BY pct DESC) AS rk
-            FROM range_pct
-        ),
-        final AS (
-            SELECT '일평균' AS section, '전체' AS label,
-                avg_cnt AS value_cnt, CAST(NULL AS Nullable(UInt64)) AS value_pct, 0 AS ord
-            FROM avg_all
-            UNION ALL
-            SELECT '일평균', '평일', avg_cnt, CAST(NULL AS Nullable(UInt64)), 1
-            FROM avg_dayType WHERE day_type='weekday'
-            UNION ALL
-            SELECT '일평균', '주말', avg_cnt, CAST(NULL AS Nullable(UInt64)), 2
-            FROM avg_dayType WHERE day_type='weekend'
-            UNION ALL
-            SELECT '성별경향', gender, avg_cnt,
-                toUInt64(round(avg_cnt / (SELECT cnt FROM overall_cnt) * 100)) AS value_pct,
-                10 + if(gender='남성',0,1) AS ord
-            FROM avg_gender WHERE gender IN ('남성','여성')
-            UNION ALL
-            SELECT '연령대경향',
-                concat(toString(rk),'위_',age_group)                         AS label,
-                avg_cnt,
-                toUInt64(round(avg_cnt / (SELECT cnt FROM overall_cnt) * 100)) AS value_pct,
-                20 + rk AS ord
-            FROM rank_age WHERE rk<=3
-            UNION ALL
-            SELECT '시간대경향',
-                concat('평일_',toString(rk),'_',time_range)                 AS label,
-                visit_cnt, pct, 30 + rk
-            FROM rank_slot WHERE day_type='weekday' AND rk<=3
-            UNION ALL
-            SELECT '시간대경향',
-                concat('주말_',toString(rk),'_',time_range),
-                visit_cnt, pct, 40 + rk
-            FROM rank_slot WHERE day_type='weekend' AND rk<=3
-        )
-        SELECT section, label, value_cnt, value_pct
-        FROM final
-        ORDER BY ord;
+df AS (
+    SELECT
+        li.date AS visit_date,
+        li.timestamp,
+        li.person_seq AS visitor_id,
+        if(toDayOfWeek(li.date) IN (1,2,3,4,5), 'weekday', 'weekend')                     AS day_type,
+        multiIf(
+            toHour(li.timestamp) IN (22,23,0,1), '22-01',
+            toHour(li.timestamp) BETWEEN 2  AND 5 , '02-05',
+            toHour(li.timestamp) BETWEEN 6  AND 9 , '06-09',
+            toHour(li.timestamp) BETWEEN 10 AND 13, '10-13',
+            toHour(li.timestamp) BETWEEN 14 AND 17, '14-17',
+            '18-21'
+        ) AS time_range,
+        multiIf(
+            dt.age BETWEEN 0  AND  9 , '10대 미만',
+            dt.age BETWEEN 10 AND 19, '10대',
+            dt.age BETWEEN 20 AND 29, '20대',
+            dt.age BETWEEN 30 AND 39, '30대',
+            dt.age BETWEEN 40 AND 49, '40대',
+            dt.age BETWEEN 50 AND 59, '50대',
+            dt.age >= 60           , '60대 이상',
+            'Unknown'
+        ) AS age_group,
+        if(dt.gender = '0', '남성', if(dt.gender='1','여성','Unknown'))                   AS gender
+    FROM line_in_out_individual li
+    LEFT JOIN detected_time dt ON li.person_seq = dt.person_seq
+    LEFT JOIN line          l  ON li.triggered_line_id = l.id
+    WHERE li.date BETWEEN '{start_date}' AND '{end_date}'
+      AND li.is_staff = 0
+      AND li.in_out   = 'IN'
+      AND l.entrance  = 1
+),
+daily_all     AS (SELECT visit_date, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date),
+avg_all       AS (SELECT toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_all),
+daily_dayType AS (SELECT visit_date, day_type, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, day_type),
+avg_dayType   AS (SELECT day_type, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_dayType GROUP BY day_type),
+daily_gender  AS (SELECT visit_date, gender, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, gender),
+avg_gender    AS (SELECT gender, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_gender GROUP BY gender),
+daily_age     AS (SELECT visit_date, age_group, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, age_group),
+avg_age       AS (SELECT age_group, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_age GROUP BY age_group),
+rank_age      AS (SELECT *, row_number() OVER (ORDER BY avg_cnt DESC) AS rk FROM avg_age),
+overall_cnt   AS (SELECT avg_cnt AS cnt FROM avg_all),
+range_cnt AS (
+    SELECT day_type, time_range, uniqExact(visitor_id) AS visit_cnt
+    FROM df GROUP BY day_type, time_range
+),
+tot_cnt   AS (SELECT day_type, sum(visit_cnt) AS total_cnt FROM range_cnt GROUP BY day_type),
+range_pct AS (
+    SELECT r.day_type, r.time_range, r.visit_cnt,
+           toUInt64(round(r.visit_cnt / t.total_cnt * 100)) AS pct
+    FROM range_cnt r JOIN tot_cnt t USING(day_type)
+),
+rank_slot AS (
+    SELECT *, row_number() OVER (PARTITION BY day_type ORDER BY pct DESC) AS rk
+    FROM range_pct
+),
+final AS (
+    SELECT '일평균' AS section, '전체' AS label,
+           avg_cnt AS value_cnt, CAST(NULL AS Nullable(UInt64)) AS value_pct, 0 AS ord
+    FROM avg_all
+    UNION ALL
+    SELECT '일평균', '평일', avg_cnt, CAST(NULL AS Nullable(UInt64)), 1
+    FROM avg_dayType WHERE day_type='weekday'
+    UNION ALL
+    SELECT '일평균', '주말', avg_cnt, CAST(NULL AS Nullable(UInt64)), 2
+    FROM avg_dayType WHERE day_type='weekend'
+    UNION ALL
+    SELECT '성별경향', gender, avg_cnt,
+           toUInt64(round(avg_cnt / (SELECT cnt FROM overall_cnt) * 100)) AS value_pct,
+           10 + if(gender='남성',0,1) AS ord
+    FROM avg_gender WHERE gender IN ('남성','여성')
+    UNION ALL
+    SELECT '연령대경향',
+           concat(toString(rk),'위_',age_group)                         AS label,
+           avg_cnt,
+           toUInt64(round(avg_cnt / (SELECT cnt FROM overall_cnt) * 100)) AS value_pct,
+           20 + rk AS ord
+    FROM rank_age WHERE rk<=3
+    UNION ALL
+    SELECT '시간대경향',
+           concat('평일_',toString(rk),'_',time_range)                 AS label,
+           visit_cnt, pct, 30 + rk
+    FROM rank_slot WHERE day_type='weekday' AND rk<=3
+    UNION ALL
+    SELECT '시간대경향',
+           concat('주말_',toString(rk),'_',time_range),
+           visit_cnt, pct, 40 + rk
+    FROM rank_slot WHERE day_type='weekend' AND rk<=3
+)
+SELECT section, label, value_cnt, value_pct
+FROM final
+ORDER BY ord;
     """
 
     answer = ""
