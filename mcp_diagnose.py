@@ -774,7 +774,7 @@ ORDER BY zone_name ASC
 
 @mcp.tool()
 def diagnose_avg_in_excel(start_date: str, end_date: str) -> str:
-    """일평균 방문객 수 진단 (엑셀 복붙용 TSV 형태)"""
+    """일평균 방문객 수 진단 (마크다운 표 형태)"""
     # 파라미터 기록
     param_log = f"diagnose_avg_in_excel 호출됨: start_date={start_date}, end_date={end_date}"
     logger.info(param_log)
@@ -905,9 +905,11 @@ def diagnose_avg_in_excel(start_date: str, end_date: str) -> str:
                     '18-21': '저녁'
                 }
                 
-                # TSV 형태로 하드코딩된 포맷 생성
-                store_answer = f"=== {store} (엑셀 복붙용) ===\n"
-                tsv_lines = []
+                # TSV 형태로 생성 (엑셀 복붙용)
+                store_answer = f"=== {store} (엑셀 복붙용) ===\n\n"
+                
+                # TSV 헤더 (3컬럼)
+                tsv_lines = ["항목\t값\t비율"]
                 
                 # 1. 일평균 방문객수
                 for label, cnt, _ in sections['일평균']:
