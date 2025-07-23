@@ -265,19 +265,71 @@ ORDER BY ord
             result = client.query(query)
 
             if len(result.result_rows) > 0:
-                store_answer = f"{store}\n"
-                current_section = None
+                # 섹션별로 데이터 분류
+                sections = {
+                    '일평균': [],
+                    '성별경향': [],
+                    '연령대경향': [],
+                    '시간대경향': []
+                }
+                
                 for row in result.result_rows:
                     section, label, value_cnt, value_pct = row
-                    if section != current_section:
-                        store_answer += f"{section}\n"
-                        current_section = section
-                    if value_pct is None:
-                        store_answer += f"  {label}: {value_cnt}\n"
-                    else:
-                        store_answer += f"  {label}: {value_cnt} ({value_pct}%)\n"
+                    sections[section].append((label, value_cnt, value_pct))
                 
-                answer += f"\n{store_answer}"
+                # 표 형태로 포맷팅
+                store_answer = f"\n=== {store} ===\n"
+                
+                # 1. 일평균 방문객수
+                store_answer += "일평균 방문객수\n"
+                for label, cnt, _ in sections['일평균']:
+                    store_answer += f"  {label}: {cnt}명\n"
+                
+                # 2. 성별경향
+                store_answer += "\n성별경향\n"
+                for label, cnt, pct in sections['성별경향']:
+                    gender_display = 'M' if label == '남성' else 'F'
+                    store_answer += f"  {gender_display}: {pct}%\n"
+                
+                # 3. 연령대별 순위 (상위 3개)
+                store_answer += "\n연령대별 순위\n"
+                for label, cnt, pct in sections['연령대경향']:
+                    rank = label.split('위_')[0]
+                    age_group = label.split('위_')[1]
+                    store_answer += f"  {rank}: {age_group} - {cnt}명 ({pct}%)\n"
+                
+                # 4. 주요 방문시간대
+                store_answer += "\n주요 방문시간대\n"
+                
+                # 시간대 명칭 매핑
+                time_names = {
+                    '22-01': '심야',
+                    '02-05': '새벽',
+                    '06-09': '아침',
+                    '10-13': '낮',
+                    '14-17': '오후',
+                    '18-21': '저녁'
+                }
+                
+                # 평일 시간대 분리
+                weekday_slots = [item for item in sections['시간대경향'] if '평일_' in item[0]]
+                weekend_slots = [item for item in sections['시간대경향'] if '주말_' in item[0]]
+                
+                store_answer += "  평일:\n"
+                for label, cnt, pct in weekday_slots:
+                    rank = label.split('_')[1]
+                    time_range = label.split('_')[2]
+                    time_name = time_names.get(time_range, time_range)
+                    store_answer += f"    {rank}: {time_name}({time_range}) - {pct}%\n"
+                
+                store_answer += "  주말:\n"
+                for label, cnt, pct in weekend_slots:
+                    rank = label.split('_')[1]
+                    time_range = label.split('_')[2]
+                    time_name = time_names.get(time_range, time_range)
+                    store_answer += f"    {rank}: {time_name}({time_range}) - {pct}%\n"
+                
+                answer += store_answer
             else:
                 answer += f"\n{store} 데이터가 없습니다."
             
