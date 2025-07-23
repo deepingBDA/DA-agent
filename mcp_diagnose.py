@@ -296,7 +296,7 @@ ORDER BY ord
                 for label, cnt, pct in sections['연령대경향']:
                     rank = label.split('위_')[0]
                     age_group = label.split('위_')[1]
-                    store_answer += f"  {rank}: {age_group} - {cnt}명 ({pct}%)\n"
+                    store_answer += f"  {rank}: {age_group} - {pct}%\n"
                 
                 # 4. 주요 방문시간대
                 store_answer += "\n주요 방문시간대\n"
