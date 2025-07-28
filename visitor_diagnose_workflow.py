@@ -3,6 +3,7 @@
 import json
 import os
 from typing import Dict, Any, List, Union
+from fastmcp import FastMCP  # FastMCP 툴 서버용
 
 from dotenv import load_dotenv
 from langchain.schema import BaseOutputParser
@@ -1050,7 +1051,12 @@ ORDER BY ord
         return dummy_data
 
 
-@tool
+# FastMCP 인스턴스 (툴 서버 등록용)
+mcp = FastMCP("visitor_diagnose")
+
+
+@tool  # LangChain Agent 호환
+@mcp.tool()  # FastMCP 서버 호환
 def visitor_diagnose(
     *,
     store_name: Union[str, List[str]],
