@@ -34,10 +34,10 @@
     ],
     "transport": "stdio"
   },
-  "visitor_excel": {
+  "visitor_diagnose_excel": {
     "command": "python3",
     "args": [
-      "/app/mcp/visitor_diagnose_workflow.py"
+      "/app/visitor_diagnose_workflow.py"
     ],
     "transport": "stdio"
   }

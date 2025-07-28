@@ -2,6 +2,7 @@
 
 import json
 import os
+import sys
 from typing import Dict, Any, List, Union
 from fastmcp import FastMCP  # FastMCP 툴 서버용
 
@@ -1052,11 +1053,10 @@ ORDER BY ord
 
 
 # FastMCP 인스턴스 (툴 서버 등록용)
-mcp = FastMCP("visitor_diagnose")
+mcp = FastMCP("visitor_diagnose_excel")
 
 
-@tool  # LangChain Agent 호환 (함수명 그대로 사용)
-@mcp.tool()  # FastMCP 서버 호환 (함수명 그대로 사용)
+@mcp.tool()  # FastMCP 서버 전용
 def visitor_diagnose_excel(
     *,
     store_name: Union[str, List[str]],
@@ -1093,12 +1093,9 @@ def visitor_diagnose_excel(
 
 
 if __name__ == "__main__":
-    wf = VisitorDiagnoseWorkflow()
-    print(
-        wf.run(
-            user_prompt="4개 매장 방문객 진단 분석 (실제 + 더미데이터)",
-            store_name=["망우혜원점", "더미데이터점1", "더미데이터점2", "더미데이터점3"],
-            start_date="2025-07-01",
-            end_date="2025-07-20",
-        )
-    )
+    # FastMCP 서버 실행
+    print("FastMCP 서버 시작 - visitor_diagnose", file=sys.stderr)
+    try:
+        mcp.run()
+    except Exception as e:
+        print(f"서버 오류 발생: {e}", file=sys.stderr)
