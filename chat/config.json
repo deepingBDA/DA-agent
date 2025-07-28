@@ -2,7 +2,7 @@
   "insight": {
     "command": "python3",
     "args": [
-      "/app/mcp/mcp_insight.py"
+      "/app/mcp_tools/mcp/mcp_insight.py"
     ],
     "transport": "stdio"
   },
@@ -31,13 +31,6 @@
     "command": "python3",
     "args": [
       "/app/mcp/mcp_diagnose.py"
-    ],
-    "transport": "stdio"
-  },
-  "visitor_diagnose_excel": {
-    "command": "python3",
-    "args": [
-      "/app/mcp/mcp_visitor_diagnose_excel.py"
     ],
     "transport": "stdio"
   }

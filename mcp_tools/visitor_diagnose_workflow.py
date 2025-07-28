@@ -8,7 +8,6 @@ from fastmcp import FastMCP  # FastMCP 툴 서버용
 
 from dotenv import load_dotenv
 from langchain.schema import BaseOutputParser
-from langchain.tools import tool
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, END, START
 
