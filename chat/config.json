@@ -33,5 +33,12 @@
       "/app/mcp/mcp_diagnose.py"
     ],
     "transport": "stdio"
+  },
+  "visitor_excel": {
+    "command": "python3",
+    "args": [
+      "/app/mcp/visitor_diagnose_workflow.py"
+    ],
+    "transport": "stdio"
   }
 }

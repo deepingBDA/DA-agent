@@ -1055,9 +1055,9 @@ ORDER BY ord
 mcp = FastMCP("visitor_diagnose")
 
 
-@tool  # LangChain Agent 호환
-@mcp.tool()  # FastMCP 서버 호환
-def visitor_diagnose(
+@tool(name="visitor_diagnose_excel")  # LangChain Agent 호환
+@mcp.tool(name="visitor_diagnose_excel")  # FastMCP 서버 호환
+def visitor_diagnose_excel(
     *,
     store_name: Union[str, List[str]],
     start_date: str,
