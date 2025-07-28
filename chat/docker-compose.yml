@@ -19,6 +19,7 @@ services:
     container_name: mcp-backend
     volumes:
       - ../:/app/mcp
+      - ./mcp_tools:/app/mcp_tools
       - ./config.json:/app/config.json
       - ./uploads:/app/uploads
       - ./logs:/app/logs
