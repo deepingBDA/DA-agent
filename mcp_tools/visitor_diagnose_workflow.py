@@ -1063,23 +1063,31 @@ def visitor_diagnose_excel(
     end_date: str,
     user_prompt: str = "매장 방문객 진단 분석 엑셀화"
 ) -> str:
-    """VisitorDiagnoseWorkflow.run() 을 래핑한 LangChain Tool.
+    """[EXCEL_REPORT] Generate an **Excel report** for *visitor diagnostics*.
+
+    Trigger words (case-insensitive):
+        - "엑셀", "excel", "xlsx", "엑셀화", "sheet", "보고서"
+        - Combinations like "방문객 진단 엑셀", "visitor diagnose excel" etc.
+
+    Use this when the user explicitly asks to *export/produce an Excel file* of
+    visitor-related metrics such as daily average visitors, gender ratio,
+    age ranking, or time-slot trends.
 
     Parameters
     ----------
     store_name : str | list[str]
-        분석할 매장명. 단일 문자열 또는 여러 매장 리스트 모두 지원.
+        Store name(s) to diagnose. Accepts a single string or a list.
     start_date : str
-        분석 시작일 (YYYY-MM-DD).
+        Start date (YYYY-MM-DD).
     end_date : str
-        분석 종료일 (YYYY-MM-DD).
+        End date (YYYY-MM-DD).
     user_prompt : str, optional
-        사용자 프롬프트(LLM 지시문). 기본 "매장 방문객 진단 분석".
+        Custom prompt for LLM. Defaults to "매장 방문객 진단 분석 엑셀화".
 
     Returns
     -------
     str
-        워크플로우 실행 결과 메시지. 정상 완료 시 "엑셀 업데이트 완료 …"를 포함.
+        Result message containing "엑셀 업데이트 완료" when successful.
     """
 
     workflow = VisitorDiagnoseWorkflow()

@@ -156,7 +156,17 @@ def get_db_name() -> str:
 
 @mcp.tool()
 def diagnose_avg_in(start_date: str, end_date: str) -> str:
-    """일평균 방문객 수 진단"""
+    """[VISITOR_DIAGNOSE]
+    Diagnose **average daily visitors** and related trends (gender, age,
+    time-slot) for a given period.
+
+    Trigger words (case-insensitive):
+        - "방문객 진단", "유입 진단", "visitor diagnose", "average visitors"
+        - Any request like "방문객 분석해줘", "일평균 방문객수" etc.
+
+    Use this tool when the user wants a textual diagnostic (not necessarily
+    Excel) about store visitors within a date range.
+    """
     # 파라미터 기록
     param_log = f"diagnose_avg_in 호출됨: start_date={start_date}, end_date={end_date}"
     logger.info(param_log)
