@@ -2,7 +2,7 @@
 
 import json
 import os
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Union
 
 from dotenv import load_dotenv
 from langchain.schema import BaseOutputParser
@@ -1048,6 +1048,42 @@ ORDER BY ord
     3: {pattern['time_weekend'][2][0]} - {pattern['time_weekend'][2][1]}%
 """
         return dummy_data
+
+
+@tool
+def visitor_diagnose(
+    *,
+    store_name: Union[str, List[str]],
+    start_date: str,
+    end_date: str,
+    user_prompt: str = "매장 방문객 진단 분석 엑셀화"
+) -> str:
+    """VisitorDiagnoseWorkflow.run() 을 래핑한 LangChain Tool.
+
+    Parameters
+    ----------
+    store_name : str | list[str]
+        분석할 매장명. 단일 문자열 또는 여러 매장 리스트 모두 지원.
+    start_date : str
+        분석 시작일 (YYYY-MM-DD).
+    end_date : str
+        분석 종료일 (YYYY-MM-DD).
+    user_prompt : str, optional
+        사용자 프롬프트(LLM 지시문). 기본 "매장 방문객 진단 분석".
+
+    Returns
+    -------
+    str
+        워크플로우 실행 결과 메시지. 정상 완료 시 "엑셀 업데이트 완료 …"를 포함.
+    """
+
+    workflow = VisitorDiagnoseWorkflow()
+    return workflow.run(
+        user_prompt=user_prompt,
+        store_name=store_name,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
 
 if __name__ == "__main__":
