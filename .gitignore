@@ -1,5 +1,5 @@
 # Custom
-
+.DS_Store
 .env
 *.pyc
 report/

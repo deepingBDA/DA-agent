@@ -1,24 +1,36 @@
 """
 Base Workflow 클래스
-공통 기능들을 제공하는 추상 베이스 클래스
+워크플로우의 기본 구조만 제공하는 추상 베이스 클래스
 """
 
-import os
 import sys
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, TypedDict, Generic, TypeVar
 
-import clickhouse_connect
-from dotenv import load_dotenv
+from langgraph.graph import StateGraph
 
 
-class BaseWorkflow(ABC):
+# Generic State Type
+StateType = TypeVar('StateType', bound='BaseState')
+
+
+class BaseState(TypedDict):
+    """
+    모든 워크플로우의 기본 상태 정의
+    최소한의 공통 필드만 포함
+    """
+    user_prompt: str        # 사용자 요청
+    workflow_id: str        # 워크플로우 고유 ID
+    timestamp: str          # 실행 시작 시간
+
+
+class BaseWorkflow(ABC, Generic[StateType]):
     """
     모든 워크플로우의 기본 클래스
-    공통 기능들을 제공합니다.
+    핵심 구조만 제공하고 구체적 구현은 하위 클래스에 위임
     """
     
     def __init__(self, workflow_name: str = "base"):
@@ -27,19 +39,10 @@ class BaseWorkflow(ABC):
             workflow_name: 워크플로우 이름 (로깅에 사용)
         """
         self.workflow_name = workflow_name
-        load_dotenv()
         
         # 로깅 설정
         self.logger = self._setup_logging()
         self.logger.info(f"{workflow_name} 워크플로우 초기화")
-        
-        # ClickHouse 연결 정보
-        self.clickhouse_config = {
-            'host': os.getenv("CLICKHOUSE_HOST"),
-            'port': os.getenv("CLICKHOUSE_PORT"), 
-            'username': os.getenv("CLICKHOUSE_USER"),
-            'password': os.getenv("CLICKHOUSE_PASSWORD")
-        }
         
     def _setup_logging(self) -> logging.Logger:
         """로깅 설정 (내부 메서드)"""
@@ -62,39 +65,34 @@ class BaseWorkflow(ABC):
         logger.info(f"로그 파일 생성: {log_file}")
         return logger
     
-    def _get_clickhouse_client(self, database: Optional[str] = None) -> Optional[clickhouse_connect.Client]:
-        """ClickHouse 클라이언트 생성 (내부 메서드)"""
-        try:
-            client = clickhouse_connect.get_client(
-                host=self.clickhouse_config['host'],
-                port=self.clickhouse_config['port'],
-                username=self.clickhouse_config['username'],
-                password=self.clickhouse_config['password'],
-                database=database
-            )
-            return client
-        except Exception as e:
-            self.logger.error(f"ClickHouse 연결 실패: {e}")
-            return None
+
+
+    def create_initial_state(self, user_prompt: str, **kwargs) -> StateType:
+        """
+        초기 상태 생성
+        하위 클래스에서 오버라이드하여 추가 필드 설정 가능
+        """
+        base_state = {
+            "user_prompt": user_prompt,
+            "workflow_id": f"{self.workflow_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "timestamp": datetime.now().isoformat(),
+        }
+        return base_state  # type: ignore
     
-    def _execute_query(self, query: str, database: Optional[str] = None) -> Optional[Any]:
-        """ClickHouse 쿼리 실행 (내부 메서드)"""
-        client = self._get_clickhouse_client(database)
-        if client is None:
-            return None
-            
-        try:
-            result = client.query(query)
-            self.logger.info(f"쿼리 실행 성공: {len(result.result_rows)}개 행 반환")
-            return result
-        except Exception as e:
-            self.logger.error(f"쿼리 실행 실패: {e}")
-            return None
-    
+
+        
     @abstractmethod
-    def run(self, query: str, **kwargs) -> str:
+    def run(self, user_prompt: str, **kwargs) -> str:
         """
         워크플로우 실행 메서드
+        하위 클래스에서 반드시 구현해야 합니다.
+        """
+        pass
+
+    @abstractmethod 
+    def _build_workflow(self) -> StateGraph:
+        """
+        LangGraph 워크플로우 구성
         하위 클래스에서 반드시 구현해야 합니다.
         """
         pass 
