@@ -27,6 +27,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   const cleanedContent = useMemo(() => {
     let text = content.trim()
 
+    console.log('원본 content:', content)
+
     // 1) 코드블록 래퍼 제거 (문자열 어디에 있든 첫/마지막 ``` 페어 제거)
     if (text.startsWith('```')) {
       // 앞쪽 ```lang?\n 제거 (가능한 lang 지정 포함)
@@ -36,7 +38,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     }
 
     // 2) [웹에서 보기](URL) 패턴을 찾아서 "웹에서 보기"만 남기고 URL 추출
+    console.log('치환 전:', text)
     text = text.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
+    console.log('치환 후:', text)
 
     return text
   }, [content])
