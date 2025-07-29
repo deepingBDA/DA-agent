@@ -21,6 +21,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   content,
   toolInfo,
 }) => {
+  console.log('ChatMessage 렌더링됨:', { role, content: content.substring(0, 50) + '...' })
+  
   const [expanded, setExpanded] = useState<boolean>(false)
 
   // 백틱(``` ) 코드블록으로 감싸진 메시지가 있으면 앞/뒤 래퍼를 제거해 링크가 활성화되도록 처리
