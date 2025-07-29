@@ -35,7 +35,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       text = text.replace(/\n```\s*$/, '')
     }
 
+    // 2) [웹에서 보기](URL) 패턴을 찾아서 "웹에서 보기"만 남기고 URL 추출
+    text = text.replace(/🔗\s*\[웹에서 보기\]\(([^)]+)\)/g, '웹에서 보기')
+
     return text
+  }, [content])
+
+  // URL 추출 (링크 클릭 핸들러용)
+  const reportUrl = useMemo(() => {
+    const match = content.match(/\[웹에서 보기\]\(([^)]+)\)/)
+    return match ? match[1] : null
   }, [content])
 
   // toolInfo가 있을 때 동일한 전처리 적용
@@ -48,6 +57,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       text = text.replace(/^```[^\n]*\n/, '')
       text = text.replace(/\n```\s*$/, '')
     }
+
+    // toolInfo에서도 동일하게 처리
+    text = text.replace(/🔗\s*\[웹에서 보기\]\(([^)]+)\)/g, '웹에서 보기')
 
     return text
   }, [toolInfo])
@@ -100,7 +112,36 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* 마크다운 렌더링 – 링크·개행·GFM, 자동 링크화 지원 */}
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            components={{ a: renderAnchor }}
+            components={{ 
+              a: renderAnchor,
+              // "웹에서 보기" 텍스트를 클릭 가능한 링크로 변환
+              p: ({ children }) => {
+                // 문단 내용이 "웹에서 보기"이고 reportUrl이 있으면 클릭 가능한 링크로 렌더
+                if (typeof children === 'string' && children.includes('웹에서 보기') && reportUrl) {
+                  const parts = children.split('웹에서 보기')
+                  return (
+                    <p>
+                      {parts[0]}
+                      <a
+                        href={reportUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ 
+                          color: '#1976d2', 
+                          textDecoration: 'underline', 
+                          fontWeight: 600,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        웹에서 보기
+                      </a>
+                      {parts[1]}
+                    </p>
+                  )
+                }
+                return <p>{children}</p>
+              }
+            }}
           >
             {cleanedContent}
           </ReactMarkdown>
