@@ -876,7 +876,7 @@ ORDER BY ord
         """개별 매장 카드 HTML 생성"""
         daily_avg = data.get('daily_avg', {})
         gender = data.get('gender', {})
-            age_rank = data.get('age_rank', {})
+        age_rank = data.get('age_rank', {})
         time_slots = data.get('time_slots', {})
         
         html = f"""
@@ -926,14 +926,14 @@ ORDER BY ord
 """
         
         # 연령대 순위 데이터 추가
-            for i in range(1, 4):
-                rank_key = None
-                for key in age_rank.keys():
-                    if key.startswith(f"{i}위_"):
-                        rank_key = key
-                        break
-            
-                if rank_key:
+        for i in range(1, 4):
+            rank_key = None
+            for key in age_rank.keys():
+                if key.startswith(f"{i}위_"):
+                    rank_key = key
+                    break
+
+            if rank_key:
                 age_group = rank_key.split('위_')[1]
                 pct = age_rank.get(rank_key, 0)
                 html += f"""
@@ -1068,7 +1068,7 @@ ORDER BY ord
                     age_group = rank_key.split('위_')[1]
                     pct = age_rank.get(rank_key, 0)
                     html += f"<td>{age_group} ({pct}%)</td>"
-                    else:
+                else:
                     html += "<td>-</td>"
             html += "</tr>"
         
@@ -1119,13 +1119,15 @@ ORDER BY ord
             self.logger.info(f"HTML 보고서 저장 완료: {html_path}")
             self.logger.info(f"백엔드 서빙용 저장 완료: {chat_html_path}")
             
-            # 웹 접근 가능한 URL 생성 (동적 호스트 지원)
-            import os
-            host = os.getenv('FRONTEND_HOST', 'localhost')
-            port = os.getenv('BACKEND_PORT', '8000')
-            web_url = f"http://{host}:{port}/reports/{filename}"
-            
-            state["final_result"] = f"📊 HTML 보고서 생성 완료!\n\n🔗 [웹에서 보기]({web_url})\n\n보고서를 클릭하여 새 탭에서 확인하세요!"
+            # 웹 접근 가능한 상대 경로 URL (컨테이너/리버스프록시 환경에서도 안정)
+            web_url = f"/reports/{filename}"
+
+            # 마크다운 링크로 반환 (코드블록 없이 한 줄 텍스트)
+            state["final_result"] = (
+                "📊 HTML 보고서 생성 완료!\n\n"
+                f"🔗 [웹에서 보기]({web_url})\n\n"
+                "보고서를 클릭하여 새 탭에서 확인하세요!"
+            )
             
         except Exception as e:
             self.logger.error(f"HTML 파일 저장 실패: {e}")
