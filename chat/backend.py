@@ -232,6 +232,12 @@ app.add_middleware(
 # 정적 파일 서빙 설정 (업로드 파일 액세스용)
 app.mount("/uploads", StaticFiles(directory=ABSOLUTE_UPLOAD_DIR), name="uploads")
 
+# HTML 보고서 서빙 설정
+REPORT_DIR = os.path.join(BASE_DIR, "mcp_tools", "report")
+if not os.path.exists(REPORT_DIR):
+    os.makedirs(REPORT_DIR, exist_ok=True)
+app.mount("/reports", StaticFiles(directory=REPORT_DIR), name="reports")
+
 # 에이전트 초기화 함수
 async def initialize_agent(thread_id: str, model: str = "gpt-4o", mcp_config=None):
     """

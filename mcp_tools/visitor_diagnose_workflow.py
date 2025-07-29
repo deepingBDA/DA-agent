@@ -1,4 +1,26 @@
-"""매장 방문객수 진단 보고서 작성을 도와주는 워크플로우"""
+"""
+[MODERN HTML VERSION]
+매장 방문객수 진단 보고서 작성을 도와주는 워크플로우 - HTML 출력 버전
+
+✨ 이 파일은 최신 HTML 버전입니다.
+
+기능:
+- 현대적인 HTML 보고서 생성
+- 반응형 디자인 (모바일 친화적)
+- 브라우저에서 즉시 확인 가능
+- AI 기반 하이라이트 (글씨 색상 강조)
+- 컴팩트한 레이아웃으로 여러 매장 한 줄 표시
+- 가벼운 파일 크기
+
+엑셀 버전 대비 장점:
+- 즉시 확인 가능 (웹 브라우저)
+- 모바일에서 완벽 지원
+- 의존성 최소화
+- 공유 및 배포 용이
+- 시각적으로 더 매력적
+
+레거시 엑셀 버전: visitor_diagnose_workflow_legacy_excel.py
+"""
 
 import json
 import os
@@ -26,6 +48,7 @@ class VisitorDiagnoseState(BaseState):
     design_spec: List[Dict[str, Any]]  # 디자인 스타일 placements
     dataframe: Any | None = None       # pandas DataFrame 저장
     highlights: List[Dict[str, Any]] | None = None  # 하이라이트 셀 정보
+    html_content: str | None = None # HTML 콘텐츠 저장
 
 
 class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
@@ -38,7 +61,7 @@ class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
         load_dotenv()
         self.llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
-        # 셀 하이라이트용 프롬프트 템플릿
+        # HTML 하이라이트용 프롬프트 템플릿
         self._highlight_prompt = (
             """<ROLE>
 당신은 오프라인 매장 데이터 분석 전문가입니다. 
@@ -57,8 +80,8 @@ class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
 - 연령대별 분포가 고르게 분산된 경우
 
 ### 시간대 패턴 관련:
-- 평일 주력 시간대가 점심(10-13시) 또는 오후(14-17시)인 경우 (직장인 유입)
-- 주말 주력 시간대가 오후(14-17시) 또는 저녁(18-21시)인 경우 (가족 단위)
+- 평일 주력 시간대가 점심(낮) 또는 오후인 경우 (직장인 유입)
+- 주말 주력 시간대가 오후 또는 저녁인 경우 (가족 단위)
 - 주력 시간대 비중이 30% 이상으로 집중도가 높은 경우
 
 ## 파란색 하이라이트 (개선 필요/부정적 지표)
@@ -72,39 +95,38 @@ class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
 - 특정 연령대에 40% 이상 집중된 경우
 
 ### 시간대 패턴 관련:
-- 평일 주력 시간대가 아침(06-09시) 또는 심야(22-01시)인 경우
-- 주말 주력 시간대가 아침(06-09시) 또는 심야(22-01시)인 경우
+- 평일 주력 시간대가 아침 또는 심야인 경우
+- 주말 주력 시간대가 아침 또는 심야인 경우
 - 주력 시간대 비중이 20% 미만으로 분산이 심한 경우
 </ANALYSIS_CRITERIA>
 
 <SELECTION_PRIORITY>
-1. **결과 컬럼 우선**: 매장명_결과 컬럼의 수치 데이터를 최우선 분석
-2. **매장간 비교**: 여러 매장이 있을 경우 상대적 순위로 판단
-3. **절대적 기준**: 단일 매장일 경우 위 기준을 절대값으로 적용
-4. **핵심 지표 집중**: 방문객 수 > 성별 균형 > 연령대 분포 > 시간대 패턴 순서로 중요도 설정
-5. **최대 8개 셀**: 너무 많은 하이라이트는 집중도를 떨어뜨림
+1. **매장간 비교**: 여러 매장이 있을 경우 상대적 순위로 판단
+2. **절대적 기준**: 단일 매장일 경우 위 기준을 절대값으로 적용
+3. **핵심 지표 집중**: 방문객 수 > 성별 균형 > 연령대 분포 > 시간대 패턴 순서로 중요도 설정
+4. **최대 5개 항목**: 너무 많은 하이라이트는 집중도를 떨어뜨림
 </SELECTION_PRIORITY>
 
 <OUTPUT_FORMAT>
 반드시 아래 JSON 형식으로만 응답하세요:
 {{
   "highlight": [
-    {{"cell": "E5", "color": "red", "reason": "방문객 수 1위"}},
-    {{"cell": "K7", "color": "blue", "reason": "성별 불균형 심함"}}
+    {{"metric": "방문객수", "store": "매장명", "color": "red", "reason": "방문객 수 1위"}},
+    {{"metric": "성별경향", "store": "매장명", "color": "blue", "reason": "성별 불균형 심함"}}
   ]
 }}
 
 주의사항:
-- cell 주소는 정확한 엑셀 좌표 (예: E5, K7, W10)
+- metric은 "방문객수", "성별경향", "연령대순위", "시간대경향" 중 하나
+- store는 실제 매장명
 - color는 "red" 또는 "blue"만 사용
 - reason은 15자 이내로 핵심만 간결하게
-- 빈 셀(NaN, 공백)은 절대 선택하지 마세요
 - JSON 외 다른 텍스트는 출력 금지
 </OUTPUT_FORMAT>
 
-<EXCEL_TABLE>
+<DATA_TABLE>
 {table}
-</EXCEL_TABLE>"""
+</DATA_TABLE>"""
         )
         
         # 워크플로우 그래프
@@ -141,20 +163,20 @@ class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
         """LangGraph 워크플로우를 구성합니다."""
         builder = StateGraph(VisitorDiagnoseState)
         
-        # 노드 추가
+        # 노드 추가 - HTML 출력으로 변경
         builder.add_node("fetch", self._query_db_node)
         builder.add_node("parse", self._parse_node)
-        builder.add_node("map", self._map_to_excel_node)
+        builder.add_node("generate_html", self._generate_html_node)
         builder.add_node("highlight", self._highlight_node)
-        builder.add_node("update", self._update_excel_node)
+        builder.add_node("save_html", self._save_html_node)
         
         # 엣지 추가 (순차 실행)
         builder.add_edge(START, "fetch")
         builder.add_edge("fetch", "parse")
-        builder.add_edge("parse", "map")
-        builder.add_edge("map", "highlight")
-        builder.add_edge("highlight", "update")
-        builder.add_edge("update", END)
+        builder.add_edge("parse", "generate_html")
+        builder.add_edge("generate_html", "highlight")
+        builder.add_edge("highlight", "save_html")
+        builder.add_edge("save_html", END)
         
         return builder.compile()
 
@@ -269,7 +291,11 @@ ORDER BY ord
 
         answer = ""
         # 요청된 매장들 처리 (더미데이터 포함)
-        store_names = [state["store_name"]] if isinstance(state["store_name"], str) else state["store_name"]
+        if isinstance(state["store_name"], str):
+            # 쉼표로 구분된 문자열을 분리
+            store_names = [name.strip() for name in state["store_name"].split(',')]
+        else:
+            store_names = state["store_name"]
         
         for store in store_names:
             # 더미데이터점들인 경우 가짜 데이터 생성
@@ -503,295 +529,690 @@ ORDER BY ord
             self.logger.info(f"  시간대: {data['time_slots']}")
         return state
 
-    def _map_to_excel_node(self, state: VisitorDiagnoseState) -> VisitorDiagnoseState:
+    def _generate_html_node(self, state: VisitorDiagnoseState) -> VisitorDiagnoseState:
         """
-        사용자 수정 템플릿에 맞는 DataFrame 구조로 생성
-        매장별 4컬럼: {매장}_템플릿1, {매장}_결과, {매장}_템플릿2, {매장}_참고값
+        방문객 진단 데이터를 HTML 테이블로 변환
         """
-        import pandas as pd
         import os
-        import numpy as np
+        from datetime import datetime
         
         metric_dict = state["metric_dict"]
-        excel_path = "report/점포진단표.xlsx"
         
         # report 디렉토리 생성
         if not os.path.exists("report"):
             os.makedirs("report", exist_ok=True)
         
-        # 기존 엑셀 파일이 있으면 삭제하고 새로 만들기
-        if os.path.exists(excel_path):
-            os.remove(excel_path)
-            self.logger.info(f"기존 엑셀 파일 삭제: {excel_path}")
+        # HTML 템플릿 시작
+        html_content = self._create_html_template(metric_dict, state["period"])
         
-        # 기본 고정 템플릿 구조 (A~C 컬럼)
-        rows = [
-            {"주제": "방문객수", "항목": "일평균", "지표": "평균 방문객 수"},
-            {"주제": "방문객수", "항목": "일평균", "지표": "평일 방문객 수"},
-            {"주제": "방문객수", "항목": "일평균", "지표": "주말 방문객 수"},
-            {"주제": "방문객수", "항목": "성별경향", "지표": "남성"},
-            {"주제": "방문객수", "항목": "성별경향", "지표": "여성"},
-            {"주제": "방문객수", "항목": "연령대 경향", "지표": "연령대 별 순위"},
-            {"주제": "방문객수", "항목": "연령대 경향", "지표": "연령대 별 순위"},
-            {"주제": "방문객수", "항목": "연령대 경향", "지표": "연령대 별 순위"},
-            {"주제": "방문객수", "항목": "시간대 경향", "지표": "평일 주요 방문시간대"},
-            {"주제": "방문객수", "항목": "시간대 경향", "지표": "평일 주요 방문시간대"},
-            {"주제": "방문객수", "항목": "시간대 경향", "지표": "평일 주요 방문시간대"},
-            {"주제": "방문객수", "항목": "시간대 경향", "지표": "주말 주요 방문시간대"},
-            {"주제": "방문객수", "항목": "시간대 경향", "지표": "주말 주요 방문시간대"},
-            {"주제": "방문객수", "항목": "시간대 경향", "지표": "주말 주요 방문시간대"},
-        ]
-        
-        df = pd.DataFrame(rows)
-        self.logger.info(f"기본 템플릿 DataFrame 생성: {len(df)}행")
-        
-        # 매장별 데이터 추가 (매장당 4컬럼)
-        for store, data in metric_dict.items():
-            self.logger.info(f"매장 {store} 데이터 추가 중")
-            
-            # 템플릿1 고정값들
-            template1_values = [
-                np.nan,  # 평균 방문객 수
-                "평일",   # 평일 방문객 수
-                "주말",   # 주말 방문객 수
-                "M",     # 남성
-                "F",     # 여성
-                "1",     # 1위 연령대
-                "2",     # 2위 연령대
-                "3",     # 3위 연령대
-                "1",     # 평일 1위 시간대
-                "2",     # 평일 2위 시간대
-                "3",     # 평일 3위 시간대
-                "1",     # 주말 1위 시간대
-                "2",     # 주말 2위 시간대
-                "3",     # 주말 3위 시간대
-            ]
-            
-            # 결과 데이터 (실제 측정값)
-            result_values = []
-            
-            # 일평균 방문객수
-            daily_avg = data.get('daily_avg', {})
-            result_values.extend([
-                daily_avg.get('전체', 0),
-                daily_avg.get('평일', 0),
-                daily_avg.get('주말', 0)
-            ])
-            
-            # 성별경향
-            gender = data.get('gender', {})
-            result_values.extend([
-                gender.get('남성', 0),
-                gender.get('여성', 0)
-            ])
-            
-            # 연령대별 순위 (상위 3개) - 실제 연령대 값 추출
-            age_rank = data.get('age_rank', {})
-            age_values = []
-            for i in range(1, 4):
-                rank_key = None
-                for key in age_rank.keys():
-                    if key.startswith(f"{i}위_"):
-                        rank_key = key
-                        break
-                if rank_key:
-                    # "1위_50대" → "50" 추출
-                    age_group = rank_key.split('위_')[1].replace('대', '')
-                    age_values.append(int(age_group) if age_group.isdigit() else 0)
-                else:
-                    age_values.append(0)
-            result_values.extend(age_values)
-            
-            # 시간대 데이터 변환: "1위_저녁_18-21" → "저녁(18-21)"
-            time_slots = data.get('time_slots', {})
-            
-            # 평일 시간대
-            weekday_slots = time_slots.get('평일', {})
-            for i in range(1, 4):
-                rank_key = None
-                for key in weekday_slots.keys():
-                    if key.startswith(f"{i}위_"):
-                        rank_key = key
-                        break
-                if rank_key:
-                    # "1위_저녁_18-21" → "저녁(18-21)"
-                    parts = rank_key.split('_')
-                    if len(parts) >= 3:
-                        time_name = parts[1]  # 저녁
-                        time_range = parts[2]  # 18-21
-                        formatted_time = f"{time_name}({time_range})"
-                        result_values.append(formatted_time)
-                    else:
-                        result_values.append(np.nan)
-                else:
-                    result_values.append(np.nan)
-                    
-            # 주말 시간대
-            weekend_slots = time_slots.get('주말', {})
-            for i in range(1, 4):
-                rank_key = None
-                for key in weekend_slots.keys():
-                    if key.startswith(f"{i}위_"):
-                        rank_key = key
-                        break
-                if rank_key:
-                    # "1위_저녁_18-21" → "저녁(18-21)"
-                    parts = rank_key.split('_')
-                    if len(parts) >= 3:
-                        time_name = parts[1]  # 저녁
-                        time_range = parts[2]  # 18-21
-                        formatted_time = f"{time_name}({time_range})"
-                        result_values.append(formatted_time)
-                    else:
-                        result_values.append(np.nan)
-                else:
-                    result_values.append(np.nan)
-            
-            # 템플릿2 고정값들 (단위)
-            template2_values = [
-                "명",    # 평균 방문객 수
-                "명",    # 평일 방문객 수
-                "명",    # 주말 방문객 수
-                "%",     # 남성
-                "%",     # 여성
-                "대",    # 1위 연령대
-                "대",    # 2위 연령대
-                "대",    # 3위 연령대
-                np.nan,  # 평일 1위 시간대
-                np.nan,  # 평일 2위 시간대
-                np.nan,  # 평일 3위 시간대
-                np.nan,  # 주말 1위 시간대
-                np.nan,  # 주말 2위 시간대
-                np.nan,  # 주말 3위 시간대
-            ]
-            
-            # 참고값 (현재는 연령대와 시간대에만 비율값)
-            reference_values = []
-            
-            # 일평균, 성별 - NaN
-            reference_values.extend([np.nan] * 5)
-            
-            # 연령대 비율값
-            for i in range(1, 4):
-                rank_key = None
-                for key in age_rank.keys():
-                    if key.startswith(f"{i}위_"):
-                        rank_key = key
-                        break
-                pct_value = age_rank.get(rank_key, 0) if rank_key else 0
-                reference_values.append(f"{pct_value}%" if pct_value > 0 else np.nan)
-            
-            # 시간대 비율값
-            for day_type in ['평일', '주말']:
-                slots = time_slots.get(day_type, {})
-                for i in range(1, 4):
-                    rank_key = None
-                    for key in slots.keys():
-                        if key.startswith(f"{i}위_"):
-                            rank_key = key
-                            break
-                    pct_value = slots.get(rank_key, 0) if rank_key else 0
-                    reference_values.append(f"{pct_value}%" if pct_value > 0 else np.nan)
-            
-            # 매장별 4컬럼 추가
-            df[f"{store}_템플릿1"] = template1_values
-            df[f"{store}_결과"] = result_values
-            df[f"{store}_템플릿2"] = template2_values
-            df[f"{store}_참고값"] = reference_values
-            
-            self.logger.info(f"{store} 4컬럼 추가 완료: 결과 {len(result_values)}개 값")
-        
-        # 엑셀 파일로 저장 (헤더 없이 저장)
-        df.to_excel(excel_path, sheet_name="방문객분석", index=False, header=False)
-        
-        # 수동으로 올바른 헤더 추가
-        import openpyxl
-        from openpyxl.styles import Alignment
-        wb = openpyxl.load_workbook(excel_path)
-        ws = wb['방문객분석']
-        
-        # 모든 데이터를 두 행씩 아래로 이동 (헤더 2행 확보)
-        ws.insert_rows(1, 2)
-        
-        # 첫 번째 행 A1:C1 은 빈칸으로 유지(지점명 표시 제거)
-        ws.merge_cells('A1:C1')  # 3칸 병합 (값 없음)
-        ws['A1'].alignment = Alignment(horizontal='center', vertical='center')
-        
-        # 매장별 4개 컬럼을 매장명으로 병합 (첫 번째 행)
-        col_start = 4  # D 컬럼부터 시작
-        for store in metric_dict.keys():
-            start_col = openpyxl.utils.get_column_letter(col_start)
-            end_col = openpyxl.utils.get_column_letter(col_start + 3)
-            merge_range = f"{start_col}1:{end_col}1"
-            
-            ws.merge_cells(merge_range)
-            ws[f"{start_col}1"].value = store
-            ws[f"{start_col}1"].alignment = Alignment(horizontal='center', vertical='center')
-            
-            col_start += 4  # 다음 매장으로 4컬럼씩 이동
-        
-        # 두 번째 행: 주제, 항목, 지표, 결과, 참고값 등
-        ws.cell(2, 1).value = "주제"
-        ws.cell(2, 2).value = "항목" 
-        ws.cell(2, 3).value = "지표"
-
-        # 매장별로 결과(3셀 병합), 참고값 헤더
-        col_start = 4
-        for store in metric_dict.keys():
-            # 결과 3셀 병합
-            start_col = openpyxl.utils.get_column_letter(col_start)
-            end_col = openpyxl.utils.get_column_letter(col_start + 2)
-            ws.merge_cells(f"{start_col}2:{end_col}2")
-            ws[f"{start_col}2"].value = "결과"
-            ws[f"{start_col}2"].alignment = Alignment(horizontal='center', vertical='center')
-
-            # 참고값 헤더
-            ref_col = openpyxl.utils.get_column_letter(col_start + 3)
-            ws[f"{ref_col}2"].value = "참고값"
-            ws[f"{ref_col}2"].alignment = Alignment(horizontal='center', vertical='center')
-
-            col_start += 4
-        
-        wb.save(excel_path)
-        
-        self.logger.info(f"템플릿 DataFrame을 엑셀로 저장: {excel_path}")
-        self.logger.info(f"DataFrame 형태: {df.shape}")
-        
-        # DataFrame 내용 로그 출력 (처음 5행만)
-        self.logger.info("DataFrame 샘플 (처음 5행):")
-        self.logger.info(f"\n{df.head().to_string()}")
-        
-        # placements는 빈 리스트로 설정
-        state["placements"] = []
-        state["dataframe"] = df
+        state["html_content"] = html_content
+        self.logger.info(f"HTML 콘텐츠 생성 완료: {len(html_content)} 문자")
         
         return state
 
-    # ----------------- 새 노드: 하이라이트 -----------------
-    def _highlight_node(self, state: VisitorDiagnoseState) -> VisitorDiagnoseState:
-        """LLM을 사용해 하이라이트 대상 셀을 결정"""
+    def _create_html_template(self, metric_dict: dict, period: str) -> str:
+        """
+        HTML 보고서 템플릿 생성
+        """
+        from datetime import datetime
+        
+        stores = list(metric_dict.keys())
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        html = f"""
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매장 방문객 진단 보고서</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        body {{
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }}
+        
+        .container {{
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }}
+        
+        .header {{
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }}
+        
+        .header h1 {{
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }}
+        
+        .header .period {{
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }}
+        
+        .header .generated {{
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }}
+        
+        .content {{
+            padding: 40px;
+        }}
+        
+        .store-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }}
+        
+        .store-card {{
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e1e8ed;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }}
+        
+        .store-card:hover {{
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }}
+        
+        .store-header {{
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }}
+        
+        .store-name {{
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }}
+        
+        .store-body {{
+            padding: 18px;
+        }}
+        
+        .metric-section {{
+            margin-bottom: 18px;
+        }}
+        
+        .metric-title {{
+            font-size: 1.0rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #3498db;
+        }}
+        
+        .metric-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
+        }}
+        
+        .metric-item {{
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }}
+        
+        .metric-label {{
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }}
+        
+        .metric-value {{
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }}
+        
+        .metric-value.highlight-red {{
+            color: #e74c3c;
+            font-weight: 800;
+        }}
+        
+        .metric-value.highlight-blue {{
+            color: #3498db;
+            font-weight: 800;
+        }}
+        
+        .time-slots {{
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }}
+        
+        .time-slot-group {{
+            flex: 1;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }}
+        
+        .time-slot-title {{
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            text-align: center;
+        }}
+        
+        .time-slot-item {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }}
+        
+        .time-slot-item:last-child {{
+            border-bottom: none;
+        }}
+        
+        .time-slot-rank {{
+            background: #6c757d;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }}
+        
+        .time-slot-time {{
+            font-size: 0.9rem;
+            color: #495057;
+        }}
+        
+        .time-slot-percent {{
+            font-weight: 600;
+            color: #2c3e50;
+        }}
+        
+        .time-slot-percent.highlight-red {{
+            color: #e74c3c;
+            font-weight: 800;
+        }}
+        
+        .time-slot-percent.highlight-blue {{
+            color: #3498db;
+            font-weight: 800;
+        }}
+        
+        .comparison-table {{
+            width: 100%;
+            margin-top: 40px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }}
+        
+        .comparison-table th {{
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+        }}
+        
+        .comparison-table td {{
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #e1e8ed;
+        }}
+        
+        .comparison-table tbody tr:hover {{
+            background: #f8f9fa;
+        }}
+        
+        .footer {{
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+        }}
+        
+        @media (max-width: 768px) {{
+            .container {{
+                margin: 10px;
+                border-radius: 15px;
+            }}
+            
+            .content {{
+                padding: 20px;
+            }}
+            
+            .store-grid {{
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }}
+            
+            .time-slots {{
+                flex-direction: column;
+                gap: 15px;
+            }}
+            
+            .header h1 {{
+                font-size: 2rem;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏪 매장 방문객 진단 보고서</h1>
+            <div class="period">📅 분석 기간: {period}</div>
+            <div class="generated">⏰ 생성 시간: {current_time}</div>
+        </div>
+        
+        <div class="content">
+            <div class="store-grid">
+"""
+        
+        # 각 매장별 카드 생성
+        for store, data in metric_dict.items():
+            html += self._create_store_card_html(store, data)
+        
+        html += """
+            </div>
+            
+            <!-- 매장 간 비교 테이블 -->
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50; font-size: 2rem;">📊 매장 간 비교</h2>
+"""
+        
+        # 비교 테이블 생성
+        html += self._create_comparison_table_html(metric_dict)
+        
+        html += f"""
+        </div>
+        
+        <div class="footer">
+            <p>💡 이 보고서는 방문객 진단 워크플로우에 의해 자동 생성되었습니다.</p>
+            <p>🔄 마지막 업데이트: {current_time}</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+        
+        return html
+
+    def _create_store_card_html(self, store_name: str, data: dict) -> str:
+        """개별 매장 카드 HTML 생성"""
+        daily_avg = data.get('daily_avg', {})
+        gender = data.get('gender', {})
+        age_rank = data.get('age_rank', {})
+        time_slots = data.get('time_slots', {})
+        
+        html = f"""
+                <div class="store-card">
+                    <div class="store-header">
+                        <div class="store-name">{store_name}</div>
+                    </div>
+                    <div class="store-body">
+                        <!-- 일평균 방문객수 -->
+                        <div class="metric-section">
+                            <div class="metric-title">👥 일평균 방문객수</div>
+                            <div class="metric-grid">
+                                <div class="metric-item">
+                                    <div class="metric-label">전체</div>
+                                    <div class="metric-value">{daily_avg.get('전체', 0):,}명</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">평일</div>
+                                    <div class="metric-value">{daily_avg.get('평일', 0):,}명</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">주말</div>
+                                    <div class="metric-value">{daily_avg.get('주말', 0):,}명</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 성별 경향 -->
+                        <div class="metric-section">
+                            <div class="metric-title">👫 성별 경향</div>
+                            <div class="metric-grid">
+                                <div class="metric-item">
+                                    <div class="metric-label">남성</div>
+                                    <div class="metric-value">{gender.get('남성', 0)}%</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">여성</div>
+                                    <div class="metric-value">{gender.get('여성', 0)}%</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 연령대 순위 -->
+                        <div class="metric-section">
+                            <div class="metric-title">🎯 연령대별 순위</div>
+                            <div class="metric-grid">
+"""
+        
+        # 연령대 순위 데이터 추가
+        for i in range(1, 4):
+            rank_key = None
+            for key in age_rank.keys():
+                if key.startswith(f"{i}위_"):
+                    rank_key = key
+                    break
+            
+            if rank_key:
+                age_group = rank_key.split('위_')[1]
+                pct = age_rank.get(rank_key, 0)
+                html += f"""
+                                <div class="metric-item">
+                                    <div class="metric-label">{i}위</div>
+                                    <div class="metric-value">{age_group}<br><small>{pct}%</small></div>
+                                </div>
+"""
+        
+        html += """
+                            </div>
+                        </div>
+                        
+                        <!-- 시간대 경향 -->
+                        <div class="metric-section">
+                            <div class="metric-title">⏰ 주요 방문시간대</div>
+                            <div class="time-slots">
+"""
+        
+        # 평일/주말 시간대 데이터 추가
+        for day_type in ['평일', '주말']:
+            icon = '💼' if day_type == '평일' else '🎉'
+            slots = time_slots.get(day_type, {})
+            
+            html += f"""
+                                <div class="time-slot-group">
+                                    <div class="time-slot-title">{icon} {day_type}</div>
+"""
+            
+            for i in range(1, 4):
+                rank_key = None
+                for key in slots.keys():
+                    if key.startswith(f"{i}위_"):
+                        rank_key = key
+                        break
+                
+                if rank_key:
+                    parts = rank_key.split('_')
+                    if len(parts) >= 3:
+                        time_name = parts[1]
+                        time_range = parts[2]
+                        pct = slots.get(rank_key, 0)
+                        
+                        html += f"""
+                                    <div class="time-slot-item">
+                                        <div class="time-slot-rank">{i}</div>
+                                        <div class="time-slot-time">{time_name}({time_range})</div>
+                                        <div class="time-slot-percent">{pct}%</div>
+                                    </div>
+"""
+            
+            html += """
+                                </div>
+"""
+        
+        html += """
+                            </div>
+                        </div>
+                    </div>
+                </div>
+"""
+        
+        return html
+
+    def _create_comparison_table_html(self, metric_dict: dict) -> str:
+        """매장 간 비교 테이블 HTML 생성"""
+        stores = list(metric_dict.keys())
+        
+        html = """
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>항목</th>
+"""
+        
+        # 매장명 헤더
+        for store in stores:
+            html += f"<th>{store}</th>"
+        
+        html += """
+                    </tr>
+                </thead>
+                <tbody>
+"""
+        
+        # 일평균 방문객수 행들
+        daily_items = [('전체', '전체'), ('평일', '평일'), ('주말', '주말')]
+        for i, (label, key) in enumerate(daily_items):
+            rowspan = 'rowspan="3"' if i == 0 else ''
+            html += f"""
+                    <tr>
+                        {'<td ' + rowspan + '>일평균 방문객수</td>' if i == 0 else ''}
+                        <td>{label}</td>
+"""
+            for store in stores:
+                value = metric_dict[store].get('daily_avg', {}).get(key, 0)
+                html += f"<td>{value:,}명</td>"
+            html += "</tr>"
+        
+        # 성별 경향 행들
+        gender_items = [('남성', '남성'), ('여성', '여성')]
+        for i, (label, key) in enumerate(gender_items):
+            rowspan = 'rowspan="2"' if i == 0 else ''
+            html += f"""
+                    <tr>
+                        {'<td ' + rowspan + '>성별 경향</td>' if i == 0 else ''}
+                        <td>{label}</td>
+"""
+            for store in stores:
+                value = metric_dict[store].get('gender', {}).get(key, 0)
+                html += f"<td>{value}%</td>"
+            html += "</tr>"
+        
+        # 연령대 순위 행들
+        for rank in range(1, 4):
+            rowspan = 'rowspan="3"' if rank == 1 else ''
+            html += f"""
+                    <tr>
+                        {'<td ' + rowspan + '>연령대 순위</td>' if rank == 1 else ''}
+                        <td>{rank}위</td>
+"""
+            for store in stores:
+                age_rank = metric_dict[store].get('age_rank', {})
+                rank_key = None
+                for key in age_rank.keys():
+                    if key.startswith(f"{rank}위_"):
+                        rank_key = key
+                        break
+                
+                if rank_key:
+                    age_group = rank_key.split('위_')[1]
+                    pct = age_rank.get(rank_key, 0)
+                    html += f"<td>{age_group} ({pct}%)</td>"
+                else:
+                    html += "<td>-</td>"
+            html += "</tr>"
+        
+        html += """
+                </tbody>
+            </table>
+"""
+        
+        return html
+
+    def _save_html_node(self, state: VisitorDiagnoseState) -> VisitorDiagnoseState:
+        """
+        생성된 HTML을 파일로 저장
+        """
+        import os
+        from datetime import datetime
+        
+        html_content = state.get("html_content", "")
+        if not html_content:
+            state["final_result"] = "HTML 콘텐츠가 없음"
+            return state
+        
+        # 하이라이트 적용
+        highlights = state.get("highlights", [])
+        if highlights:
+            html_content = self._apply_html_highlights(html_content, highlights)
+        
+        # HTML 파일 저장
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"방문객진단_{timestamp}.html"
+        
+        # 현재 디렉토리와 chat 디렉토리 모두에 저장 (백엔드 호환성)
+        html_path = f"report/{filename}"
+        chat_html_path = f"../chat/mcp_tools/report/{filename}"
+        
         try:
-            import pandas as pd
+            # 로컬 report 디렉토리에 저장
+            with open(html_path, 'w', encoding='utf-8') as f:
+                f.write(html_content)
+            
+            # chat/mcp_tools/report 디렉토리에도 저장 (백엔드 서빙용)
+            chat_dir = os.path.dirname(chat_html_path)
+            if not os.path.exists(chat_dir):
+                os.makedirs(chat_dir, exist_ok=True)
+            with open(chat_html_path, 'w', encoding='utf-8') as f:
+                f.write(html_content)
+            
+            self.logger.info(f"HTML 보고서 저장 완료: {html_path}")
+            self.logger.info(f"백엔드 서빙용 저장 완료: {chat_html_path}")
+            
+            # 웹 접근 가능한 URL 생성
+            web_url = f"http://localhost:8000/reports/{filename}"
+            abs_path = os.path.abspath(html_path)
+            
+            state["final_result"] = f"📊 HTML 보고서 생성 완료!\n\n🔗 웹에서 보기: {web_url}\n📁 파일 경로: {abs_path}"
+            
+        except Exception as e:
+            self.logger.error(f"HTML 파일 저장 실패: {e}")
+            state["final_result"] = f"HTML 파일 저장 실패: {e}"
+        
+        return state
+
+    def _apply_html_highlights(self, html_content: str, highlights: list) -> str:
+        """
+        HTML에 하이라이트 효과 적용
+        """
+        import re
+        
+        for highlight in highlights:
+            metric = highlight.get("metric", "")
+            store = highlight.get("store", "")
+            color = highlight.get("color", "red")
+            reason = highlight.get("reason", "")
+            
+            self.logger.info(f"하이라이트 적용: {store} - {metric} ({color}) - {reason}")
+            
+            # 매장명과 메트릭에 따라 해당 섹션을 찾아서 하이라이트 적용
+            if metric == "방문객수":
+                # 방문객수 섹션의 metric-value들을 하이라이트
+                pattern = f'(<div class="store-name">{re.escape(store)}</div>.*?<div class="metric-title">👥 일평균 방문객수</div>.*?<div class="metric-value">)([^<]+)(</div>)'
+                html_content = re.sub(
+                    pattern,
+                    f'\\1<span class="highlight-{color}">\\2</span>\\3',
+                    html_content,
+                    flags=re.DOTALL,
+                    count=1
+                )
+            
+            elif metric == "성별경향":
+                # 성별경향 섹션을 하이라이트
+                pattern = f'(<div class="store-name">{re.escape(store)}</div>.*?<div class="metric-title">👫 성별 경향</div>.*?<div class="metric-grid">.*?</div>)'
+                def add_highlight(match):
+                    content = match.group(1)
+                    # 모든 metric-value에 하이라이트 클래스 추가
+                    content = content.replace('class="metric-value"', f'class="metric-value highlight-{color}"')
+                    return content
+                
+                html_content = re.sub(pattern, add_highlight, html_content, flags=re.DOTALL, count=1)
+                
+            elif metric == "연령대순위":
+                # 연령대 순위 섹션을 하이라이트
+                pattern = f'(<div class="store-name">{re.escape(store)}</div>.*?<div class="metric-title">🎯 연령대별 순위</div>.*?<div class="metric-grid">.*?</div>)'
+                def add_highlight(match):
+                    content = match.group(1)
+                    content = content.replace('class="metric-value"', f'class="metric-value highlight-{color}"')
+                    return content
+                
+                html_content = re.sub(pattern, add_highlight, html_content, flags=re.DOTALL, count=1)
+                
+            elif metric == "시간대경향":
+                # 시간대 경향 섹션을 하이라이트
+                pattern = f'(<div class="store-name">{re.escape(store)}</div>.*?<div class="metric-title">⏰ 주요 방문시간대</div>.*?<div class="time-slots">.*?</div>.*?</div>)'
+                def add_highlight(match):
+                    content = match.group(1)
+                    # time-slot-percent에 하이라이트 클래스 추가
+                    content = content.replace('class="time-slot-percent"', f'class="time-slot-percent highlight-{color}"')
+                    return content
+                
+                html_content = re.sub(pattern, add_highlight, html_content, flags=re.DOTALL, count=1)
+        
+        return html_content
+
+    def _highlight_node(self, state: VisitorDiagnoseState) -> VisitorDiagnoseState:
+        """LLM을 사용해 하이라이트 대상 메트릭을 결정"""
+        try:
             import json as _json
 
-            df = state.get("dataframe")
-            if df is None:
-                self.logger.warning("DataFrame이 없어 highlight 스킵")
+            metric_dict = state.get("metric_dict", {})
+            if not metric_dict:
+                self.logger.warning("metric_dict가 없어 highlight 스킵")
                 state["highlights"] = []
                 return state
 
-            # 표를 markdown 형식으로 변환
-            try:
-                table_md = df.to_markdown(index=False)
-            except Exception:
-                table_md = str(df.head())
+            # metric_dict를 표 형식으로 변환
+            table_text = self._format_metrics_for_highlight(metric_dict)
 
-            prompt = self._highlight_prompt.format(table=table_md)
+            prompt = self._highlight_prompt.format(table=table_text)
             self.logger.info(f"하이라이트 프롬프트 길이: {len(prompt)}")
             self.logger.info(f"프롬프트 샘플: {prompt[:500]}...")
+            
             response = self.llm.invoke(prompt)
             self.logger.info(f"LLM 응답 타입: {type(response.content)}")
             self.logger.info(f"LLM 응답 내용: '{response.content}'")
+            
             highlights = []
             try:
                 # 마크다운 코드 블록 제거
@@ -815,316 +1236,55 @@ ORDER BY ord
             state["highlights"] = []
             return state
 
-    def _update_excel_node(self, state: VisitorDiagnoseState) -> VisitorDiagnoseState:
+    def _format_metrics_for_highlight(self, metric_dict: dict) -> str:
         """
-        pandas DataFrame으로 이미 엑셀 저장이 완료되었으므로 상태만 업데이트
-        추가로 셀 병합과 정렬 적용
+        metric_dict를 LLM이 분석하기 좋은 표 형식으로 변환
         """
-        # placements가 비어있으면 pandas로 이미 저장 완료
-        if not state["placements"]:
-            self.logger.info("pandas DataFrame으로 엑셀 저장 완료")
+        table_lines = []
+        table_lines.append("매장별 방문객 진단 데이터:")
+        table_lines.append("=" * 50)
+        
+        for store, data in metric_dict.items():
+            table_lines.append(f"\n[{store}]")
             
-            # 셀 병합과 정렬 적용
-            excel_path = "report/점포진단표.xlsx"
-            self._apply_cell_merge_and_alignment(excel_path)
-
-            # ----------------- 하이라이트 적용 -----------------
-            highlights = state.get("highlights", [])
-            if highlights:
-                from openpyxl import load_workbook
-                from openpyxl.styles import PatternFill
-
-                red_fill = PatternFill(start_color="FFF4CCCC", end_color="FFF4CCCC", fill_type="solid")
-                blue_fill = PatternFill(start_color="FFDAE8FC", end_color="FFDAE8FC", fill_type="solid")
-
-                wb = load_workbook(excel_path)
-                ws = wb.active
-                for item in highlights:
-                    cell_addr = item.get("cell")
-                    color = item.get("color")
-                    if not cell_addr:
-                        continue
-                    try:
-                        cell = ws[cell_addr]
-                        cell.fill = red_fill if color == "red" else blue_fill
-                    except Exception as e:
-                        self.logger.error(f"셀 색칠 실패 {cell_addr}: {e}")
-                wb.save(excel_path)
-
-            state["final_result"] = "엑셀 업데이트 완료 (pandas + 셀병합)"
-            return state
-        
-        # 혹시 placements가 있다면 기존 로직 실행
-        import asyncio
-        
-        async def update_excel():
-            from mcp_use import MCPClient  # tools import 제거
-            import os
-
-            config = {
-                "mcpServers": {
-                    "excel": {"command": "npx", "args": ["--yes", "@negokaz/excel-mcp-server"]}
-                }
-            }
-            client = MCPClient.from_dict(config)
-            await client.create_all_sessions()
-            session = client.get_session("excel")
-
-            excel_file = os.path.abspath("report/점포진단표.xlsx")
-            for p in state["placements"]:
-                await session.connector.call_tool(
-                    "excel_write_to_sheet",
-                    {
-                        "fileAbsolutePath": excel_file,
-                        "sheetName": p["sheet"],
-                        "newSheet": False,
-                        "range": p["cell"],
-                        "values": [[p["value"]]],
-                    },
-                )
-            await client.close_all_sessions()
-        
-        # 비동기 함수를 동기적으로 실행
-        asyncio.run(update_excel())
-        state["final_result"] = "엑셀 업데이트 완료 (mcp-server)"
-        return state
-
-    def _apply_cell_merge_and_alignment(self, excel_path: str):
-        """
-        셀 병합, 정렬, 테두리, 크기를 단계별로 적용합니다.
-        """
-        self.logger.info("셀 병합 및 정렬 적용 시작")
-        self._apply_cell_merging(excel_path)
-        self._apply_alignment(excel_path)
-        self._apply_borders(excel_path)
-        self._apply_cell_sizing(excel_path)
-        self.logger.info(f"셀 병합 및 정렬 적용 완료: {excel_path}")
-
-    def _apply_cell_merging(self, excel_path: str):
-        """1단계: 셀 병합만 처리"""
-        from openpyxl import load_workbook
-        
-        wb = load_workbook(excel_path)
-        ws = wb.active
-        
-        self.logger.info("1단계: 셀 병합 적용")
-        
-        # 주제 컬럼 (A) - 모든 방문객수 병합
-        ws.merge_cells('A3:A16')
-        ws['A3'].value = "방문객수"
-        
-        # 항목 컬럼 (B) - 같은 내용끼리 병합
-        merge_ranges = [
-            ('B3:B5', '일평균'),
-            ('B6:B7', '성별경향'),
-            ('B8:B10', '연령대 경향'),
-            ('B11:B16', '시간대 경향')
-        ]
-        
-        for range_str, value in merge_ranges:
-            ws.merge_cells(range_str)
-            first_cell = range_str.split(':')[0]
-            ws[first_cell].value = value
-        
-        # 지표 컬럼 (C) - 같은 내용끼리 병합
-        ws.merge_cells('C8:C10')
-        ws['C8'].value = "연령대 별 순위"
-        ws.merge_cells('C11:C13')
-        ws['C11'].value = "평일 주요 방문시간대"
-        ws.merge_cells('C14:C16')
-        ws['C14'].value = "주말 주요 방문시간대"
-        
-        # 참고값 컬럼 빈칸 세로 병합 (일평균/성별만) - 하드코딩
-        # 4개 매장 기준: G, K, O, S 컬럼
-        for col_letter in ['G', 'K', 'O', 'S']:
-            ws.merge_cells(f'{col_letter}3:{col_letter}5')  # 일평균
-            ws.merge_cells(f'{col_letter}6:{col_letter}7')  # 성별경향
-        
-        wb.save(excel_path)
-        self.logger.info("1단계 완료: 셀 병합")
-
-    def _apply_alignment(self, excel_path: str):
-        """2단계: 정렬만 처리"""
-        from openpyxl import load_workbook
-        from openpyxl.styles import Alignment
-        
-        wb = load_workbook(excel_path)
-        ws = wb.active
-        
-        self.logger.info("2단계: 정렬 적용")
-        
-        # 정렬 스타일 정의
-        center_alignment = Alignment(horizontal='center', vertical='center')
-        left_alignment = Alignment(horizontal='left', vertical='center')
-        right_alignment = Alignment(horizontal='right', vertical='center')
-        
-        # 첫 번째 행 (매장명) - 모두 중앙 정렬
-        for col in range(1, ws.max_column + 1):
-            ws.cell(1, col).alignment = center_alignment
-        
-        # 두 번째 행 (헤더) - 중앙 정렬
-        for col in range(1, ws.max_column + 1):
-            ws.cell(2, col).alignment = center_alignment
-        
-        # 데이터 행들 정렬
-        for row in range(3, ws.max_row + 1):
-            # A열 (주제) - 중앙 정렬
-            ws.cell(row, 1).alignment = center_alignment
-            # B열 (항목) - 중앙 정렬  
-            ws.cell(row, 2).alignment = center_alignment
-            # C열 (지표) - 좌측 정렬
-            ws.cell(row, 3).alignment = left_alignment
+            # 일평균 방문객수
+            daily_avg = data.get('daily_avg', {})
+            table_lines.append(f"일평균 방문객수: 전체 {daily_avg.get('전체', 0)}명, 평일 {daily_avg.get('평일', 0)}명, 주말 {daily_avg.get('주말', 0)}명")
             
-            # 매장 데이터 컬럼들 (D~S, 4개 매장 × 4컬럼)
-            for col in range(4, ws.max_column + 1):
-                col_type = (col - 4) % 4  # 0:템플릿1, 1:결과, 2:템플릿2, 3:참고값
-                if col_type == 0:  # 템플릿1 - 중앙 정렬
-                    ws.cell(row, col).alignment = center_alignment
-                elif col_type == 1:  # 결과 - 우측 정렬 (숫자)
-                    ws.cell(row, col).alignment = right_alignment
-                elif col_type == 2:  # 템플릿2 - 좌측 정렬 (단위)
-                    ws.cell(row, col).alignment = left_alignment
-                elif col_type == 3:  # 참고값 - 우측 정렬
-                    ws.cell(row, col).alignment = right_alignment
+            # 성별 경향
+            gender = data.get('gender', {})
+            table_lines.append(f"성별 경향: 남성 {gender.get('남성', 0)}%, 여성 {gender.get('여성', 0)}%")
+            
+            # 연령대 순위
+            age_rank = data.get('age_rank', {})
+            age_info = []
+            for i in range(1, 4):
+                for key, pct in age_rank.items():
+                    if key.startswith(f"{i}위_"):
+                        age_group = key.split('위_')[1]
+                        age_info.append(f"{i}위: {age_group} ({pct}%)")
+                        break
+            table_lines.append(f"연령대 순위: {', '.join(age_info)}")
+            
+            # 시간대 경향
+            time_slots = data.get('time_slots', {})
+            for day_type in ['평일', '주말']:
+                slots = time_slots.get(day_type, {})
+                time_info = []
+                for i in range(1, 4):
+                    for key, pct in slots.items():
+                        if key.startswith(f"{i}위_"):
+                            parts = key.split('_')
+                            if len(parts) >= 3:
+                                time_name = parts[1]
+                                time_range = parts[2]
+                                time_info.append(f"{i}위: {time_name}({time_range}) {pct}%")
+                            break
+                table_lines.append(f"{day_type} 시간대: {', '.join(time_info)}")
         
-        wb.save(excel_path)
-        self.logger.info("2단계 완료: 정렬")
+        return "\n".join(table_lines)
 
-    def _apply_borders(self, excel_path: str):
-        """3단계: 테두리만 처리 (excel-mcp-server 사용)"""
-        from openpyxl import load_workbook
-        from openpyxl.styles import Border, Side
-        
-        self.logger.info("3단계: 테두리 적용")
-        
-        wb = load_workbook(excel_path)
-        ws = wb.active
-        
-        # 테두리 스타일 정의
-        thin_border = Side(style='thin')
-        medium_border = Side(style='medium')
-        thick_border = Side(style='thick')
-        
-        # 샘플 파일 기반 하드코딩된 테두리 패턴
-        # 첫 번째 행 (매장명 헤더)
-        for col in range(4, ws.max_column + 1, 4):  # D, H, L, P (매장 시작 컬럼)
-            # 매장명 첫 컬럼
-            ws.cell(1, col).border = Border(left=medium_border, right=medium_border, top=medium_border)
-            # 매장명 중간 컬럼들
-            for i in range(1, 3):
-                ws.cell(1, col + i).border = Border(top=medium_border)
-            # 매장명 마지막 컬럼
-            ws.cell(1, col + 3).border = Border(right=medium_border, top=medium_border)
-        
-        # 두 번째 행 (주제/항목/지표/결과/참고값 헤더)
-        ws.cell(2, 1).border = Border(left=medium_border, right=thin_border, top=medium_border, bottom=medium_border)  # 주제
-        ws.cell(2, 2).border = Border(left=thin_border, right=thin_border, top=medium_border, bottom=medium_border)   # 항목
-        ws.cell(2, 3).border = Border(left=thin_border, top=medium_border, bottom=medium_border)                     # 지표
-        
-        # 매장별 결과/참고값 헤더
-        for col in range(4, ws.max_column + 1, 4):
-            # 결과 (3컬럼 병합의 첫 컬럼)
-            ws.cell(2, col).border = Border(left=thick_border, right=thin_border, top=medium_border, bottom=medium_border)
-            ws.cell(2, col + 1).border = Border(top=medium_border, bottom=medium_border)
-            ws.cell(2, col + 2).border = Border(right=thin_border, top=medium_border, bottom=medium_border)
-            # 참고값
-            ws.cell(2, col + 3).border = Border(left=thin_border, top=medium_border, bottom=medium_border)
-        
-        # 데이터 행들 (3-16행)
-        for row in range(3, 17):
-            # A열 (주제) - 세로 병합된 셀
-            ws.cell(row, 1).border = Border(left=medium_border, right=thin_border)
-            if row == 16:  # 마지막 행
-                ws.cell(row, 1).border = Border(left=medium_border, right=thin_border, bottom=medium_border)
-            
-            # B열 (항목)
-            if row in [3, 6, 8, 11]:  # 항목 시작 행들
-                ws.cell(row, 2).border = Border(right=thin_border, top=medium_border if row in [6, 11] else thin_border)
-            elif row in [5, 7, 10, 16]:  # 항목 끝 행들
-                ws.cell(row, 2).border = Border(right=thin_border, bottom=medium_border if row in [5, 7, 16] else thin_border)
-            else:
-                ws.cell(row, 2).border = Border(right=thin_border)
-            
-            # C열 (지표)
-            if row <= 7:  # 일평균, 성별경향
-                if row in [3, 4, 5]:  # 일평균
-                    ws.cell(row, 3).border = Border(left=thin_border, bottom=thin_border if row == 5 else None)
-                elif row in [6, 7]:  # 성별경향
-                    ws.cell(row, 3).border = Border(left=thin_border, top=medium_border if row == 6 else None, bottom=medium_border if row == 7 else thin_border)
-            elif row in [8, 9, 10]:  # 연령대
-                ws.cell(row, 3).border = Border(left=thin_border, right=thick_border, top=thin_border if row == 8 else None, bottom=thin_border if row == 10 else None)
-            elif row in [11, 12, 13]:  # 평일 시간대
-                ws.cell(row, 3).border = Border(left=thin_border, right=thick_border, top=medium_border if row == 11 else None, bottom=thin_border if row == 13 else None)
-            elif row in [14, 15, 16]:  # 주말 시간대
-                ws.cell(row, 3).border = Border(left=thin_border, right=thick_border, top=thin_border if row == 14 else None, bottom=medium_border if row == 16 else None)
-            
-            # 매장 데이터 컬럼들 (D부터)
-            for col in range(4, ws.max_column + 1):
-                col_type = (col - 4) % 4  # 0:템플릿1, 1:결과, 2:템플릿2, 3:참고값
-                
-                # 기본 테두리
-                left_border = thick_border if col_type == 0 else None
-                right_border = None
-                top_border = None
-                bottom_border = None
-                
-                # 행별 특별 테두리
-                if row == 3:  # 첫 데이터 행
-                    top_border = None
-                    bottom_border = thin_border
-                elif row in [4, 5]:  # 일평균 나머지
-                    bottom_border = thin_border if row == 4 else None
-                elif row in [6, 7]:  # 성별경향
-                    top_border = medium_border if row == 6 else None
-                    bottom_border = medium_border if row == 7 else thin_border
-                elif row in [8, 9, 10]:  # 연령대
-                    bottom_border = thin_border
-                elif row in [11, 12, 13]:  # 평일 시간대
-                    top_border = medium_border if row == 11 else None
-                    bottom_border = thin_border
-                elif row in [14, 15, 16]:  # 주말 시간대
-                    top_border = thin_border if row == 14 else None
-                    bottom_border = medium_border if row == 16 else thin_border
-                
-                # 참고값 컬럼 (마지막 컬럼)
-                if col_type == 3:
-                    left_border = thin_border
-                
-                ws.cell(row, col).border = Border(
-                    left=left_border,
-                    right=right_border,
-                    top=top_border,
-                    bottom=bottom_border
-                )
-        
-        wb.save(excel_path)
-        self.logger.info("3단계 완료: 테두리 (하드코딩)")
-
-    def _apply_cell_sizing(self, excel_path: str):
-        """4단계: 셀 크기만 처리"""
-        from openpyxl import load_workbook
-        
-        wb = load_workbook(excel_path)
-        ws = wb.active
-        
-        self.logger.info("4단계: 셀 크기 적용")
-        
-        # 행 높이 조정
-        for row in range(1, ws.max_row + 1):
-            ws.row_dimensions[row].height = 25
-        
-        # 컬럼 너비 조정
-        ws.column_dimensions['A'].width = 12  # 주제
-        ws.column_dimensions['B'].width = 18  # 항목
-        ws.column_dimensions['C'].width = 15  # 지표
-        
-        # 매장 컬럼들 너비 조정
-        for col_idx in range(4, ws.max_column + 1):
-            col_letter = chr(ord('A') + col_idx - 1)
-            ws.column_dimensions[col_letter].width = 12
-        
-        wb.save(excel_path)
-        self.logger.info("4단계 완료: 셀 크기")
+# 기존 엑셀 관련 메서드들은 HTML 버전으로 대체되었습니다.
 
     def _generate_dummy_data_for_store(self, store_name: str) -> str:
         """더미데이터점들을 위한 가짜 데이터 생성 (각 매장마다 다른 특성)"""
@@ -1200,22 +1360,25 @@ mcp = FastMCP("visitor_diagnose_excel")
 
 
 @mcp.tool()  # FastMCP 서버 전용
-def visitor_diagnose_excel(
+def visitor_diagnose_html(
     *,
     store_name: Union[str, List[str]],
     start_date: str,
     end_date: str,
-    user_prompt: str = "매장 방문객 진단 분석 엑셀화"
+    user_prompt: str = "매장 방문객 진단 분석 HTML 보고서"
 ) -> str:
-    """[EXCEL_REPORT] Generate an **Excel report** for *visitor diagnostics*.
+    """[HTML_REPORT] Generate a **modern HTML report** for *visitor diagnostics*.
 
     Trigger words (case-insensitive):
-        - "엑셀", "excel", "xlsx", "엑셀화", "sheet", "보고서"
-        - Combinations like "방문객 진단 엑셀", "visitor diagnose excel" etc.
+        - "html", "웹", "web", "보고서", "report", "진단"
+        - Combinations like "방문객 진단 html", "visitor diagnose report" etc.
 
-    Use this when the user explicitly asks to *export/produce an Excel file* of
-    visitor-related metrics such as daily average visitors, gender ratio,
-    age ranking, or time-slot trends.
+    Use this when the user asks for a visitor analysis report. Creates a beautiful,
+    responsive HTML report with interactive features including:
+    - Individual store cards with metrics
+    - Comparison tables between stores  
+    - Visual highlights for important data
+    - Mobile-friendly responsive design
 
     Parameters
     ----------
@@ -1226,12 +1389,12 @@ def visitor_diagnose_excel(
     end_date : str
         End date (YYYY-MM-DD).
     user_prompt : str, optional
-        Custom prompt for LLM. Defaults to "매장 방문객 진단 분석 엑셀화".
+        Custom prompt for LLM. Defaults to "매장 방문객 진단 분석 HTML 보고서".
 
     Returns
     -------
     str
-        Result message containing "엑셀 업데이트 완료" when successful.
+        Result message containing the absolute path to the generated HTML file.
     """
 
     workflow = VisitorDiagnoseWorkflow()

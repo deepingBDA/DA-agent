@@ -4,8 +4,10 @@ import {
   SmartToy as BotIcon,
   KeyboardArrowDown as CollapseIcon,
   KeyboardArrowUp as ExpandIcon,
+  OpenInNew as OpenIcon,
+  Assessment as ReportIcon,
 } from '@mui/icons-material'
-import { Paper, Typography, Box, IconButton, Collapse } from '@mui/material'
+import { Paper, Typography, Box, IconButton, Collapse, Button, Chip } from '@mui/material'
 
 interface ChatMessageProps {
   role: 'user' | 'assistant' | 'assistant_tool'
@@ -22,6 +24,63 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
   const handleExpandClick = () => {
     setExpanded(!expanded)
+  }
+
+  // URL을 인식하고 클릭 가능한 링크로 변환하는 함수
+  const renderContentWithLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    const reportUrlRegex = /(http:\/\/localhost:8000\/reports\/[^\s]+\.html)/g
+    
+    // HTML 보고서 URL을 특별히 처리
+    const parts = text.split(reportUrlRegex)
+    
+    return parts.map((part, index) => {
+      if (reportUrlRegex.test(part)) {
+        const filename = part.split('/').pop()?.replace('.html', '') || '보고서'
+        return (
+          <Box key={index} sx={{ my: 1 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<ReportIcon />}
+              endIcon={<OpenIcon />}
+              onClick={() => window.open(part, '_blank')}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600,
+                px: 2,
+                py: 1,
+              }}
+            >
+              📊 {filename} 보고서 열기
+            </Button>
+            <Chip
+              label="클릭하여 새 탭에서 보기"
+              size="small"
+              variant="outlined"
+              sx={{ ml: 1, fontSize: '0.75rem' }}
+            />
+          </Box>
+        )
+      } else if (urlRegex.test(part)) {
+        // 일반 URL 처리
+        return (
+          <Button
+            key={index}
+            variant="outlined"
+            size="small"
+            startIcon={<OpenIcon />}
+            onClick={() => window.open(part, '_blank')}
+            sx={{ mx: 0.5, textTransform: 'none' }}
+          >
+            링크 열기
+          </Button>
+        )
+      } else {
+        return part
+      }
+    })
   }
 
   return (
@@ -69,7 +128,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               lineHeight: 1.6
             }}
           >
-            {content}
+            {renderContentWithLinks(content)}
           </Typography>
         </Box>
 
