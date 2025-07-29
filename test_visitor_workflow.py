@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Visitor Diagnose Workflow 테스트 스크립트
+Visitor Diagnose Workflow 테스트 스크립트 (HTML 버전)
 
 Usage:
     python test_visitor_workflow.py
     python test_visitor_workflow.py --store 더미데이터점1 --start 2025-01-01 --end 2025-01-07
-    python test_visitor_workflow.py --multi  # 모든 더미매장 비교
+    python test_visitor_workflow.py --multi  # 모든 더미매장 비교 (HTML 보고서)
 """
 
 import sys
@@ -44,7 +44,7 @@ def test_visitor_workflow():
     
     # 매장 선택
     if args.multi:
-        store_names = ["더미데이터점", "더미데이터점1", "더미데이터점2", "더미데이터점3", "망우혜원점"]
+        store_names = ["더미데이터점", "더미데이터점1", "더미데이터점2", "더미데이터점3", "더미데이터점4"]
         test_name = "Multi-Store Comparison"
     else:
         store_names = args.store
@@ -76,15 +76,27 @@ def test_visitor_workflow():
         print(f"Result: {result}")
         
         # 생성된 파일 확인
-        excel_path = "report/점포진단표.xlsx"
-        if os.path.exists(excel_path):
-            file_size = os.path.getsize(excel_path)
-            print(f"📊 Excel file created: {excel_path} ({file_size} bytes)")
+        # HTML 파일 찾기 (파일명에 타임스탬프가 포함됨)
+        report_dir = "report"
+        if os.path.exists(report_dir):
+            html_files = [f for f in os.listdir(report_dir) if f.endswith('.html') and '방문객진단' in f]
+        else:
+            html_files = []
+        
+        if html_files:
+            # 가장 최근 파일 선택
+            latest_html = max(html_files, key=lambda x: os.path.getctime(os.path.join(report_dir, x)))
+            html_path = os.path.join(report_dir, latest_html)
+            file_size = os.path.getsize(html_path)
+            print(f"📊 HTML report created: {html_path} ({file_size} bytes)")
             
             if args.multi:
-                print("🔍 Multi-store comparison enabled - check for highlight colors!")
+                print("🔍 Multi-store comparison enabled - check for red highlights!")
+            
+            # 브라우저에서 열기 제안
+            print(f"🌐 Open in browser: file://{os.path.abspath(html_path)}")
         else:
-            print("⚠️  Excel file not found")
+            print("⚠️  HTML report file not found")
             
     except ImportError as e:
         print(f"❌ Import error: {e}")

@@ -720,10 +720,10 @@ const AgentApp: React.FC = () => {
                       sx={{
                         p: 2,
                         mb: 2,
-                        bgcolor: '#292929',
+                        background: 'linear-gradient(135deg, #1a202c 0%, #2d3748 100%)',
                         borderRadius: '10px',
-                        borderLeft: '4px solid #FFFFFF',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        borderLeft: '4px solid #4fd1c7',
+                        boxShadow: '0 12px 40px rgba(26, 32, 44, 0.4)',
                         overflow: 'hidden',
                       }}
                     >
@@ -745,10 +745,11 @@ const AgentApp: React.FC = () => {
                         <Typography
                           variant="subtitle2"
                           sx={{
-                            color: '#2196f3',
+                            color: '#4fd1c7',
                             fontWeight: 'bold',
                             display: 'flex',
                             alignItems: 'center',
+                            textShadow: '0 1px 2px rgba(79, 209, 199, 0.3)',
                           }}
                         >
                           도구 참조 #{toolIndex + 1}
@@ -773,11 +774,12 @@ const AgentApp: React.FC = () => {
                         <Box
                           sx={{
                             mt: 1,
-                            backgroundColor: '#FFFFFF',
+                            background: 'linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)',
                             borderRadius: '6px',
                             p: 1.5,
                             maxHeight: 'calc(100vh - 300px)',
                             overflowY: 'auto',
+                            border: '1px solid rgba(79, 209, 199, 0.2)',
                           }}
                         >
                           <div>
@@ -843,15 +845,21 @@ const AgentApp: React.FC = () => {
                           width: message.role === 'user' ? 'auto' : 'auto',
                           bgcolor:
                             message.role === 'user'
-                              ? 'primary.dark'
-                              : '#d6b46b',
+                              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                              : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
                           borderRadius: '18px',
                           borderTopLeftRadius:
                             message.role === 'user' ? '18px' : '4px',
                           borderTopRightRadius:
                             message.role === 'user' ? '4px' : '18px',
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                          boxShadow: message.role === 'user' 
+                            ? '0 8px 32px rgba(102, 126, 234, 0.3)'
+                            : '0 8px 32px rgba(240, 147, 251, 0.3)',
                           position: 'relative',
+                          background: message.role === 'user'
+                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                            : 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+                          color: message.role === 'user' ? '#ffffff' : '#2d3748',
                         }}
                       >
                         {/* 말풍선 가장자리의 도구 참조 번호 표시 제거 */}
@@ -881,10 +889,11 @@ const AgentApp: React.FC = () => {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             style={{ 
-                                              color: '#1976d2', 
+                                              color: '#e53e3e', 
                                               textDecoration: 'underline', 
                                               fontWeight: 600,
-                                              cursor: 'pointer'
+                                              cursor: 'pointer',
+                                              textShadow: '0 1px 2px rgba(229, 62, 62, 0.3)'
                                             }}
                                           >
                                             웹에서 보기
