@@ -433,7 +433,36 @@ const AgentApp: React.FC = () => {
         flexDirection: 'column',
         overflow: 'hidden',
         width: '100%',
-        bgcolor: 'background.paper',
+        background: `
+          linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%),
+          radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%)
+        `,
+        backgroundAttachment: 'fixed',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `
+            repeating-linear-gradient(
+              90deg,
+              transparent,
+              transparent 98px,
+              rgba(255, 255, 255, 0.03) 100px
+            ),
+            repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 98px,
+              rgba(255, 255, 255, 0.03) 100px
+            )
+          `,
+          pointerEvents: 'none',
+        },
       }}
     >
       <Grid
@@ -445,7 +474,7 @@ const AgentApp: React.FC = () => {
           width: '100%',
           position: 'relative',
           overflow: 'hidden',
-          bgcolor: 'background.paper',
+          background: 'transparent',
         }}
       >
         {/* 사이드바 */}
@@ -479,7 +508,10 @@ const AgentApp: React.FC = () => {
             <Typography variant="h6" gutterBottom>
               🚀 MCP Tool Utilization Agent
             </Typography>
-            <Divider sx={{ my: 2 }} />
+            <Divider sx={{ 
+              my: 2,
+              borderColor: 'rgba(255, 255, 255, 0.1)',
+            }} />
 
             {/* 시스템 설정 */}
             <Accordion defaultExpanded>
@@ -653,17 +685,43 @@ const AgentApp: React.FC = () => {
               borderRadius: 0,
               transition: 'all 0.3s ease',
               width: '100%',
-              bgcolor: 'background.paper',
+              background: `
+                linear-gradient(180deg, #ffffff 0%, #fafbfc 100%)
+              `,
+              boxShadow: `
+                0 2px 4px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8)
+              `,
+              border: '1px solid #e9ecef',
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '3px',
+                background: 'linear-gradient(90deg, #007bff 0%, #6610f2 50%, #e83e8c 100%)',
+              },
             }}
           >
             {/* 사이드바 토글 버튼 */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
               <Button
                 variant="outlined"
-                color="primary"
                 onClick={() => setShowSidebar(!showSidebar)}
                 startIcon={showSidebar ? <CloseIcon /> : <MenuIcon />}
                 size="small"
+                sx={{
+                  background: 'rgba(79, 209, 199, 0.1)',
+                  border: '1px solid rgba(79, 209, 199, 0.3)',
+                  color: '#4fd1c7',
+                  '&:hover': {
+                    background: 'rgba(79, 209, 199, 0.2)',
+                    border: '1px solid rgba(79, 209, 199, 0.5)',
+                  },
+                  backdropFilter: 'blur(10px)',
+                }}
               >
                 {showSidebar ? '사이드바 닫기' : '사이드바 열기'}
               </Button>
@@ -674,12 +732,17 @@ const AgentApp: React.FC = () => {
             {/* 메시지 표시 영역 */}
             <Box
               sx={{
-                flexGrow: 1,
-                overflow: 'hidden',
-                mb: 2,
+                flex: 1,
+                overflowY: 'auto',
+                p: 2,
                 display: 'flex',
-                flexDirection: 'row',
-                height: 'calc(100% - 200px)',
+                flexDirection: 'column',
+                gap: 2,
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                margin: '8px',
               }}
             >
               {/* 왼쪽 컬럼: 도구 사용 내역 */}
@@ -720,11 +783,28 @@ const AgentApp: React.FC = () => {
                       sx={{
                         p: 2,
                         mb: 2,
-                        background: 'linear-gradient(135deg, #1a202c 0%, #2d3748 100%)',
+                        background: `
+                          linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%),
+                          linear-gradient(180deg, rgba(0, 123, 255, 0.03) 0%, transparent 100%)
+                        `,
                         borderRadius: '10px',
-                        borderLeft: '4px solid #4fd1c7',
-                        boxShadow: '0 12px 40px rgba(26, 32, 44, 0.4)',
+                        borderLeft: '4px solid #007bff',
+                        boxShadow: `
+                          0 2px 8px rgba(0, 0, 0, 0.08),
+                          inset 0 1px 0 rgba(255, 255, 255, 0.8)
+                        `,
                         overflow: 'hidden',
+                        border: '1px solid #e9ecef',
+                        position: 'relative',
+                        '&::before': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          bottom: 0,
+                          width: '2px',
+                          background: 'linear-gradient(180deg, #007bff 0%, transparent 100%)',
+                        },
                       }}
                     >
                       <Box
@@ -745,11 +825,12 @@ const AgentApp: React.FC = () => {
                         <Typography
                           variant="subtitle2"
                           sx={{
-                            color: '#4fd1c7',
+                            color: '#007bff',
                             fontWeight: 'bold',
                             display: 'flex',
                             alignItems: 'center',
-                            textShadow: '0 1px 2px rgba(79, 209, 199, 0.3)',
+                            textShadow: '0 1px 2px rgba(0, 123, 255, 0.2)',
+                            letterSpacing: '0.5px',
                           }}
                         >
                           도구 참조 #{toolIndex + 1}
@@ -845,21 +926,35 @@ const AgentApp: React.FC = () => {
                           width: message.role === 'user' ? 'auto' : 'auto',
                           bgcolor:
                             message.role === 'user'
-                              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                              : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                              ? 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'
+                              : 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
                           borderRadius: '18px',
                           borderTopLeftRadius:
                             message.role === 'user' ? '18px' : '4px',
                           borderTopRightRadius:
                             message.role === 'user' ? '4px' : '18px',
                           boxShadow: message.role === 'user' 
-                            ? '0 8px 32px rgba(102, 126, 234, 0.3)'
-                            : '0 8px 32px rgba(240, 147, 251, 0.3)',
+                            ? '0 4px 12px rgba(0, 123, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                            : '0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                           position: 'relative',
                           background: message.role === 'user'
-                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                            : 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+                            ? 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'
+                            : `
+                              linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%),
+                              linear-gradient(90deg, rgba(0, 123, 255, 0.02) 0%, transparent 100%)
+                            `,
                           color: message.role === 'user' ? '#ffffff' : '#2d3748',
+                          border: message.role === 'user' ? 'none' : '1px solid #e9ecef',
+                          '&::before': message.role !== 'user' ? {
+                            content: '""',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '2px',
+                            background: 'linear-gradient(90deg, #007bff 0%, transparent 100%)',
+                            borderRadius: '18px 18px 0 0',
+                          } : {},
                         }}
                       >
                         {/* 말풍선 가장자리의 도구 참조 번호 표시 제거 */}
@@ -1017,7 +1112,17 @@ const AgentApp: React.FC = () => {
 
             {/* 메시지 입력 영역 */}
             <Box
-              sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                p: 2,
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                margin: '8px',
+              }}
             >
               {/* 첨부 파일 표시 영역 */}
               {attachment && (
