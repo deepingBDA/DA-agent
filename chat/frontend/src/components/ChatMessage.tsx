@@ -36,7 +36,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     }
 
     // 2) [웹에서 보기](URL) 패턴을 찾아서 "웹에서 보기"만 남기고 URL 추출
-    text = text.replace(/🔗\s*\[웹에서 보기\]\(([^)]+)\)/g, '웹에서 보기')
+    text = text.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
 
     return text
   }, [content])
@@ -59,7 +59,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     }
 
     // toolInfo에서도 동일하게 처리
-    text = text.replace(/🔗\s*\[웹에서 보기\]\(([^)]+)\)/g, '웹에서 보기')
+    text = text.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
 
     return text
   }, [toolInfo])
