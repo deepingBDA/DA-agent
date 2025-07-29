@@ -41,6 +41,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     return text
   }, [content])
 
+  // toolInfo가 있을 때 동일한 전처리 적용
+  const cleanedToolInfo = useMemo(() => {
+    if (!toolInfo) return undefined
+
+    let text = toolInfo.trim()
+
+    if (text.startsWith('```')) {
+      text = text.replace(/^```[^\n]*\n/, '')
+      text = text.replace(/\n```\s*$/, '')
+    }
+
+    text = text.replace(/(\/reports\/[^\s)]+\.html)/g, '[$1]($1)')
+
+    return text
+  }, [toolInfo])
+
   const handleExpandClick = () => {
     setExpanded(!expanded)
   }
@@ -130,12 +146,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 }}
               >
                 {/* toolInfo 도 마크다운으로 렌더링하여 링크·코드블록 지원 */}
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{ a: renderAnchor }}
-                >
-                  {toolInfo}
-                </ReactMarkdown>
+                {cleanedToolInfo && (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{ a: renderAnchor }}
+                  >
+                    {cleanedToolInfo}
+                  </ReactMarkdown>
+                )}
               </Box>
             </Collapse>
           </Box>
