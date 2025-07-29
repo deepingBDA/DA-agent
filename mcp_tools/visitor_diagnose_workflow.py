@@ -876,7 +876,7 @@ ORDER BY ord
         """개별 매장 카드 HTML 생성"""
         daily_avg = data.get('daily_avg', {})
         gender = data.get('gender', {})
-        age_rank = data.get('age_rank', {})
+            age_rank = data.get('age_rank', {})
         time_slots = data.get('time_slots', {})
         
         html = f"""
@@ -926,14 +926,14 @@ ORDER BY ord
 """
         
         # 연령대 순위 데이터 추가
-        for i in range(1, 4):
-            rank_key = None
-            for key in age_rank.keys():
-                if key.startswith(f"{i}위_"):
-                    rank_key = key
-                    break
+            for i in range(1, 4):
+                rank_key = None
+                for key in age_rank.keys():
+                    if key.startswith(f"{i}위_"):
+                        rank_key = key
+                        break
             
-            if rank_key:
+                if rank_key:
                 age_group = rank_key.split('위_')[1]
                 pct = age_rank.get(rank_key, 0)
                 html += f"""
@@ -1068,7 +1068,7 @@ ORDER BY ord
                     age_group = rank_key.split('위_')[1]
                     pct = age_rank.get(rank_key, 0)
                     html += f"<td>{age_group} ({pct}%)</td>"
-                else:
+                    else:
                     html += "<td>-</td>"
             html += "</tr>"
         

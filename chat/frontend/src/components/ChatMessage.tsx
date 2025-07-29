@@ -6,6 +6,8 @@ import {
   KeyboardArrowUp as ExpandIcon,
 } from '@mui/icons-material'
 import { Paper, Typography, Box, IconButton, Collapse } from '@mui/material'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface ChatMessageProps {
   role: 'user' | 'assistant' | 'assistant_tool'
@@ -24,10 +26,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     setExpanded(!expanded)
   }
 
-  // 기본 마크다운 렌더링 사용 (안정성 우선)
-  const renderContentWithLinks = (text: string) => {
-    return text
-  }
+  // react-markdown으로 마크다운 콘텐츠 렌더링
 
   return (
     <Box
@@ -60,22 +59,29 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           </Typography>
         </Box>
 
-        <Box sx={{ 
-          whiteSpace: 'pre-wrap', 
-          wordBreak: 'break-word',
-          fontFamily: 'monospace, "Noto Sans KR", sans-serif'
-        }}>
-          <Typography 
-            variant="body1" 
-            component="div"
-            sx={{ 
-              whiteSpace: 'pre-wrap',
-              fontFamily: 'inherit',
-              lineHeight: 1.6
+        <Box
+          sx={{
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            fontFamily: 'monospace, "Noto Sans KR", sans-serif',
+            lineHeight: 1.6,
+          }}
+        >
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              a: ({ node, ...props }) => (
+                <a
+                  {...props}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#1976d2', textDecoration: 'underline', fontWeight: 600 }}
+                />
+              ),
             }}
           >
-            {renderContentWithLinks(content)}
-          </Typography>
+            {content}
+          </ReactMarkdown>
         </Box>
 
         {toolInfo && (
