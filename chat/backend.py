@@ -233,7 +233,7 @@ app.add_middleware(
 app.mount("/uploads", StaticFiles(directory=ABSOLUTE_UPLOAD_DIR), name="uploads")
 
 # HTML 보고서 서빙 설정
-REPORT_DIR = os.path.join(BASE_DIR, "mcp_tools", "report")
+REPORT_DIR = os.path.join(BASE_DIR, "report")
 if not os.path.exists(REPORT_DIR):
     os.makedirs(REPORT_DIR, exist_ok=True)
 app.mount("/reports", StaticFiles(directory=REPORT_DIR), name="reports")

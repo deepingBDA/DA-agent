@@ -1101,15 +1101,16 @@ ORDER BY ord
         filename = f"방문객진단_{timestamp}.html"
         
         # 현재 디렉토리와 chat 디렉토리 모두에 저장 (백엔드 호환성)
-        html_path = f"report/{filename}"
-        chat_html_path = f"../chat/mcp_tools/report/{filename}"
+        # /app/chat/mcp_tools/report  경로에 저장해야 FastAPI StaticFiles(/reports) 가 서빙
+        html_path = f"report/{filename}"  # 로컬(작업 디렉토리) 보관
+        chat_html_path = f"../chat/report/{filename}"
         
         try:
             # 로컬 report 디렉토리에 저장
             with open(html_path, 'w', encoding='utf-8') as f:
                 f.write(html_content)
             
-            # chat/mcp_tools/report 디렉토리에도 저장 (백엔드 서빙용)
+            # Chat 디렉토리(report)에도 저장 (백엔드 서빙용)
             chat_dir = os.path.dirname(chat_html_path)
             if not os.path.exists(chat_dir):
                 os.makedirs(chat_dir, exist_ok=True)
