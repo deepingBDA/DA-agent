@@ -8,7 +8,6 @@ import {
 import { Paper, Typography, Box, IconButton, Collapse } from '@mui/material'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import remarkBreaks from 'remark-breaks'
 // remark-linkify 패키지는 존재하지 않아 제거
 
 interface ChatMessageProps {
@@ -28,12 +27,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   const cleanedContent = useMemo(() => {
     let text = content.trim()
 
+    // 1) 코드블록 래퍼 제거 (문자열 어디에 있든 첫/마지막 ``` 페어 제거)
     if (text.startsWith('```')) {
-      // 첫 줄 ```lang?\n 제거
+      // 앞쪽 ```lang?\n 제거 (가능한 lang 지정 포함)
       text = text.replace(/^```[^\n]*\n/, '')
-      // 마지막 줄의 ``` 제거
-      text = text.replace(/\n```$/, '')
+      // 뒤쪽 ``` 또는 ```\r?\n 제거
+      text = text.replace(/\n```\s*$/, '')
     }
+
+    // 2) /reports/xxxx.html 같은 ‘맨글자 링크’ 자동 래핑 → Markdown 링크
+    text = text.replace(/(\/reports\/[^\s)]+\.html)/g, '[$1]($1)')
 
     return text
   }, [content])
@@ -85,7 +88,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         >
           {/* 마크다운 렌더링 – 링크·개행·GFM, 자동 링크화 지원 */}
           <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkBreaks]}
+            remarkPlugins={[remarkGfm]}
             components={{ a: renderAnchor }}
           >
             {cleanedContent}
@@ -128,7 +131,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               >
                 {/* toolInfo 도 마크다운으로 렌더링하여 링크·코드블록 지원 */}
                 <ReactMarkdown
-                  remarkPlugins={[remarkGfm, remarkBreaks]}
+                  remarkPlugins={[remarkGfm]}
                   components={{ a: renderAnchor }}
                 >
                   {toolInfo}
