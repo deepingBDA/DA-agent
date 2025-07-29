@@ -1128,6 +1128,9 @@ ORDER BY ord
                 f"🔗 [웹에서 보기]({web_url})\n\n"
                 "보고서를 클릭하여 새 탭에서 확인하세요!"
             )
+
+            # DEBUG: 로그로 raw 문자열 확인
+            self.logger.info(f"FINAL_RESULT_RAW: {repr(state['final_result'])}")
             
         except Exception as e:
             self.logger.error(f"HTML 파일 저장 실패: {e}")
