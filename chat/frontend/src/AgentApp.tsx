@@ -434,7 +434,7 @@ const AgentApp: React.FC = () => {
         overflow: 'hidden',
         width: '100%',
         background: `
-          linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%),
+          linear-gradient(135deg, #f8f6f0 0%, #e8e6e0 100%),
           radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
           radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%)
         `,
@@ -684,7 +684,7 @@ const AgentApp: React.FC = () => {
               overflow: 'hidden',
               borderRadius: 0,
               background: `
-                linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%),
+                linear-gradient(135deg, #f7f5f1 0%, #ede9e3 100%),
                 linear-gradient(180deg, rgba(0, 123, 255, 0.03) 0%, transparent 100%)
               `,
               boxShadow: `
@@ -725,7 +725,7 @@ const AgentApp: React.FC = () => {
                       p: 2,
                       mb: 2,
                       background: `
-                        linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%),
+                        linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%),
                         linear-gradient(180deg, rgba(0, 123, 255, 0.03) 0%, transparent 100%)
                       `,
                       borderRadius: '10px',
@@ -773,12 +773,12 @@ const AgentApp: React.FC = () => {
                       <Box
                         sx={{
                           mt: 1,
-                          background: 'linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)',
+                          background: 'linear-gradient(135deg, #f5f3ef 0%, #ebe7e1 100%)',
                           borderRadius: '6px',
                           p: 1.5,
                           maxHeight: 'calc(100vh - 300px)',
                           overflowY: 'auto',
-                          border: '1px solid rgba(79, 209, 199, 0.2)',
+                          border: '1px solid rgba(0, 123, 255, 0.15)',
                         }}
                       >
                         <div>
@@ -824,7 +824,8 @@ const AgentApp: React.FC = () => {
               transition: 'all 0.3s ease',
               width: '100%',
               background: `
-                linear-gradient(180deg, #ffffff 0%, #fafbfc 100%)
+                linear-gradient(180deg, #faf8f4 0%, #f2f0ec 100%),
+                linear-gradient(90deg, rgba(0, 123, 255, 0.05) 0%, transparent 100%)
               `,
               boxShadow: `
                 0 2px 4px rgba(0, 0, 0, 0.05),
@@ -926,7 +927,7 @@ const AgentApp: React.FC = () => {
                           bgcolor:
                             message.role === 'user'
                               ? 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'
-                              : 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                              : 'linear-gradient(135deg, #f9f7f3 0%, #f1efeb 100%)',
                           borderRadius: '18px',
                           borderTopLeftRadius:
                             message.role === 'user' ? '18px' : '4px',
@@ -939,7 +940,7 @@ const AgentApp: React.FC = () => {
                           background: message.role === 'user'
                             ? 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'
                             : `
-                              linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%),
+                              linear-gradient(135deg, #f9f7f3 0%, #f1efeb 100%),
                               linear-gradient(90deg, rgba(0, 123, 255, 0.02) 0%, transparent 100%)
                             `,
                           color: message.role === 'user' ? '#ffffff' : '#2d3748',
@@ -1099,7 +1100,7 @@ const AgentApp: React.FC = () => {
                 sx={{
                   p: 2,
                   borderTop: '1px solid #e9ecef',
-                  background: 'rgba(255, 255, 255, 0.9)',
+                  background: 'rgba(250, 248, 244, 0.95)',
                 }}
               >
                 {/* 첨부 파일 표시 영역 */}
