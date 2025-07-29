@@ -1119,11 +1119,13 @@ ORDER BY ord
             self.logger.info(f"HTML 보고서 저장 완료: {html_path}")
             self.logger.info(f"백엔드 서빙용 저장 완료: {chat_html_path}")
             
-            # 웹 접근 가능한 URL 생성
-            web_url = f"http://localhost:8000/reports/{filename}"
-            abs_path = os.path.abspath(html_path)
+            # 웹 접근 가능한 URL 생성 (동적 호스트 지원)
+            import os
+            host = os.getenv('FRONTEND_HOST', 'localhost')
+            port = os.getenv('BACKEND_PORT', '8000')
+            web_url = f"http://{host}:{port}/reports/{filename}"
             
-            state["final_result"] = f"📊 HTML 보고서 생성 완료!\n\n🔗 웹에서 보기: {web_url}\n📁 파일 경로: {abs_path}"
+            state["final_result"] = f"📊 HTML 보고서 생성 완료!\n\n🔗 웹에서 보기: {web_url}\n\n보고서를 클릭하여 새 탭에서 확인하세요!"
             
         except Exception as e:
             self.logger.error(f"HTML 파일 저장 실패: {e}")
