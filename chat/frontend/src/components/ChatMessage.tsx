@@ -9,8 +9,7 @@ import { Paper, Typography, Box, IconButton, Collapse } from '@mui/material'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
-// @ts-ignore – 타입 정의가 없는 외부 플러그인
-import remarkLinkify from 'remark-linkify'
+// remark-linkify 패키지는 존재하지 않아 제거
 
 interface ChatMessageProps {
   role: 'user' | 'assistant' | 'assistant_tool'
@@ -86,7 +85,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         >
           {/* 마크다운 렌더링 – 링크·개행·GFM, 자동 링크화 지원 */}
           <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkBreaks, remarkLinkify]}
+            remarkPlugins={[remarkGfm, remarkBreaks]}
             components={{ a: renderAnchor }}
           >
             {cleanedContent}
@@ -129,7 +128,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               >
                 {/* toolInfo 도 마크다운으로 렌더링하여 링크·코드블록 지원 */}
                 <ReactMarkdown
-                  remarkPlugins={[remarkGfm, remarkBreaks, remarkLinkify]}
+                  remarkPlugins={[remarkGfm, remarkBreaks]}
                   components={{ a: renderAnchor }}
                 >
                   {toolInfo}
