@@ -929,7 +929,45 @@ const AgentApp: React.FC = () => {
                                 fontFamily: 'monospace, "Noto Sans KR", sans-serif',
                                 lineHeight: 1.6
                               }}>
-                                {message.content}
+                                <ReactMarkdown
+                                  remarkPlugins={[remarkMath]}
+                                  rehypePlugins={[rehypeKatex]}
+                                  components={{
+                                    // "웹에서 보기" 텍스트를 클릭 가능한 링크로 변환
+                                    p: ({ children }) => {
+                                      if (typeof children === 'string' && children.includes('웹에서 보기')) {
+                                        // URL 추출
+                                        const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
+                                        if (urlMatch) {
+                                          const reportUrl = urlMatch[1]
+                                          const parts = children.split('웹에서 보기')
+                                          return (
+                                            <p>
+                                              {parts[0]}
+                                              <a
+                                                href={reportUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ 
+                                                  color: '#1976d2', 
+                                                  textDecoration: 'underline', 
+                                                  fontWeight: 600,
+                                                  cursor: 'pointer'
+                                                }}
+                                              >
+                                                웹에서 보기
+                                              </a>
+                                              {parts[1]}
+                                            </p>
+                                          )
+                                        }
+                                      }
+                                      return <p>{children}</p>
+                                    }
+                                  }}
+                                >
+                                  {message.content.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')}
+                                </ReactMarkdown>
                               </Box>
                               {message.attachmentPath && (
                                 <Box
