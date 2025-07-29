@@ -35,7 +35,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       text = text.replace(/\n```\s*$/, '')
     }
 
-    // 2) /reports/xxxx.html 같은 ‘맨글자 링크’ 자동 래핑 → Markdown 링크
+    // 2) 보고서 링크 자동 래핑 → Markdown 링크
+    //  - '/reports/...' (상대경로)
+    //  - 'http(s)://.../reports/...' (절대경로, @ 기호로 시작할 수도 있음)
+    text = text.replace(/@?(https?:\/\/[^\s)]+\/reports\/[^\s)]+\.html)/g, '[$1]($1)')
     text = text.replace(/(\/reports\/[^\s)]+\.html)/g, '[$1]($1)')
 
     return text
@@ -52,6 +55,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       text = text.replace(/\n```\s*$/, '')
     }
 
+    text = text.replace(/@?(https?:\/\/[^\s)]+\/reports\/[^\s)]+\.html)/g, '[$1]($1)')
     text = text.replace(/(\/reports\/[^\s)]+\.html)/g, '[$1]($1)')
 
     return text
