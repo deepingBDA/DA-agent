@@ -780,48 +780,37 @@ const AgentApp: React.FC = () => {
                             overflowY: 'auto',
                           }}
                         >
-                          <ReactMarkdown
-                            remarkPlugins={[remarkMath]}
-                            rehypePlugins={[rehypeKatex]}
-                            components={{
-                              // "웹에서 보기" 텍스트를 클릭 가능한 링크로 변환
-                              p: ({ children }) => {
-                                console.log('p 컴포넌트 children:', children)
-                                if (typeof children === 'string' && children.includes('웹에서 보기')) {
-                                  console.log('웹에서 보기 텍스트 발견!')
-                                  // URL 추출
-                                  const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
-                                  console.log('URL 매치 결과:', urlMatch)
-                                  if (urlMatch) {
-                                    const reportUrl = urlMatch[1]
-                                    const parts = children.split('웹에서 보기')
-                                    return (
-                                      <p>
-                                        {parts[0]}
-                                        <a
-                                          href={reportUrl}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          style={{ 
-                                            color: '#1976d2', 
-                                            textDecoration: 'underline', 
-                                            fontWeight: 600,
-                                            cursor: 'pointer'
-                                          }}
-                                        >
-                                          웹에서 보기
-                                        </a>
-                                        {parts[1]}
-                                      </p>
-                                    )
-                                  }
-                                }
-                                return <p>{children}</p>
+                          <div>
+                            {(() => {
+                              // URL 추출
+                              const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
+                              if (urlMatch) {
+                                const reportUrl = urlMatch[1]
+                                const cleanText = message.content.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
+                                const parts = cleanText.split('웹에서 보기')
+                                return (
+                                  <div style={{ whiteSpace: 'pre-wrap' }}>
+                                    {parts[0]}
+                                    <a
+                                      href={reportUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      style={{ 
+                                        color: '#1976d2', 
+                                        textDecoration: 'underline', 
+                                        fontWeight: 600,
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      웹에서 보기
+                                    </a>
+                                    {parts[1]}
+                                  </div>
+                                )
                               }
-                            }}
-                          >
-                            {message.content.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')}
-                          </ReactMarkdown>
+                              return <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{message.content}</ReactMarkdown>
+                            })()}
+                          </div>
                         </Box>
                       </Collapse>
                     </Paper>
@@ -930,11 +919,14 @@ const AgentApp: React.FC = () => {
                                 lineHeight: 1.6
                               }}>
                                 {(() => {
+                                  console.log('메시지 내용:', message.content)
                                   // URL 추출
                                   const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
+                                  console.log('URL 매치 결과:', urlMatch)
                                   if (urlMatch) {
                                     const reportUrl = urlMatch[1]
                                     const cleanText = message.content.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
+                                    console.log('변환된 텍스트:', cleanText)
                                     const parts = cleanText.split('웹에서 보기')
                                     return (
                                       <div>
@@ -956,6 +948,7 @@ const AgentApp: React.FC = () => {
                                       </div>
                                     )
                                   }
+                                  console.log('URL 매치 안됨, 원본 반환')
                                   return message.content
                                 })()}
                               </Box>
