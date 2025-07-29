@@ -919,6 +919,8 @@ const AgentApp: React.FC = () => {
                                 lineHeight: 1.6
                               }}>
                                 {(() => {
+                                  console.log('=== 메시지 처리 ===')
+                                  console.log('메시지 역할:', message.role)
                                   console.log('메시지 내용:', message.content)
                                   // URL 추출
                                   const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
