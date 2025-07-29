@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   Person as PersonIcon,
   SmartToy as BotIcon,
@@ -22,10 +22,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 }) => {
   const [expanded, setExpanded] = useState<boolean>(false)
 
-  // DEBUG: raw content log
-  React.useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('[DEBUG raw content]', JSON.stringify(content));
+  // 백틱(``` ) 코드블록으로 감싸진 경우 제거하여 링크 파싱 가능하게 변환
+  const cleanedContent = useMemo(() => {
+    let text = content.trim();
+    if (text.startsWith('```')) {
+      // 첫 줄 ```lang? 제거
+      text = text.replace(/^```[a-zA-Z]*\n?/, '');
+      // 마지막 ``` 제거 (끝 공백 고려)
+      text = text.replace(/\n?```$/, '');
+    }
+    return text;
   }, [content]);
 
   const handleExpandClick = () => {
@@ -73,10 +79,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             lineHeight: 1.6,
           }}
         >
-          {/* DEBUG: show raw string for inspection */}
-          <pre style={{ background: '#f5f5f5', padding: 4, marginBottom: 8 }}>
-            {content}
-          </pre>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -90,7 +92,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               ),
             }}
           >
-            {content}
+            {cleanedContent}
           </ReactMarkdown>
         </Box>
 
