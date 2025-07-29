@@ -21,7 +21,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   content,
   toolInfo,
 }) => {
-  console.log('ChatMessage 렌더링됨:', { role, content: content.substring(0, 50) + '...' })
+  alert('ChatMessage 호출됨! role: ' + role)
   
   const [expanded, setExpanded] = useState<boolean>(false)
 
