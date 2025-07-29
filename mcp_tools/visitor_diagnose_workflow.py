@@ -24,6 +24,8 @@ class VisitorDiagnoseState(BaseState):
     placements: List[Dict[str, Any]]  # 엑셀 셀 배치 정보
     final_result: str  # 최종 결과
     design_spec: List[Dict[str, Any]]  # 디자인 스타일 placements
+    dataframe: Any | None = None       # pandas DataFrame 저장
+    highlights: List[Dict[str, Any]] | None = None  # 하이라이트 셀 정보
 
 
 class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
@@ -35,6 +37,75 @@ class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
         # 환경변수 로드 및 LLM 설정
         load_dotenv()
         self.llm = ChatOpenAI(model="gpt-4o", temperature=0)
+
+        # 셀 하이라이트용 프롬프트 템플릿
+        self._highlight_prompt = (
+            """<ROLE>
+당신은 오프라인 매장 데이터 분석 전문가입니다. 
+매장 방문객 데이터를 분석하여 경영진이 주목해야 할 핵심 지표를 식별하고 시각적으로 강조해야 합니다.
+</ROLE>
+
+<ANALYSIS_CRITERIA>
+## 빨간색 하이라이트 (우수/긍정적 지표)
+### 방문객 수 관련:
+- 다른 매장 대비 20% 이상 높은 일평균/평일/주말 방문객 수
+- 주말 대비 평일 방문객이 안정적인 경우 (80% 이상)
+
+### 고객 구성 관련:
+- 성별 비율이 40-60% 범위로 균형잡힌 경우
+- 주력 연령대(1위)가 30-50대로 구매력이 높은 경우
+- 연령대별 분포가 고르게 분산된 경우
+
+### 시간대 패턴 관련:
+- 평일 주력 시간대가 점심(10-13시) 또는 오후(14-17시)인 경우 (직장인 유입)
+- 주말 주력 시간대가 오후(14-17시) 또는 저녁(18-21시)인 경우 (가족 단위)
+- 주력 시간대 비중이 30% 이상으로 집중도가 높은 경우
+
+## 파란색 하이라이트 (개선 필요/부정적 지표)
+### 방문객 수 관련:
+- 다른 매장 대비 20% 이상 낮은 일평균/평일/주말 방문객 수
+- 평일 방문객이 주말 대비 60% 미만으로 너무 낮은 경우
+
+### 고객 구성 관련:
+- 성별 비율이 70% 이상 편중된 경우 (30:70 이상 불균형)
+- 주력 연령대가 10대 또는 60대 이상으로 구매력이 제한적인 경우
+- 특정 연령대에 40% 이상 집중된 경우
+
+### 시간대 패턴 관련:
+- 평일 주력 시간대가 아침(06-09시) 또는 심야(22-01시)인 경우
+- 주말 주력 시간대가 아침(06-09시) 또는 심야(22-01시)인 경우
+- 주력 시간대 비중이 20% 미만으로 분산이 심한 경우
+</ANALYSIS_CRITERIA>
+
+<SELECTION_PRIORITY>
+1. **결과 컬럼 우선**: 매장명_결과 컬럼의 수치 데이터를 최우선 분석
+2. **매장간 비교**: 여러 매장이 있을 경우 상대적 순위로 판단
+3. **절대적 기준**: 단일 매장일 경우 위 기준을 절대값으로 적용
+4. **핵심 지표 집중**: 방문객 수 > 성별 균형 > 연령대 분포 > 시간대 패턴 순서로 중요도 설정
+5. **최대 8개 셀**: 너무 많은 하이라이트는 집중도를 떨어뜨림
+</SELECTION_PRIORITY>
+
+<OUTPUT_FORMAT>
+반드시 아래 JSON 형식으로만 응답하세요:
+{{
+  "highlight": [
+    {{"cell": "E5", "color": "red", "reason": "방문객 수 1위"}},
+    {{"cell": "K7", "color": "blue", "reason": "성별 불균형 심함"}}
+  ]
+}}
+
+주의사항:
+- cell 주소는 정확한 엑셀 좌표 (예: E5, K7, W10)
+- color는 "red" 또는 "blue"만 사용
+- reason은 15자 이내로 핵심만 간결하게
+- 빈 셀(NaN, 공백)은 절대 선택하지 마세요
+- JSON 외 다른 텍스트는 출력 금지
+</OUTPUT_FORMAT>
+
+<EXCEL_TABLE>
+{table}
+</EXCEL_TABLE>"""
+        )
         
         # 워크플로우 그래프
         self.workflow_app = self._build_workflow()
@@ -74,13 +145,15 @@ class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
         builder.add_node("fetch", self._query_db_node)
         builder.add_node("parse", self._parse_node)
         builder.add_node("map", self._map_to_excel_node)
+        builder.add_node("highlight", self._highlight_node)
         builder.add_node("update", self._update_excel_node)
         
         # 엣지 추가 (순차 실행)
         builder.add_edge(START, "fetch")
         builder.add_edge("fetch", "parse")
         builder.add_edge("parse", "map")
-        builder.add_edge("map", "update")
+        builder.add_edge("map", "highlight")
+        builder.add_edge("highlight", "update")
         builder.add_edge("update", END)
         
         return builder.compile()
@@ -694,6 +767,54 @@ ORDER BY ord
         
         return state
 
+    # ----------------- 새 노드: 하이라이트 -----------------
+    def _highlight_node(self, state: VisitorDiagnoseState) -> VisitorDiagnoseState:
+        """LLM을 사용해 하이라이트 대상 셀을 결정"""
+        try:
+            import pandas as pd
+            import json as _json
+
+            df = state.get("dataframe")
+            if df is None:
+                self.logger.warning("DataFrame이 없어 highlight 스킵")
+                state["highlights"] = []
+                return state
+
+            # 표를 markdown 형식으로 변환
+            try:
+                table_md = df.to_markdown(index=False)
+            except Exception:
+                table_md = str(df.head())
+
+            prompt = self._highlight_prompt.format(table=table_md)
+            self.logger.info(f"하이라이트 프롬프트 길이: {len(prompt)}")
+            self.logger.info(f"프롬프트 샘플: {prompt[:500]}...")
+            response = self.llm.invoke(prompt)
+            self.logger.info(f"LLM 응답 타입: {type(response.content)}")
+            self.logger.info(f"LLM 응답 내용: '{response.content}'")
+            highlights = []
+            try:
+                # 마크다운 코드 블록 제거
+                content = response.content.strip()
+                if content.startswith("```json"):
+                    content = content[7:]  # ```json 제거
+                if content.endswith("```"):
+                    content = content[:-3]  # ``` 제거
+                content = content.strip()
+                
+                highlights = _json.loads(content)["highlight"]
+            except Exception as e:
+                self.logger.error(f"highlight JSON 파싱 실패: {e}")
+                self.logger.error(f"파싱 시도한 내용: '{content[:200] if 'content' in locals() else response.content[:200]}'")
+
+            state["highlights"] = highlights
+            self.logger.info(f"하이라이트 선정: {highlights}")
+            return state
+        except Exception as e:
+            self.logger.error(f"highlight 노드 오류: {e}")
+            state["highlights"] = []
+            return state
+
     def _update_excel_node(self, state: VisitorDiagnoseState) -> VisitorDiagnoseState:
         """
         pandas DataFrame으로 이미 엑셀 저장이 완료되었으므로 상태만 업데이트
@@ -706,7 +827,30 @@ ORDER BY ord
             # 셀 병합과 정렬 적용
             excel_path = "report/점포진단표.xlsx"
             self._apply_cell_merge_and_alignment(excel_path)
-            
+
+            # ----------------- 하이라이트 적용 -----------------
+            highlights = state.get("highlights", [])
+            if highlights:
+                from openpyxl import load_workbook
+                from openpyxl.styles import PatternFill
+
+                red_fill = PatternFill(start_color="FFF4CCCC", end_color="FFF4CCCC", fill_type="solid")
+                blue_fill = PatternFill(start_color="FFDAE8FC", end_color="FFDAE8FC", fill_type="solid")
+
+                wb = load_workbook(excel_path)
+                ws = wb.active
+                for item in highlights:
+                    cell_addr = item.get("cell")
+                    color = item.get("color")
+                    if not cell_addr:
+                        continue
+                    try:
+                        cell = ws[cell_addr]
+                        cell.fill = red_fill if color == "red" else blue_fill
+                    except Exception as e:
+                        self.logger.error(f"셀 색칠 실패 {cell_addr}: {e}")
+                wb.save(excel_path)
+
             state["final_result"] = "엑셀 업데이트 완료 (pandas + 셀병합)"
             return state
         
@@ -1100,9 +1244,41 @@ def visitor_diagnose_excel(
 
 
 if __name__ == "__main__":
-    # FastMCP 서버 실행
-    print("FastMCP 서버 시작 - visitor_diagnose", file=sys.stderr)
-    try:
-        mcp.run()
-    except Exception as e:
-        print(f"서버 오류 발생: {e}", file=sys.stderr)
+    import argparse
+    parser = argparse.ArgumentParser(description="Visitor Diagnose Workflow runner")
+    parser.add_argument("--cli", action="store_true", help="Run a one-off workflow instead of starting FastMCP server")
+    parser.add_argument("--store", default="더미데이터점", help="Store name for test run")
+    parser.add_argument("--start", default=None, help="Start date YYYY-MM-DD (default: 지난주 월요일)")
+    parser.add_argument("--end",   default=None, help="End date YYYY-MM-DD (default: 지난주 일요일)")
+    args = parser.parse_args()
+
+    if args.cli:
+        import datetime as dt
+
+        # 기간 기본값 계산(지난주)
+        if not args.start or not args.end:
+            today = dt.date.today()
+            this_mon = today - dt.timedelta(days=today.weekday())
+            start = this_mon - dt.timedelta(days=7)
+            end = start + dt.timedelta(days=6)
+            start_date = start.isoformat()
+            end_date   = end.isoformat()
+        else:
+            start_date = args.start
+            end_date   = args.end
+
+        wf = VisitorDiagnoseWorkflow()
+        result = wf.run(
+            user_prompt="CLI test run",
+            store_name=args.store,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        print("Workflow finished:", result)
+    else:
+        # FastMCP 서버 실행
+        print("FastMCP 서버 시작 - visitor_diagnose", file=sys.stderr)
+        try:
+            mcp.run()
+        except Exception as e:
+            print(f"서버 오류 발생: {e}", file=sys.stderr)
