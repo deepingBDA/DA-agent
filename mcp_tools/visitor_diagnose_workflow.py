@@ -1125,7 +1125,7 @@ ORDER BY ord
             port = os.getenv('BACKEND_PORT', '8000')
             web_url = f"http://{host}:{port}/reports/{filename}"
             
-            state["final_result"] = f"📊 HTML 보고서 생성 완료!\n\n🔗 웹에서 보기: {web_url}\n\n보고서를 클릭하여 새 탭에서 확인하세요!"
+            state["final_result"] = f"📊 HTML 보고서 생성 완료!\n\n🔗 [웹에서 보기]({web_url})\n\n보고서를 클릭하여 새 탭에서 확인하세요!"
             
         except Exception as e:
             self.logger.error(f"HTML 파일 저장 실패: {e}")
