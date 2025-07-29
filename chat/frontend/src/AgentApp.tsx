@@ -782,33 +782,12 @@ const AgentApp: React.FC = () => {
                         >
                           <div>
                             {(() => {
-                              // URL 추출
-                              const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
-                              if (urlMatch) {
-                                const reportUrl = urlMatch[1]
-                                const cleanText = message.content.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
-                                const parts = cleanText.split('웹에서 보기')
-                                return (
-                                  <div style={{ whiteSpace: 'pre-wrap' }}>
-                                    {parts[0]}
-                                    <a
-                                      href={reportUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      style={{ 
-                                        color: '#1976d2', 
-                                        textDecoration: 'underline', 
-                                        fontWeight: 600,
-                                        cursor: 'pointer'
-                                      }}
-                                    >
-                                      웹에서 보기
-                                    </a>
-                                    {parts[1]}
-                                  </div>
-                                )
-                              }
-                              return <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{message.content}</ReactMarkdown>
+                              return <ReactMarkdown
+                                remarkPlugins={[remarkMath]}
+                                rehypePlugins={[rehypeKatex]}
+                              >
+                                {message.content}
+                              </ReactMarkdown>
                             })()}
                           </div>
                         </Box>
@@ -826,7 +805,6 @@ const AgentApp: React.FC = () => {
                 }}
               >
                 {messages.filter((msg, idx) => {
-                  console.log(`전체 메시지 ${idx}:`, { role: msg.role, content: msg.content?.substring(0, 100) })
                   return msg.role !== 'assistant_tool'
                 })
                   .length === 0 && (
@@ -845,10 +823,6 @@ const AgentApp: React.FC = () => {
                 )}
 
                 {messages
-                  .map((msg, idx) => {
-                    console.log(`전체 메시지 ${idx}:`, { role: msg.role, content: msg.content?.substring(0, 100) })
-                    return msg
-                  })
                   .filter((msg) => msg.role !== 'assistant_tool')
                   .map((message, chatIndex) => (
                     <Box
@@ -893,15 +867,11 @@ const AgentApp: React.FC = () => {
                               }}>
                                 <div>
                                   {(() => {
-                                    console.log('=== Assistant 메시지 처리 ===')
-                                    console.log('메시지 내용:', message.content)
                                     // URL 추출
                                     const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
-                                    console.log('URL 매치 결과:', urlMatch)
                                     if (urlMatch) {
                                       const reportUrl = urlMatch[1]
                                       const cleanText = message.content.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
-                                      console.log('변환된 텍스트:', cleanText)
                                       const parts = cleanText.split('웹에서 보기')
                                       return (
                                         <div>
@@ -923,7 +893,6 @@ const AgentApp: React.FC = () => {
                                         </div>
                                       )
                                     }
-                                    console.log('URL 매치 안됨, 원본 반환')
                                     return message.content
                                   })()}
                                 </div>
@@ -961,16 +930,11 @@ const AgentApp: React.FC = () => {
                                 lineHeight: 1.6
                               }}>
                                 {(() => {
-                                  console.log('=== 메시지 처리 ===')
-                                  console.log('메시지 역할:', message.role)
-                                  console.log('메시지 내용:', message.content)
                                   // URL 추출
                                   const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
-                                  console.log('URL 매치 결과:', urlMatch)
                                   if (urlMatch) {
                                     const reportUrl = urlMatch[1]
                                     const cleanText = message.content.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
-                                    console.log('변환된 텍스트:', cleanText)
                                     const parts = cleanText.split('웹에서 보기')
                                     return (
                                       <div>
@@ -992,7 +956,6 @@ const AgentApp: React.FC = () => {
                                       </div>
                                     )
                                   }
-                                  console.log('URL 매치 안됨, 원본 반환')
                                   return message.content
                                 })()}
                               </Box>
