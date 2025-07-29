@@ -786,6 +786,7 @@ const AgentApp: React.FC = () => {
                             components={{
                               // "웹에서 보기" 텍스트를 클릭 가능한 링크로 변환
                               p: ({ children }) => {
+                                alert('p 컴포넌트 실행됨: ' + children)
                                 if (typeof children === 'string' && children.includes('웹에서 보기')) {
                                   // URL 추출
                                   const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
