@@ -10,7 +10,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
 // @ts-ignore – 타입 정의가 없는 외부 플러그인
-import remarkLinkify from 'remark-linkify-it'
+import remarkLinkify from 'remark-linkify'
 
 interface ChatMessageProps {
   role: 'user' | 'assistant' | 'assistant_tool'
