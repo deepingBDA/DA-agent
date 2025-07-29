@@ -12,6 +12,33 @@ const theme = createTheme({
   typography: {
     fontFamily: 'pretendard-kr',
   },
+  palette: {
+    mode: 'light',
+    background: {
+      default: '#f3f0f8',
+      paper: '#f6f4f9',
+    },
+    primary: {
+      main: '#8B5CF6', // CU 보라색
+      light: '#A78BFA',
+      dark: '#6B46C1',
+    },
+    secondary: {
+      main: '#00a86b', // CU 초록색
+      light: '#10b981',
+      dark: '#047857',
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: 'linear-gradient(135deg, #f3f0f8 0%, #e8e3f0 100%) !important',
+          backgroundAttachment: 'fixed !important',
+        },
+      },
+    },
+  },
 })
 
 ChartJS.register(...registerables, zoomPlugin.default)

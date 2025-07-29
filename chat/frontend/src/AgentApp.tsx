@@ -434,9 +434,8 @@ const AgentApp: React.FC = () => {
         overflow: 'hidden',
         width: '100%',
         background: `
-          linear-gradient(135deg, #f3f0f8 0%, #e8e3f0 100%),
-          radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.05) 0%, transparent 50%)
+          linear-gradient(135deg, #8B5CF6 0%, #00a86b 100%),
+          linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(0, 168, 107, 0.1) 100%)
         `,
         backgroundAttachment: 'fixed',
         position: 'relative',
@@ -684,8 +683,7 @@ const AgentApp: React.FC = () => {
               overflow: 'hidden',
               borderRadius: 0,
               background: `
-                linear-gradient(135deg, #f4f2f8 0%, #e9e6f0 100%),
-                linear-gradient(180deg, rgba(138, 43, 226, 0.06) 0%, transparent 100%)
+                linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(0, 168, 107, 0.08) 100%) !important
               `,
               boxShadow: `
                 0 2px 8px rgba(0, 0, 0, 0.08),
@@ -824,8 +822,7 @@ const AgentApp: React.FC = () => {
               transition: 'all 0.3s ease',
               width: '100%',
               background: `
-                linear-gradient(180deg, #f6f4f9 0%, #f0eef4 100%),
-                linear-gradient(90deg, rgba(138, 43, 226, 0.08) 0%, transparent 100%)
+                linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(139, 92, 246, 0.08) 100%) !important
               `,
               boxShadow: `
                 0 2px 4px rgba(0, 0, 0, 0.05),
@@ -940,8 +937,7 @@ const AgentApp: React.FC = () => {
                           background: message.role === 'user'
                             ? 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'
                             : `
-                              linear-gradient(135deg, #f7f5fa 0%, #f1eff5 100%),
-                              linear-gradient(90deg, rgba(138, 43, 226, 0.04) 0%, transparent 100%)
+                              linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(139, 92, 246, 0.1) 100%) !important
                             `,
                           color: message.role === 'user' ? '#ffffff' : '#2d3748',
                           border: message.role === 'user' ? 'none' : '1px solid #e9ecef',
@@ -1100,7 +1096,7 @@ const AgentApp: React.FC = () => {
                 sx={{
                   p: 2,
                   borderTop: '1px solid #e9ecef',
-                  background: 'rgba(246, 244, 249, 0.95)',
+                  background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(139, 92, 246, 0.1) 100%) !important',
                 }}
               >
                 {/* 첨부 파일 표시 영역 */}
