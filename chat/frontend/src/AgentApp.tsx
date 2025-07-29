@@ -481,13 +481,13 @@ const AgentApp: React.FC = () => {
         <Grid
           item
           xs={12}
-          md={3}
+          md={2.4}
           sx={{
             height: '100%',
             position: 'absolute',
             left: 0,
             top: 0,
-            width: showSidebar ? '25%' : '0%',
+            width: showSidebar ? '20%' : '0%',
             opacity: showSidebar ? 1 : 0,
             visibility: showSidebar ? 'visible' : 'hidden',
             transition: 'all 0.3s ease',
@@ -660,17 +660,155 @@ const AgentApp: React.FC = () => {
           </Paper>
         </Grid>
 
+        {/* 도구 사용 내역 */}
+        <Grid
+          item
+          xs={12}
+          md={2.4}
+          sx={{
+            height: '100%',
+            position: 'absolute',
+            left: showSidebar ? '20%' : '0%',
+            top: 0,
+            width: showSidebar ? '20%' : '25%',
+            transition: 'all 0.3s ease',
+            zIndex: 5,
+          }}
+        >
+          <Paper
+            sx={{
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+              overflow: 'hidden',
+              borderRadius: 0,
+              background: `
+                linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%),
+                linear-gradient(180deg, rgba(0, 123, 255, 0.03) 0%, transparent 100%)
+              `,
+              boxShadow: `
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8)
+              `,
+              borderRight: '1px solid #e9ecef',
+              borderLeft: '1px solid #e9ecef',
+            }}
+          >
+            <Typography variant="h6" gutterBottom sx={{ color: '#007bff', fontWeight: 'bold' }}>
+              🔧 도구 사용 내역
+            </Typography>
+            
+            {messages.filter((msg) => msg.role === 'assistant_tool').length === 0 && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100px',
+                  mt: 2,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  아직 사용된 도구가 없습니다
+                </Typography>
+              </Box>
+            )}
+            
+            <Box sx={{ flex: 1, overflowY: 'auto' }}>
+              {messages
+                .filter((msg) => msg.role === 'assistant_tool')
+                .map((message, toolIndex) => (
+                  <Paper
+                    key={`tool-${toolIndex}`}
+                    sx={{
+                      p: 2,
+                      mb: 2,
+                      background: `
+                        linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%),
+                        linear-gradient(180deg, rgba(0, 123, 255, 0.03) 0%, transparent 100%)
+                      `,
+                      borderRadius: '10px',
+                      borderLeft: '4px solid #007bff',
+                      boxShadow: `
+                        0 2px 8px rgba(0, 0, 0, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.8)
+                      `,
+                      overflow: 'hidden',
+                      border: '1px solid #e9ecef',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        mb: 1,
+                        cursor: 'pointer',
+                        '&:hover': { opacity: 0.9 },
+                      }}
+                      onClick={() => handleToolToggle(messages.indexOf(message))}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          color: '#007bff',
+                          fontWeight: 'bold',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        도구 참조 #{toolIndex + 1}
+                      </Typography>
+                      <IconButton size="small" sx={{ color: '#007bff' }}>
+                        {expandedTools[messages.indexOf(message)] ? (
+                          <KeyboardArrowUpIcon />
+                        ) : (
+                          <KeyboardArrowDownIcon />
+                        )}
+                      </IconButton>
+                    </Box>
+
+                    <Collapse in={expandedTools[messages.indexOf(message)]}>
+                      <Box
+                        sx={{
+                          mt: 1,
+                          background: 'linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)',
+                          borderRadius: '6px',
+                          p: 1.5,
+                          maxHeight: 'calc(100vh - 300px)',
+                          overflowY: 'auto',
+                          border: '1px solid rgba(79, 209, 199, 0.2)',
+                        }}
+                      >
+                        <div>
+                          <ReactMarkdown
+                            remarkPlugins={[remarkMath]}
+                            rehypePlugins={[rehypeKatex]}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
+                      </Box>
+                    </Collapse>
+                  </Paper>
+                ))}
+            </Box>
+          </Paper>
+        </Grid>
+
         {/* 메인 채팅 영역 */}
         <Grid
           item
           xs={12}
-          md={showSidebar ? 9 : 12}
+          md={showSidebar ? 7.2 : 10}
           sx={{
             height: '100%',
             position: 'absolute',
             right: 0,
             top: 0,
-            width: showSidebar ? '75%' : '100%',
+            width: showSidebar ? '60%' : '75%',
+            left: showSidebar ? '40%' : '25%',
             transition: 'width 0.3s ease',
             willChange: 'width',
           }}
@@ -732,158 +870,19 @@ const AgentApp: React.FC = () => {
             {/* 메시지 표시 영역 */}
             <Box
               sx={{
-                flex: 1,
-                overflowY: 'auto',
-                p: 2,
+                flexGrow: 1,
+                overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 2,
-                background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '12px',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                margin: '8px',
+                height: '100%',
               }}
             >
-              {/* 왼쪽 컬럼: 도구 사용 내역 */}
+              {/* 메인 채팅 메시지 */}
               <Box
                 sx={{
-                  width: '50%',
-                  mr: 2,
-                  overflow: 'auto',
-                  borderRight: '1px solid rgba(255, 255, 255, 0.12)',
-                  pr: 2,
-                }}
-              >
-                <Typography variant="h6" gutterBottom>
-                  🔧 도구 사용 내역
-                </Typography>
-                {messages.filter((msg) => msg.role === 'assistant_tool')
-                  .length === 0 && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      height: '100px',
-                      mt: 2,
-                    }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      아직 사용된 도구가 없습니다
-                    </Typography>
-                  </Box>
-                )}
-                {messages
-                  .filter((msg) => msg.role === 'assistant_tool')
-                  .map((message, toolIndex) => (
-                    <Paper
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={`tool-${toolIndex}`}
-                      sx={{
-                        p: 2,
-                        mb: 2,
-                        background: `
-                          linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%),
-                          linear-gradient(180deg, rgba(0, 123, 255, 0.03) 0%, transparent 100%)
-                        `,
-                        borderRadius: '10px',
-                        borderLeft: '4px solid #007bff',
-                        boxShadow: `
-                          0 2px 8px rgba(0, 0, 0, 0.08),
-                          inset 0 1px 0 rgba(255, 255, 255, 0.8)
-                        `,
-                        overflow: 'hidden',
-                        border: '1px solid #e9ecef',
-                        position: 'relative',
-                        '&::before': {
-                          content: '""',
-                          position: 'absolute',
-                          top: 0,
-                          right: 0,
-                          bottom: 0,
-                          width: '2px',
-                          background: 'linear-gradient(180deg, #007bff 0%, transparent 100%)',
-                        },
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          mb: 1,
-                          cursor: 'pointer',
-                          '&:hover': {
-                            opacity: 0.9,
-                          },
-                        }}
-                        onClick={() =>
-                          handleToolToggle(messages.indexOf(message))
-                        }
-                      >
-                        <Typography
-                          variant="subtitle2"
-                          sx={{
-                            color: '#007bff',
-                            fontWeight: 'bold',
-                            display: 'flex',
-                            alignItems: 'center',
-                            textShadow: '0 1px 2px rgba(0, 123, 255, 0.2)',
-                            letterSpacing: '0.5px',
-                          }}
-                        >
-                          도구 참조 #{toolIndex + 1}
-                        </Typography>
-                        <IconButton
-                          size="small"
-                          sx={{ color: '#FFFFFF' }}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleToolToggle(messages.indexOf(message))
-                          }}
-                        >
-                          {expandedTools[messages.indexOf(message)] ? (
-                            <KeyboardArrowUpIcon />
-                          ) : (
-                            <KeyboardArrowDownIcon />
-                          )}
-                        </IconButton>
-                      </Box>
-
-                      <Collapse in={expandedTools[messages.indexOf(message)]}>
-                        <Box
-                          sx={{
-                            mt: 1,
-                            background: 'linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)',
-                            borderRadius: '6px',
-                            p: 1.5,
-                            maxHeight: 'calc(100vh - 300px)',
-                            overflowY: 'auto',
-                            border: '1px solid rgba(79, 209, 199, 0.2)',
-                          }}
-                        >
-                          <div>
-                            {(() => {
-                              return <ReactMarkdown
-                                remarkPlugins={[remarkMath]}
-                                rehypePlugins={[rehypeKatex]}
-                              >
-                                {message.content}
-                              </ReactMarkdown>
-                            })()}
-                          </div>
-                        </Box>
-                      </Collapse>
-                    </Paper>
-                  ))}
-              </Box>
-
-              {/* 오른쪽 컬럼: 대화 내용 */}
-              <Box
-                sx={{
-                  width: '50%',
-                  overflow: 'auto',
+                  flex: 1,
+                  height: '100%',
+                  overflowY: 'auto',
                   pl: 2,
                 }}
               >
@@ -1095,7 +1094,81 @@ const AgentApp: React.FC = () => {
                   ))}
               </Box>
 
-              {isProcessing && (
+              {/* 채팅 입력 영역 */}
+              <Box
+                sx={{
+                  p: 2,
+                  borderTop: '1px solid #e9ecef',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                }}
+              >
+                {/* 첨부 파일 표시 영역 */}
+                {attachment && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      bgcolor: 'rgba(33, 150, 243, 0.1)',
+                      p: 1,
+                      borderRadius: 1,
+                      mb: 1,
+                    }}
+                  >
+                    <AttachFileIcon sx={{ mr: 1, color: 'primary.main' }} />
+                    <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                      {attachment.name}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={() => setAttachment(null)}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </Box>
+                )}
+
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleFileUpload}
+                    accept=".txt,.pdf,.doc,.docx,.xlsx,.csv"
+                  />
+                  <IconButton
+                    onClick={handleAttachmentButtonClick}
+                    disabled={isProcessing}
+                  >
+                    <AttachFileIcon />
+                  </IconButton>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="안녕하세요! 무엇을 도와드릴까요?"
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    onKeyDown={async (e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault()
+                        await handleSendMessage()
+                      }
+                    }}
+                    disabled={isProcessing}
+                    size="small"
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={handleSendMessage}
+                    disabled={isProcessing || !userInput.trim()}
+                    sx={{ minWidth: '60px' }}
+                  >
+                    전송
+                  </Button>
+                </Box>
+              </Box>
+            </Box>
+
+            {isProcessing && (
                 <Box
                   sx={{
                     position: 'absolute',
@@ -1108,82 +1181,6 @@ const AgentApp: React.FC = () => {
                   <LinearProgress />
                 </Box>
               )}
-            </Box>
-
-            {/* 메시지 입력 영역 */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                p: 2,
-                background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '12px',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                margin: '8px',
-              }}
-            >
-              {/* 첨부 파일 표시 영역 */}
-              {attachment && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    bgcolor: 'rgba(33, 150, 243, 0.1)',
-                    p: 1,
-                    mb: 1,
-                    borderRadius: '4px',
-                  }}
-                >
-                  <AttachFileIcon sx={{ color: '#2196f3', mr: 1 }} />
-                  <Typography variant="body2" sx={{ flexGrow: 1 }}>
-                    {attachment.name} ({(attachment.size / 1024).toFixed(1)} KB)
-                  </Typography>
-                  <IconButton size="small" onClick={handleRemoveAttachment}>
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              )}
-
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                />
-                <IconButton
-                  onClick={handleAttachmentButtonClick}
-                  sx={{ mr: 1 }}
-                  color={attachment ? 'primary' : 'default'}
-                >
-                  <AttachFileIcon />
-                </IconButton>
-                <TextField
-                  fullWidth
-                  placeholder="메시지를 입력하세요..."
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  onKeyDown={async (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault()
-                      await handleSendMessage()
-                    }
-                  }}
-                  multiline
-                  disabled={isProcessing}
-                  sx={{ mr: 1 }}
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  endIcon={<SendIcon />}
-                  onClick={handleSendMessage}
-                  disabled={isProcessing || (!userInput.trim() && !attachment)}
-                />
-              </Box>
-            </Box>
           </Paper>
         </Grid>
       </Grid>
