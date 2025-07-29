@@ -891,7 +891,42 @@ const AgentApp: React.FC = () => {
                                 fontFamily: 'monospace, "Noto Sans KR", sans-serif',
                                 lineHeight: 1.6
                               }}>
-                                {message.content}
+                                <div>
+                                  {(() => {
+                                    console.log('=== Assistant 메시지 처리 ===')
+                                    console.log('메시지 내용:', message.content)
+                                    // URL 추출
+                                    const urlMatch = message.content.match(/\[웹에서 보기\]\(([^)]+)\)/)
+                                    console.log('URL 매치 결과:', urlMatch)
+                                    if (urlMatch) {
+                                      const reportUrl = urlMatch[1]
+                                      const cleanText = message.content.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
+                                      console.log('변환된 텍스트:', cleanText)
+                                      const parts = cleanText.split('웹에서 보기')
+                                      return (
+                                        <div>
+                                          {parts[0]}
+                                          <a
+                                            href={reportUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{ 
+                                              color: '#1976d2', 
+                                              textDecoration: 'underline', 
+                                              fontWeight: 600,
+                                              cursor: 'pointer'
+                                            }}
+                                          >
+                                            웹에서 보기
+                                          </a>
+                                          {parts[1]}
+                                        </div>
+                                      )
+                                    }
+                                    console.log('URL 매치 안됨, 원본 반환')
+                                    return message.content
+                                  })()}
+                                </div>
                               </Box>
                               {message.referencedToolId && (
                                 <Box

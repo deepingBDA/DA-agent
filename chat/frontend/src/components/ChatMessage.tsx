@@ -113,48 +113,45 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             lineHeight: 1.6,
           }}
         >
-          {/* 마크다운 렌더링 – 링크·개행·GFM, 자동 링크화 지원 */}
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{ 
-              a: renderAnchor,
-              // "웹에서 보기" 텍스트를 클릭 가능한 링크로 변환
-              p: ({ children }) => {
-                console.log('ChatMessage p 컴포넌트:', children)
-                if (typeof children === 'string' && children.includes('웹에서 보기')) {
-                  // URL 추출
-                  const urlMatch = content.match(/\[웹에서 보기\]\(([^)]+)\)/)
-                  console.log('ChatMessage URL 매치:', urlMatch)
-                  if (urlMatch) {
-                    const extractedUrl = urlMatch[1]
-                    const parts = children.split('웹에서 보기')
-                    return (
-                      <p>
-                        {parts[0]}
-                        <a
-                          href={extractedUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ 
-                            color: '#1976d2', 
-                            textDecoration: 'underline', 
-                            fontWeight: 600,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          웹에서 보기
-                        </a>
-                        {parts[1]}
-                      </p>
-                    )
-                  }
-                }
-                return <p>{children}</p>
-              }
-            }}
-          >
-            {cleanedContent}
-          </ReactMarkdown>
+          {(() => {
+            alert('ChatMessage 컴포넌트 실행!')
+            console.log('ChatMessage 직접 처리:', content)
+            // URL 추출
+            const urlMatch = content.match(/\[웹에서 보기\]\(([^)]+)\)/)
+            console.log('ChatMessage URL 매치:', urlMatch)
+            if (urlMatch) {
+              const reportUrl = urlMatch[1]
+              const cleanText = content.replace(/🔗\s*\[웹에서 보기\]\([^)]+\)/g, '웹에서 보기')
+              const parts = cleanText.split('웹에서 보기')
+              return (
+                <div style={{ whiteSpace: 'pre-wrap' }}>
+                  {parts[0]}
+                  <a
+                    href={reportUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ 
+                      color: '#1976d2', 
+                      textDecoration: 'underline', 
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    웹에서 보기
+                  </a>
+                  {parts[1]}
+                </div>
+              )
+            }
+            return (
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{ a: renderAnchor }}
+              >
+                {cleanedContent}
+              </ReactMarkdown>
+            )
+          })()}
         </Box>
 
         {toolInfo && (
