@@ -22,6 +22,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 }) => {
   const [expanded, setExpanded] = useState<boolean>(false)
 
+  // DEBUG: raw content log
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('[DEBUG raw content]', JSON.stringify(content));
+  }, [content]);
+
   const handleExpandClick = () => {
     setExpanded(!expanded)
   }
@@ -67,6 +73,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             lineHeight: 1.6,
           }}
         >
+          {/* DEBUG: show raw string for inspection */}
+          <pre style={{ background: '#f5f5f5', padding: 4, marginBottom: 8 }}>
+            {content}
+          </pre>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
