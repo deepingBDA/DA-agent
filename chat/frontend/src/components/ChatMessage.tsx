@@ -8,6 +8,9 @@ import {
 import { Paper, Typography, Box, IconButton, Collapse } from '@mui/material'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkBreaks from 'remark-breaks'
+// @ts-ignore – 타입 정의가 없는 외부 플러그인
+import remarkLinkify from 'remark-linkify-it'
 
 interface ChatMessageProps {
   role: 'user' | 'assistant' | 'assistant_tool'
@@ -22,17 +25,19 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 }) => {
   const [expanded, setExpanded] = useState<boolean>(false)
 
-  // 백틱(``` ) 코드블록으로 감싸진 경우 제거하여 링크 파싱 가능하게 변환
+  // 백틱(``` ) 코드블록으로 감싸진 메시지가 있으면 앞/뒤 래퍼를 제거해 링크가 활성화되도록 처리
   const cleanedContent = useMemo(() => {
-    let text = content.trim();
+    let text = content.trim()
+
     if (text.startsWith('```')) {
-      // 첫 줄 ```lang? 제거
-      text = text.replace(/^```[a-zA-Z]*\n?/, '');
-      // 마지막 ``` 제거 (끝 공백 고려)
-      text = text.replace(/\n?```$/, '');
+      // 첫 줄 ```lang?\n 제거
+      text = text.replace(/^```[^\n]*\n/, '')
+      // 마지막 줄의 ``` 제거
+      text = text.replace(/\n```$/, '')
     }
-    return text;
-  }, [content]);
+
+    return text
+  }, [content])
 
   const handleExpandClick = () => {
     setExpanded(!expanded)
@@ -79,18 +84,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             lineHeight: 1.6,
           }}
         >
+          {/* 마크다운 렌더링 – 링크·개행·GFM, 자동 링크화 지원 */}
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              a: ({ node, ...props }) => (
-                <a
-                  {...props}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: '#1976d2', textDecoration: 'underline', fontWeight: 600 }}
-                />
-              ),
-            }}
+            remarkPlugins={[remarkGfm, remarkBreaks, remarkLinkify]}
+            components={{ a: renderAnchor }}
           >
             {cleanedContent}
           </ReactMarkdown>
@@ -130,17 +127,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   overflow: 'auto',
                 }}
               >
-                <Typography 
-                  variant="body2"
-                  component="pre"
-                  sx={{ 
-                    fontFamily: 'inherit',
-                    whiteSpace: 'pre-wrap',
-                    margin: 0
-                  }}
+                {/* toolInfo 도 마크다운으로 렌더링하여 링크·코드블록 지원 */}
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkBreaks, remarkLinkify]}
+                  components={{ a: renderAnchor }}
                 >
                   {toolInfo}
-                </Typography>
+                </ReactMarkdown>
               </Box>
             </Collapse>
           </Box>
@@ -149,5 +142,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     </Box>
   )
 }
+
+// ===== 헬퍼: 공통 a 태그 렌더러 =====
+const renderAnchor = ({ node, ...props }: any) => (
+  <a
+    {...props}
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{ color: '#1976d2', textDecoration: 'underline', fontWeight: 600 }}
+  />
+)
 
 export default ChatMessage
