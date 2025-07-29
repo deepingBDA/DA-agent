@@ -120,28 +120,34 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               a: renderAnchor,
               // "웹에서 보기" 텍스트를 클릭 가능한 링크로 변환
               p: ({ children }) => {
-                // 문단 내용이 "웹에서 보기"이고 reportUrl이 있으면 클릭 가능한 링크로 렌더
-                if (typeof children === 'string' && children.includes('웹에서 보기') && reportUrl) {
-                  const parts = children.split('웹에서 보기')
-                  return (
-                    <p>
-                      {parts[0]}
-                      <a
-                        href={reportUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ 
-                          color: '#1976d2', 
-                          textDecoration: 'underline', 
-                          fontWeight: 600,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        웹에서 보기
-                      </a>
-                      {parts[1]}
-                    </p>
-                  )
+                console.log('ChatMessage p 컴포넌트:', children)
+                if (typeof children === 'string' && children.includes('웹에서 보기')) {
+                  // URL 추출
+                  const urlMatch = content.match(/\[웹에서 보기\]\(([^)]+)\)/)
+                  console.log('ChatMessage URL 매치:', urlMatch)
+                  if (urlMatch) {
+                    const extractedUrl = urlMatch[1]
+                    const parts = children.split('웹에서 보기')
+                    return (
+                      <p>
+                        {parts[0]}
+                        <a
+                          href={extractedUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ 
+                            color: '#1976d2', 
+                            textDecoration: 'underline', 
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          웹에서 보기
+                        </a>
+                        {parts[1]}
+                      </p>
+                    )
+                  }
                 }
                 return <p>{children}</p>
               }

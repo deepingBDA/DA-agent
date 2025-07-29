@@ -825,7 +825,10 @@ const AgentApp: React.FC = () => {
                   pl: 2,
                 }}
               >
-                {messages.filter((msg) => msg.role !== 'assistant_tool')
+                {messages.filter((msg, idx) => {
+                  console.log(`전체 메시지 ${idx}:`, { role: msg.role, content: msg.content?.substring(0, 100) })
+                  return msg.role !== 'assistant_tool'
+                })
                   .length === 0 && (
                   <Box
                     sx={{
@@ -842,6 +845,10 @@ const AgentApp: React.FC = () => {
                 )}
 
                 {messages
+                  .map((msg, idx) => {
+                    console.log(`전체 메시지 ${idx}:`, { role: msg.role, content: msg.content?.substring(0, 100) })
+                    return msg
+                  })
                   .filter((msg) => msg.role !== 'assistant_tool')
                   .map((message, chatIndex) => (
                     <Box
