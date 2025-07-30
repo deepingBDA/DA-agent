@@ -433,7 +433,7 @@ const AgentApp: React.FC = () => {
         flexDirection: 'column',
         overflow: 'hidden',
         width: '100%',
-        background: '#f3f0ff', // 연보라색 단색 배경
+        background: '#c4bee2', // 연보라색 단색 배경
         position: 'relative',
       }}
     >
@@ -710,7 +710,7 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'hidden',
               borderRadius: 0,
-              background: '#faf9ff', // 연보라색 배경
+              background: '#d4d0e8', // 연보라색 배경
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
               borderRight: '1px solid #e5e7eb',
               borderLeft: '1px solid #e5e7eb',
@@ -1106,7 +1106,7 @@ const AgentApp: React.FC = () => {
                 sx={{
                   p: 2,
                   borderTop: '1px solid #e5e7eb',
-                  background: '#fafafa', // 연한 회색 배경
+                  background: '#e8e4f0', // 연한 보라색 배경
                 }}
               >
                 {/* 첨부 파일 표시 영역 */}
