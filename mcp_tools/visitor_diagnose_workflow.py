@@ -1374,7 +1374,7 @@ def visitor_diagnose_html(
     store_name: Union[str, List[str]],
     start_date: str,
     end_date: str,
-    user_prompt: str = "매장 방문객 진단 분석 HTML 보고서"
+    user_prompt: str = "매장 방문객 진단 HTML 보고서"
 ) -> str:
     """[HTML_REPORT] Generate a **modern HTML report** for *visitor diagnostics*.
 
@@ -1393,23 +1393,83 @@ def visitor_diagnose_html(
     ----------
     store_name : str | list[str]
         Store name(s) to diagnose. Accepts a single string or a list.
+        Special values:
+        - "더미데이터" or "더미" or "dummy": Automatically generates multi-store dummy data
     start_date : str
         Start date (YYYY-MM-DD).
     end_date : str
         End date (YYYY-MM-DD).
     user_prompt : str, optional
-        Custom prompt for LLM. Defaults to "매장 방문객 진단 분석 HTML 보고서".
+        Custom prompt for LLM. Defaults to "매장 방문객 진단 HTML 보고서".
 
     Returns
     -------
     str
         Result message containing the absolute path to the generated HTML file.
     """
+    
+    # 더미데이터 자동 확장 기능
+    if isinstance(store_name, str):
+        dummy_keywords = ["더미데이터", "더미", "dummy", "테스트", "test"]
+        if any(keyword in store_name.lower() for keyword in dummy_keywords):
+            # 더미데이터 요청 시 여러 매장으로 자동 확장 (test_visitor_workflow.py --multi와 동일)
+            store_name = ["더미데이터점", "더미데이터점1", "더미데이터점2", "더미데이터점3", "더미데이터점4"]
+            print(f"🎯 더미데이터 요청 감지 - 다중 매장 비교 모드로 변환: {store_name}")
 
     workflow = VisitorDiagnoseWorkflow()
     return workflow.run(
         user_prompt=user_prompt,
         store_name=store_name,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+
+@mcp.tool()  # 더미데이터 전용 함수
+def visitor_diagnose_dummy_multi(
+    *,
+    start_date: str,
+    end_date: str,
+    user_prompt: str = "더미데이터 매장들 비교 진단 보고서"
+) -> str:
+    """[DUMMY_DATA] Generate a **multi-store comparison HTML report** using *dummy test data*.
+
+    Trigger words (case-insensitive):
+        - "더미", "dummy", "테스트", "test", "샘플", "sample", "예시", "example"
+        - Combinations like "더미데이터 보고서", "테스트 매장", "샘플 보고서" etc.
+
+    Use this when the user wants to see a demo/test report with multiple dummy stores.
+    Automatically includes 5 different dummy stores with diverse visitor patterns:
+    - 더미데이터점: 평일/주말 불균형, 성별/연령대 편중 (하이라이트 많음)
+    - 더미데이터점1: 아침/심야 시간대 주력 (특이한 패턴)
+    - 더미데이터점2: 여성/중장년층 편중 (특정 고객층 집중)
+    - 더미데이터점3: 극심한 평일/주말 차이, 젊은층 집중 (문제점 많음)
+    - 더미데이터점4: 균형잡힌 운영 (비교 기준점)
+
+    Parameters
+    ----------
+    start_date : str
+        Start date (YYYY-MM-DD).
+    end_date : str
+        End date (YYYY-MM-DD).
+    user_prompt : str, optional
+        Custom prompt for LLM. Defaults to "더미데이터 매장들 비교 진단 보고서".
+
+    Returns
+    -------
+    str
+        Result message containing the HTML report with comparison of all dummy stores.
+    """
+    
+    # 미리 정의된 더미매장들 (test_visitor_workflow.py --multi와 동일)
+    dummy_stores = ["더미데이터점", "더미데이터점1", "더미데이터점2", "더미데이터점3", "더미데이터점4"]
+    
+    print(f"🎯 더미데이터 다중매장 비교 모드: {dummy_stores}")
+    
+    workflow = VisitorDiagnoseWorkflow()
+    return workflow.run(
+        user_prompt=user_prompt,
+        store_name=dummy_stores,
         start_date=start_date,
         end_date=end_date,
     )
