@@ -993,11 +993,11 @@ const AgentApp: React.FC = () => {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             style={{ 
-                                              color: '#e53e3e', 
+                                              color: '#1976d2', 
                                               textDecoration: 'underline', 
                                               fontWeight: 600,
                                               cursor: 'pointer',
-                                              textShadow: '0 1px 2px rgba(229, 62, 62, 0.3)'
+                                              textShadow: '0 1px 2px rgba(25, 118, 210, 0.3)'
                                             }}
                                           >
                                             웹에서 보기
