@@ -491,7 +491,7 @@ const AgentApp: React.FC = () => {
             {/* 시스템 설정 */}
             <Accordion defaultExpanded>
               <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#7c3aed' }} />}>
-                              <SettingsIcon sx={{ mr: 1, color: '#22c55e' }} />
+                              <SettingsIcon sx={{ mr: 1, color: '#1cb454' }} />
               <Typography sx={{ color: '#7c3aed', fontWeight: 'bold' }}>⚙️ 시스템 설정</Typography>
               </AccordionSummary>
               <AccordionDetails>
@@ -505,13 +505,13 @@ const AgentApp: React.FC = () => {
                     }
                     sx={{
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#22c55e',
+                        borderColor: '#1cb454',
                       },
                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#16a34a',
+                        borderColor: '#169244',
                       },
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#22c55e',
+                        borderColor: '#1cb454',
                       }
                     }}
                   >
@@ -537,12 +537,12 @@ const AgentApp: React.FC = () => {
                   }
                   sx={{ 
                     mb: 2,
-                    color: '#22c55e',
+                    color: '#1cb454',
                     '& .MuiSlider-thumb': {
-                      backgroundColor: '#22c55e',
+                      backgroundColor: '#1cb454',
                     },
                     '& .MuiSlider-track': {
-                      backgroundColor: '#22c55e',
+                      backgroundColor: '#1cb454',
                     },
                     '& .MuiSlider-rail': {
                       backgroundColor: '#d1d5db',
@@ -564,12 +564,12 @@ const AgentApp: React.FC = () => {
                   }
                   sx={{ 
                     mb: 2,
-                    color: '#22c55e',
+                    color: '#1cb454',
                     '& .MuiSlider-thumb': {
-                      backgroundColor: '#22c55e',
+                      backgroundColor: '#1cb454',
                     },
                     '& .MuiSlider-track': {
-                      backgroundColor: '#22c55e',
+                      backgroundColor: '#1cb454',
                     },
                     '& .MuiSlider-rail': {
                       backgroundColor: '#d1d5db',
@@ -602,9 +602,9 @@ const AgentApp: React.FC = () => {
                 />
                 <Button variant="contained" fullWidth onClick={handleAddTool}
                   sx={{
-                    backgroundColor: '#22c55e',
+                    backgroundColor: '#1cb454',
                     '&:hover': {
-                      backgroundColor: '#16a34a',
+                      backgroundColor: '#169244',
                     }
                   }}>
                   도구 추가
@@ -661,9 +661,9 @@ const AgentApp: React.FC = () => {
                 onClick={handleApplySettings}
                 sx={{ 
                   mb: 1,
-                  backgroundColor: '#22c55e',
+                  backgroundColor: '#1cb454',
                   '&:hover': {
-                    backgroundColor: '#16a34a',
+                    backgroundColor: '#169244',
                   }
                 }}
                 disabled={isProcessing}
@@ -676,11 +676,11 @@ const AgentApp: React.FC = () => {
                 onClick={handleResetConversation}
                 disabled={isProcessing}
                 sx={{
-                  borderColor: '#22c55e',
-                  color: '#22c55e',
+                  borderColor: '#1cb454',
+                  color: '#1cb454',
                   '&:hover': {
-                    borderColor: '#16a34a',
-                    backgroundColor: 'rgba(34, 197, 94, 0.04)',
+                    borderColor: '#169244',
+                    backgroundColor: 'rgba(28, 180, 84, 0.04)',
                   }
                 }}
               >
@@ -750,7 +750,7 @@ const AgentApp: React.FC = () => {
                       mb: 2,
                       background: '#e0dae8', // 연보라색 배경
                       borderRadius: '12px',
-                      borderLeft: '4px solid #22c55e',
+                      borderLeft: '4px solid #1cb454',
                       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
                       overflow: 'hidden',
                       border: '1px solid #e5e7eb',
@@ -770,7 +770,7 @@ const AgentApp: React.FC = () => {
                       <Typography
                         variant="subtitle2"
                         sx={{
-                          color: '#22c55e',
+                          color: '#1cb454',
                           fontWeight: 'bold',
                           display: 'flex',
                           alignItems: 'center',
@@ -778,7 +778,7 @@ const AgentApp: React.FC = () => {
                       >
                         도구 참조 #{toolIndex + 1}
                       </Typography>
-                      <IconButton size="small" sx={{ color: '#22c55e' }}>
+                      <IconButton size="small" sx={{ color: '#1cb454' }}>
                         {expandedTools[messages.indexOf(message)] ? (
                           <KeyboardArrowUpIcon />
                         ) : (
@@ -852,7 +852,7 @@ const AgentApp: React.FC = () => {
                 left: 0,
                 right: 0,
                 height: '3px',
-                background: '#22c55e', // 초록색 상단 바
+                background: '#1cb454', // 초록색 상단 바
               },
             }}
           >
@@ -864,12 +864,12 @@ const AgentApp: React.FC = () => {
                 startIcon={showSidebar ? <CloseIcon /> : <MenuIcon />}
                 size="small"
                 sx={{
-                  background: 'rgba(34, 197, 94, 0.1)',
-                  border: '1px solid rgba(34, 197, 94, 0.3)',
-                  color: '#22c55e',
+                  background: 'rgba(28, 180, 84, 0.1)',
+                  border: '1px solid rgba(28, 180, 84, 0.3)',
+                  color: '#1cb454',
                   '&:hover': {
-                    background: 'rgba(34, 197, 94, 0.2)',
-                    border: '1px solid rgba(34, 197, 94, 0.5)',
+                    background: 'rgba(28, 180, 84, 0.2)',
+                    border: '1px solid rgba(28, 180, 84, 0.5)',
                   },
                   backdropFilter: 'blur(10px)',
                 }}
@@ -938,7 +938,7 @@ const AgentApp: React.FC = () => {
                           width: message.role === 'user' ? 'auto' : 'auto',
                           bgcolor:
                             message.role === 'user'
-                              ? '#22c55e' // 사용자 메시지는 초록색
+                              ? '#1cb454' // 사용자 메시지는 초록색
                               : '#ffffff', // AI 메시지는 흰색
                           borderRadius: '20px',
                           borderTopLeftRadius:
@@ -946,11 +946,11 @@ const AgentApp: React.FC = () => {
                           borderTopRightRadius:
                             message.role === 'user' ? '8px' : '20px',
                           boxShadow: message.role === 'user' 
-                            ? '0 6px 16px rgba(34, 197, 94, 0.20)'
+                            ? '0 6px 16px rgba(28, 180, 84, 0.20)'
                             : '0 4px 12px rgba(0, 0, 0, 0.12)',
                           position: 'relative',
                           background: message.role === 'user'
-                            ? '#22c55e' // 사용자 메시지는 초록색
+                            ? '#1cb454' // 사용자 메시지는 초록색
                             : '#ffffff', // AI 메시지는 흰색
                           color: message.role === 'user' ? '#ffffff' : '#374151',
                           border: message.role === 'user' ? 'none' : '1px solid #e5e7eb',
@@ -1118,13 +1118,13 @@ const AgentApp: React.FC = () => {
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      bgcolor: 'rgba(34, 197, 94, 0.1)',
+                      bgcolor: 'rgba(28, 180, 84, 0.1)',
                       p: 1,
                       borderRadius: 1,
                       mb: 1,
                     }}
                   >
-                    <AttachFileIcon sx={{ mr: 1, color: '#22c55e' }} />
+                    <AttachFileIcon sx={{ mr: 1, color: '#1cb454' }} />
                     <Typography variant="body2" sx={{ flexGrow: 1 }}>
                       {attachment.name}
                     </Typography>
@@ -1148,7 +1148,7 @@ const AgentApp: React.FC = () => {
                   <IconButton
                     onClick={handleAttachmentButtonClick}
                     disabled={isProcessing}
-                    sx={{ color: '#22c55e' }}
+                    sx={{ color: '#1cb454' }}
                   >
                     <AttachFileIcon />
                   </IconButton>
@@ -1173,13 +1173,13 @@ const AgentApp: React.FC = () => {
                           backgroundColor: 'transparent',
                         },
                         '& fieldset': {
-                          borderColor: '#22c55e',
+                          borderColor: '#1cb454',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#16a34a',
+                          borderColor: '#169244',
                         },
                         '&.Mui-focused fieldset': {
-                          borderColor: '#22c55e',
+                          borderColor: '#1cb454',
                         },
                         '&.Mui-focused': {
                           backgroundColor: '#f0edf4 !important',
@@ -1199,9 +1199,9 @@ const AgentApp: React.FC = () => {
                     disabled={isProcessing || !userInput.trim()}
                     sx={{ 
                       minWidth: '60px',
-                      backgroundColor: '#22c55e',
+                      backgroundColor: '#1cb454',
                       '&:hover': {
-                        backgroundColor: '#16a34a',
+                        backgroundColor: '#169244',
                       }
                     }}
                   >
@@ -1223,7 +1223,7 @@ const AgentApp: React.FC = () => {
                 >
                   <LinearProgress sx={{
                     '& .MuiLinearProgress-bar': {
-                      backgroundColor: '#22c55e',
+                      backgroundColor: '#1cb454',
                     },
                     backgroundColor: '#e5e7eb',
                   }} />
