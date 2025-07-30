@@ -24,9 +24,9 @@ const theme = createTheme({
       dark: '#6B46C1',
     },
     secondary: {
-      main: '#00a86b', // CU 초록색
-      light: '#10b981',
-      dark: '#047857',
+      main: '#10c977', // CU 초록색 (더 밝게)
+      light: '#22d394',
+      dark: '#059669',
     },
   },
   components: {
