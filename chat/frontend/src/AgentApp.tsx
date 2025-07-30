@@ -468,7 +468,7 @@ const AgentApp: React.FC = () => {
         >
           <Paper
             sx={{
-              p: 2,
+              p: 1.5,
               display: 'flex',
               flexDirection: 'column',
               height: '100%',
@@ -476,7 +476,7 @@ const AgentApp: React.FC = () => {
               borderRadius: 0,
               bgcolor: '#d4d0e8', // 연보라색 배경 통일
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-              borderRight: '3px solid #7c3aed', // 보라색 구분선
+              borderRight: '1px solid #b8b8b8', // 연한 회색 구분선
             }}
           >
                           <Typography variant="h6" gutterBottom sx={{ color: '#7c3aed', fontWeight: 'bold' }}>
@@ -706,7 +706,7 @@ const AgentApp: React.FC = () => {
         >
           <Paper
             sx={{
-              p: 2,
+              p: 1.5,
               display: 'flex',
               flexDirection: 'column',
               height: '100%',
@@ -714,8 +714,8 @@ const AgentApp: React.FC = () => {
               borderRadius: 0,
               background: '#d4d0e8', // 연보라색 배경 통일
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-              borderRight: '3px solid #7c3aed', // 보라색 구분선
-              borderLeft: '1px solid #a855f7', // 연한 보라색 구분선
+              borderRight: '1px solid #b8b8b8', // 연한 회색 구분선
+              borderLeft: '1px solid #d0d0d0', // 매우 연한 회색 구분선
             }}
           >
             <Typography variant="h6" gutterBottom sx={{ color: '#7c3aed', fontWeight: 'bold' }}>
@@ -832,7 +832,7 @@ const AgentApp: React.FC = () => {
         >
           <Paper
             sx={{
-              p: 2,
+              p: 1.5,
               display: 'flex',
               flexDirection: 'column',
               height: '100%',
@@ -842,7 +842,7 @@ const AgentApp: React.FC = () => {
               width: '100%',
               background: '#d4d0e8', // 연보라색 배경 통일
               boxShadow: '0 6px 16px rgba(0, 0, 0, 0.12)',
-              borderLeft: '3px solid #7c3aed', // 보라색 구분선
+              borderLeft: '1px solid #b8b8b8', // 연한 회색 구분선
               position: 'relative',
               '&::before': {
                 content: '""',
@@ -1106,8 +1106,8 @@ const AgentApp: React.FC = () => {
               {/* 채팅 입력 영역 */}
               <Box
                 sx={{
-                  p: 2,
-                  borderTop: '2px solid #7c3aed', // 보라색 구분선
+                  p: 1.5,
+                  borderTop: '1px solid #b8b8b8', // 연한 회색 구분선
                   background: '#d4d0e8', // 연보라색 배경 통일
                 }}
               >
