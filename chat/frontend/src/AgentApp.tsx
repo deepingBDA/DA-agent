@@ -475,8 +475,8 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'auto',
               borderRadius: 3, // 둥근 모서리 추가
-              bgcolor: '#d4d0e8', // 연보라색 배경 통일
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              bgcolor: '#f0eef5', // 흰색에 가까운 연보라색
+              boxShadow: '0 6px 20px rgba(0, 0, 0, 0.16)',
               borderRight: '1px solid #b8b8b8', // 연한 회색 구분선
             }}
           >
@@ -698,9 +698,9 @@ const AgentApp: React.FC = () => {
           sx={{
             height: '100%',
             position: 'absolute',
-            left: showSidebar ? '20%' : '0%',
+            left: showSidebar ? '19.7%' : '0%',
             top: 0,
-            width: showSidebar ? '20%' : '24%',
+            width: showSidebar ? '20%' : '23%',
             transition: 'all 0.3s ease',
             zIndex: 5,
           }}
@@ -713,8 +713,8 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'hidden',
               borderRadius: 3, // 둥근 모서리 추가
-              background: '#d4d0e8', // 연보라색 배경 통일
-              boxShadow: '0 6px 16px rgba(0, 0, 0, 0.12)',
+              background: '#f0eef5', // 흰색에 가까운 연보라색
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.18)',
               borderRight: '1px solid #b8b8b8', // 연한 회색 구분선
               borderLeft: '1px solid #d0d0d0', // 매우 연한 회색 구분선
             }}
@@ -751,7 +751,7 @@ const AgentApp: React.FC = () => {
                       background: '#e0dae8', // 연보라색 배경
                       borderRadius: '12px',
                       borderLeft: '4px solid #16a34a',
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
                       overflow: 'hidden',
                       border: '1px solid #e5e7eb',
                     }}
@@ -825,8 +825,8 @@ const AgentApp: React.FC = () => {
             position: 'absolute',
             right: 0,
             top: 0,
-            width: showSidebar ? '59%' : '75%',
-            left: showSidebar ? '41%' : '25%',
+            width: showSidebar ? '59.6%' : '76.3%',
+            left: showSidebar ? '40.4%' : '23.7%',
             transition: 'width 0.3s ease',
             willChange: 'width',
           }}
@@ -841,8 +841,8 @@ const AgentApp: React.FC = () => {
               borderRadius: 3, // 둥근 모서리 추가
               transition: 'all 0.3s ease',
               width: '100%',
-              background: '#d4d0e8', // 연보라색 배경 통일
-              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+              background: '#f0eef5', // 흰색에 가까운 연보라색
+              boxShadow: '0 10px 28px rgba(0, 0, 0, 0.20)',
               borderLeft: '1px solid #b8b8b8', // 연한 회색 구분선
               position: 'relative',
               '&::before': {
@@ -946,8 +946,8 @@ const AgentApp: React.FC = () => {
                           borderTopRightRadius:
                             message.role === 'user' ? '8px' : '20px',
                           boxShadow: message.role === 'user' 
-                            ? '0 4px 12px rgba(22, 163, 74, 0.15)'
-                            : '0 2px 8px rgba(0, 0, 0, 0.08)',
+                            ? '0 6px 16px rgba(22, 163, 74, 0.20)'
+                            : '0 4px 12px rgba(0, 0, 0, 0.12)',
                           position: 'relative',
                           background: message.role === 'user'
                             ? '#16a34a' // 사용자 메시지는 초록색
@@ -1109,7 +1109,7 @@ const AgentApp: React.FC = () => {
                 sx={{
                   p: 2,
                   borderTop: '1px solid #b8b8b8', // 연한 회색 구분선
-                  background: '#d4d0e8', // 연보라색 배경 통일
+                  background: '#f0eef5', // 흰색에 가까운 연보라색
                 }}
               >
                 {/* 첨부 파일 표시 영역 */}
@@ -1168,7 +1168,7 @@ const AgentApp: React.FC = () => {
                     size="small"
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#d4d0e8 !important', // 연보라색 배경 통일
+                        backgroundColor: '#f0eef5 !important', // 흰색에 가까운 연보라색
                         '& input': {
                           backgroundColor: 'transparent',
                         },
@@ -1182,10 +1182,10 @@ const AgentApp: React.FC = () => {
                           borderColor: '#16a34a',
                         },
                         '&.Mui-focused': {
-                          backgroundColor: '#d4d0e8 !important',
+                          backgroundColor: '#f0eef5 !important',
                         },
                         '&:hover': {
-                          backgroundColor: '#d4d0e8 !important',
+                          backgroundColor: '#f0eef5 !important',
                         }
                       },
                       '& .MuiInputBase-input': {
