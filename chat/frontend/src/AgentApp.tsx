@@ -475,7 +475,7 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'auto',
               borderRadius: 3, // 둥근 모서리 추가
-              bgcolor: '#e0dae8', // 배경과 흰색의 중간 톤
+              bgcolor: '#f0edf4', // 현재 색상과 흰색의 중간 톤
               boxShadow: '0 6px 20px rgba(0, 0, 0, 0.16)',
               borderRight: '1px solid #b8b8b8', // 연한 회색 구분선
             }}
@@ -713,7 +713,7 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'hidden',
               borderRadius: 3, // 둥근 모서리 추가
-              background: '#e0dae8', // 배경과 흰색의 중간 톤
+              background: '#f0edf4', // 현재 색상과 흰색의 중간 톤
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.18)',
               borderRight: '1px solid #b8b8b8', // 연한 회색 구분선
               borderLeft: '1px solid #d0d0d0', // 매우 연한 회색 구분선
@@ -841,7 +841,7 @@ const AgentApp: React.FC = () => {
               borderRadius: 3, // 둥근 모서리 추가
               transition: 'all 0.3s ease',
               width: '100%',
-              background: '#e0dae8', // 배경과 흰색의 중간 톤
+              background: '#f0edf4', // 현재 색상과 흰색의 중간 톤
               boxShadow: '0 10px 28px rgba(0, 0, 0, 0.20)',
               borderLeft: '1px solid #b8b8b8', // 연한 회색 구분선
               position: 'relative',
@@ -1109,7 +1109,7 @@ const AgentApp: React.FC = () => {
                 sx={{
                   p: 2,
                   borderTop: '1px solid #b8b8b8', // 연한 회색 구분선
-                  background: '#e0dae8', // 배경과 흰색의 중간 톤
+                  background: '#f0edf4', // 현재 색상과 흰색의 중간 톤
                 }}
               >
                 {/* 첨부 파일 표시 영역 */}
@@ -1168,7 +1168,7 @@ const AgentApp: React.FC = () => {
                     size="small"
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#e0dae8 !important', // 배경과 흰색의 중간 톤
+                        backgroundColor: '#f0edf4 !important', // 현재 색상과 흰색의 중간 톤
                         '& input': {
                           backgroundColor: 'transparent',
                         },
@@ -1182,10 +1182,10 @@ const AgentApp: React.FC = () => {
                           borderColor: '#16a34a',
                         },
                         '&.Mui-focused': {
-                          backgroundColor: '#e0dae8 !important',
+                          backgroundColor: '#f0edf4 !important',
                         },
                         '&:hover': {
-                          backgroundColor: '#e0dae8 !important',
+                          backgroundColor: '#f0edf4 !important',
                         }
                       },
                       '& .MuiInputBase-input': {
