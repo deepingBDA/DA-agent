@@ -433,35 +433,8 @@ const AgentApp: React.FC = () => {
         flexDirection: 'column',
         overflow: 'hidden',
         width: '100%',
-        background: `
-          linear-gradient(135deg, #8B5CF6 0%, #00a86b 100%),
-          linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(0, 168, 107, 0.1) 100%)
-        `,
-        backgroundAttachment: 'fixed',
+        background: '#f3f0ff', // 연보라색 단색 배경
         position: 'relative',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `
-            repeating-linear-gradient(
-              90deg,
-              transparent,
-              transparent 98px,
-              rgba(255, 255, 255, 0.03) 100px
-            ),
-            repeating-linear-gradient(
-              0deg,
-              transparent,
-              transparent 98px,
-              rgba(255, 255, 255, 0.03) 100px
-            )
-          `,
-          pointerEvents: 'none',
-        },
       }}
     >
       <Grid
@@ -504,29 +477,40 @@ const AgentApp: React.FC = () => {
               bgcolor: 'background.paper',
             }}
           >
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: '#7c3aed', fontWeight: 'bold' }}>
               🚀 MCP Tool Utilization Agent
             </Typography>
             <Divider sx={{ 
               my: 2,
-              borderColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: 'rgba(124, 58, 237, 0.2)',
             }} />
 
             {/* 시스템 설정 */}
             <Accordion defaultExpanded>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <SettingsIcon sx={{ mr: 1 }} />
-                <Typography>⚙️ 시스템 설정</Typography>
+              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#7c3aed' }} />}>
+                <SettingsIcon sx={{ mr: 1, color: '#16a34a' }} />
+                <Typography sx={{ color: '#7c3aed', fontWeight: 'bold' }}>⚙️ 시스템 설정</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                  <InputLabel>🤖 모델 선택</InputLabel>
+                  <InputLabel sx={{ color: '#7c3aed' }}>🤖 모델 선택</InputLabel>
                   <Select
                     value={settings.selectedModel}
                     label="🤖 모델 선택"
                     onChange={(e) =>
                       handleSettingsChange('selectedModel', e.target.value)
                     }
+                    sx={{
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#16a34a',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#15803d',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#16a34a',
+                      }
+                    }}
                   >
                     {settings.models.map((model) => (
                       <MenuItem key={model} value={model}>
@@ -536,7 +520,7 @@ const AgentApp: React.FC = () => {
                   </Select>
                 </FormControl>
 
-                <Typography variant="body2" gutterBottom>
+                <Typography variant="body2" gutterBottom sx={{ color: '#7c3aed' }}>
                   ⏱️ 응답 생성 시간 제한 (초)
                 </Typography>
                 <Slider
@@ -548,10 +532,22 @@ const AgentApp: React.FC = () => {
                   onChange={(_, value) =>
                     handleSettingsChange('timeoutSeconds', value)
                   }
-                  sx={{ mb: 2 }}
+                  sx={{ 
+                    mb: 2,
+                    color: '#16a34a',
+                    '& .MuiSlider-thumb': {
+                      backgroundColor: '#16a34a',
+                    },
+                    '& .MuiSlider-track': {
+                      backgroundColor: '#16a34a',
+                    },
+                    '& .MuiSlider-rail': {
+                      backgroundColor: '#d1d5db',
+                    }
+                  }}
                 />
 
-                <Typography variant="body2" gutterBottom>
+                <Typography variant="body2" gutterBottom sx={{ color: '#7c3aed' }}>
                   ⏱️ 재귀 호출 제한 (횟수)
                 </Typography>
                 <Slider
@@ -563,18 +559,30 @@ const AgentApp: React.FC = () => {
                   onChange={(_, value) =>
                     handleSettingsChange('recursionLimit', value)
                   }
-                  sx={{ mb: 2 }}
+                  sx={{ 
+                    mb: 2,
+                    color: '#16a34a',
+                    '& .MuiSlider-thumb': {
+                      backgroundColor: '#16a34a',
+                    },
+                    '& .MuiSlider-track': {
+                      backgroundColor: '#16a34a',
+                    },
+                    '& .MuiSlider-rail': {
+                      backgroundColor: '#d1d5db',
+                    }
+                  }}
                 />
               </AccordionDetails>
             </Accordion>
 
             {/* 도구 설정 */}
             <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>🔧 도구 설정</Typography>
+              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#7c3aed' }} />}>
+                <Typography sx={{ color: '#7c3aed', fontWeight: 'bold' }}>🔧 도구 설정</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Typography variant="body2" gutterBottom>
+                <Typography variant="body2" gutterBottom sx={{ color: '#6b7280' }}>
                   JSON 형식으로 도구를 추가하세요
                 </Typography>
                 <TextField
@@ -589,11 +597,17 @@ const AgentApp: React.FC = () => {
                   }
                   sx={{ mb: 2 }}
                 />
-                <Button variant="contained" fullWidth onClick={handleAddTool}>
+                <Button variant="contained" fullWidth onClick={handleAddTool}
+                  sx={{
+                    backgroundColor: '#16a34a',
+                    '&:hover': {
+                      backgroundColor: '#15803d',
+                    }
+                  }}>
                   도구 추가
                 </Button>
 
-                <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
+                <Typography variant="h6" sx={{ mt: 2, mb: 1, color: '#7c3aed' }}>
                   등록된 도구
                 </Typography>
                 {Object.keys(config).map((toolName) => (
@@ -622,8 +636,8 @@ const AgentApp: React.FC = () => {
 
             {/* 시스템 정보 */}
             <Accordion defaultExpanded>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>📊 시스템 정보</Typography>
+              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#7c3aed' }} />}>
+                <Typography sx={{ color: '#7c3aed', fontWeight: 'bold' }}>📊 시스템 정보</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Typography variant="body2" gutterBottom>
@@ -642,7 +656,13 @@ const AgentApp: React.FC = () => {
                 fullWidth
                 startIcon={<SettingsIcon />}
                 onClick={handleApplySettings}
-                sx={{ mb: 1 }}
+                sx={{ 
+                  mb: 1,
+                  backgroundColor: '#16a34a',
+                  '&:hover': {
+                    backgroundColor: '#15803d',
+                  }
+                }}
                 disabled={isProcessing}
               >
                 설정 적용
@@ -652,6 +672,14 @@ const AgentApp: React.FC = () => {
                 fullWidth
                 onClick={handleResetConversation}
                 disabled={isProcessing}
+                sx={{
+                  borderColor: '#16a34a',
+                  color: '#16a34a',
+                  '&:hover': {
+                    borderColor: '#15803d',
+                    backgroundColor: 'rgba(22, 163, 74, 0.04)',
+                  }
+                }}
               >
                 대화 초기화
               </Button>
@@ -682,18 +710,13 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'hidden',
               borderRadius: 0,
-              background: `
-                linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(0, 168, 107, 0.08) 100%) !important
-              `,
-              boxShadow: `
-                0 2px 8px rgba(0, 0, 0, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8)
-              `,
-              borderRight: '1px solid #e9ecef',
-              borderLeft: '1px solid #e9ecef',
+              background: '#faf9ff', // 연보라색 배경
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              borderRight: '1px solid #e5e7eb',
+              borderLeft: '1px solid #e5e7eb',
             }}
           >
-            <Typography variant="h6" gutterBottom sx={{ color: '#007bff', fontWeight: 'bold' }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#7c3aed', fontWeight: 'bold' }}>
               🔧 도구 사용 내역
             </Typography>
             
@@ -722,18 +745,12 @@ const AgentApp: React.FC = () => {
                     sx={{
                       p: 2,
                       mb: 2,
-                      background: `
-                        linear-gradient(135deg, #f4f2f8 0%, #e9e6f0 100%),
-                        linear-gradient(180deg, rgba(138, 43, 226, 0.05) 0%, transparent 100%)
-                      `,
+                      background: '#ffffff',
                       borderRadius: '10px',
-                      borderLeft: '4px solid #007bff',
-                      boxShadow: `
-                        0 2px 8px rgba(0, 0, 0, 0.08),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.8)
-                      `,
+                      borderLeft: '4px solid #16a34a',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
                       overflow: 'hidden',
-                      border: '1px solid #e9ecef',
+                      border: '1px solid #e5e7eb',
                     }}
                   >
                     <Box
@@ -750,7 +767,7 @@ const AgentApp: React.FC = () => {
                       <Typography
                         variant="subtitle2"
                         sx={{
-                          color: '#007bff',
+                          color: '#16a34a',
                           fontWeight: 'bold',
                           display: 'flex',
                           alignItems: 'center',
@@ -758,7 +775,7 @@ const AgentApp: React.FC = () => {
                       >
                         도구 참조 #{toolIndex + 1}
                       </Typography>
-                      <IconButton size="small" sx={{ color: '#007bff' }}>
+                      <IconButton size="small" sx={{ color: '#16a34a' }}>
                         {expandedTools[messages.indexOf(message)] ? (
                           <KeyboardArrowUpIcon />
                         ) : (
@@ -771,12 +788,12 @@ const AgentApp: React.FC = () => {
                       <Box
                         sx={{
                           mt: 1,
-                          background: 'linear-gradient(135deg, #f3f1f7 0%, #e7e4ee 100%)',
+                          background: '#f9fafb',
                           borderRadius: '6px',
                           p: 1.5,
                           maxHeight: 'calc(100vh - 300px)',
                           overflowY: 'auto',
-                          border: '1px solid rgba(138, 43, 226, 0.2)',
+                          border: '1px solid #e5e7eb',
                         }}
                       >
                         <div>
@@ -821,14 +838,9 @@ const AgentApp: React.FC = () => {
               borderRadius: 0,
               transition: 'all 0.3s ease',
               width: '100%',
-              background: `
-                linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(139, 92, 246, 0.08) 100%) !important
-              `,
-              boxShadow: `
-                0 2px 4px rgba(0, 0, 0, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8)
-              `,
-              border: '1px solid #e9ecef',
+              background: '#ffffff', // 흰색 배경
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+              border: '1px solid #e5e7eb',
               position: 'relative',
               '&::before': {
                 content: '""',
@@ -837,7 +849,7 @@ const AgentApp: React.FC = () => {
                 left: 0,
                 right: 0,
                 height: '3px',
-                background: 'linear-gradient(90deg, #007bff 0%, #6610f2 50%, #e83e8c 100%)',
+                background: '#16a34a', // 초록색 상단 바
               },
             }}
           >
@@ -849,12 +861,12 @@ const AgentApp: React.FC = () => {
                 startIcon={showSidebar ? <CloseIcon /> : <MenuIcon />}
                 size="small"
                 sx={{
-                  background: 'rgba(0, 168, 107, 0.1)',
-                  border: '1px solid rgba(0, 168, 107, 0.3)',
-                  color: '#00a86b',
+                  background: 'rgba(22, 163, 74, 0.1)',
+                  border: '1px solid rgba(22, 163, 74, 0.3)',
+                  color: '#16a34a',
                   '&:hover': {
-                    background: 'rgba(0, 168, 107, 0.2)',
-                    border: '1px solid rgba(0, 168, 107, 0.5)',
+                    background: 'rgba(22, 163, 74, 0.2)',
+                    border: '1px solid rgba(22, 163, 74, 0.5)',
                   },
                   backdropFilter: 'blur(10px)',
                 }}
@@ -923,24 +935,22 @@ const AgentApp: React.FC = () => {
                           width: message.role === 'user' ? 'auto' : 'auto',
                           bgcolor:
                             message.role === 'user'
-                              ? 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'
-                              : 'linear-gradient(135deg, #f7f5fa 0%, #f1eff5 100%)',
+                              ? '#16a34a' // 사용자 메시지는 초록색
+                              : '#ffffff', // AI 메시지는 흰색
                           borderRadius: '18px',
                           borderTopLeftRadius:
                             message.role === 'user' ? '18px' : '4px',
                           borderTopRightRadius:
                             message.role === 'user' ? '4px' : '18px',
                           boxShadow: message.role === 'user' 
-                            ? '0 4px 12px rgba(0, 123, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
-                            : '0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                            ? '0 4px 12px rgba(22, 163, 74, 0.15)'
+                            : '0 2px 8px rgba(0, 0, 0, 0.08)',
                           position: 'relative',
                           background: message.role === 'user'
-                            ? 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'
-                            : `
-                              linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(139, 92, 246, 0.1) 100%) !important
-                            `,
-                          color: message.role === 'user' ? '#ffffff' : '#2d3748',
-                          border: message.role === 'user' ? 'none' : '1px solid #e9ecef',
+                            ? '#16a34a' // 사용자 메시지는 초록색
+                            : '#ffffff', // AI 메시지는 흰색
+                          color: message.role === 'user' ? '#ffffff' : '#374151',
+                          border: message.role === 'user' ? 'none' : '1px solid #e5e7eb',
                           '&::before': message.role !== 'user' ? {
                             content: '""',
                             position: 'absolute',
@@ -948,7 +958,7 @@ const AgentApp: React.FC = () => {
                             left: 0,
                             right: 0,
                             height: '2px',
-                            background: 'linear-gradient(90deg, #007bff 0%, transparent 100%)',
+                            background: '#7c3aed', // 보라색 상단 바
                             borderRadius: '18px 18px 0 0',
                           } : {},
                         }}
@@ -1011,7 +1021,7 @@ const AgentApp: React.FC = () => {
                                   <Typography
                                     variant="caption"
                                     sx={{
-                                      color: '#2196f3',
+                                      color: '#7c3aed', // 보라색 참조 텍스트
                                       fontWeight: 'bold',
                                     }}
                                   >
@@ -1095,8 +1105,8 @@ const AgentApp: React.FC = () => {
               <Box
                 sx={{
                   p: 2,
-                  borderTop: '1px solid #e9ecef',
-                  background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(139, 92, 246, 0.1) 100%) !important',
+                  borderTop: '1px solid #e5e7eb',
+                  background: '#fafafa', // 연한 회색 배경
                 }}
               >
                 {/* 첨부 파일 표시 영역 */}
@@ -1105,13 +1115,13 @@ const AgentApp: React.FC = () => {
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      bgcolor: 'rgba(33, 150, 243, 0.1)',
+                      bgcolor: 'rgba(22, 163, 74, 0.1)',
                       p: 1,
                       borderRadius: 1,
                       mb: 1,
                     }}
                   >
-                    <AttachFileIcon sx={{ mr: 1, color: 'primary.main' }} />
+                    <AttachFileIcon sx={{ mr: 1, color: '#16a34a' }} />
                     <Typography variant="body2" sx={{ flexGrow: 1 }}>
                       {attachment.name}
                     </Typography>
@@ -1135,6 +1145,7 @@ const AgentApp: React.FC = () => {
                   <IconButton
                     onClick={handleAttachmentButtonClick}
                     disabled={isProcessing}
+                    sx={{ color: '#16a34a' }}
                   >
                     <AttachFileIcon />
                   </IconButton>
@@ -1152,12 +1163,31 @@ const AgentApp: React.FC = () => {
                     }}
                     disabled={isProcessing}
                     size="small"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#16a34a',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#15803d',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#16a34a',
+                        },
+                      }
+                    }}
                   />
                   <Button
                     variant="contained"
                     onClick={handleSendMessage}
                     disabled={isProcessing || !userInput.trim()}
-                    sx={{ minWidth: '60px' }}
+                    sx={{ 
+                      minWidth: '60px',
+                      backgroundColor: '#16a34a',
+                      '&:hover': {
+                        backgroundColor: '#15803d',
+                      }
+                    }}
                   >
                     전송
                   </Button>
@@ -1165,7 +1195,7 @@ const AgentApp: React.FC = () => {
               </Box>
             </Box>
 
-            {isProcessing && (
+                          {isProcessing && (
                 <Box
                   sx={{
                     position: 'absolute',
@@ -1175,7 +1205,12 @@ const AgentApp: React.FC = () => {
                     px: 2,
                   }}
                 >
-                  <LinearProgress />
+                  <LinearProgress sx={{
+                    '& .MuiLinearProgress-bar': {
+                      backgroundColor: '#16a34a',
+                    },
+                    backgroundColor: '#e5e7eb',
+                  }} />
                 </Box>
               )}
           </Paper>
