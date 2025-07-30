@@ -475,7 +475,7 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'auto',
               borderRadius: 3, // 둥근 모서리 추가
-              bgcolor: '#f0eef5', // 흰색에 가까운 연보라색
+              bgcolor: '#e0dae8', // 배경과 흰색의 중간 톤
               boxShadow: '0 6px 20px rgba(0, 0, 0, 0.16)',
               borderRight: '1px solid #b8b8b8', // 연한 회색 구분선
             }}
