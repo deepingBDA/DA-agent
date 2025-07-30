@@ -474,7 +474,9 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'auto',
               borderRadius: 0,
-              bgcolor: '#d4d0e8', // 연보라색 배경
+              bgcolor: '#d4d0e8', // 연보라색 배경 통일
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              borderRight: '3px solid #7c3aed', // 보라색 구분선
             }}
           >
                           <Typography variant="h6" gutterBottom sx={{ color: '#7c3aed', fontWeight: 'bold' }}>
@@ -710,10 +712,10 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'hidden',
               borderRadius: 0,
-              background: '#d4d0e8', // 연보라색 배경
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-              borderRight: '1px solid #e5e7eb',
-              borderLeft: '1px solid #e5e7eb',
+              background: '#d4d0e8', // 연보라색 배경 통일
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              borderRight: '3px solid #7c3aed', // 보라색 구분선
+              borderLeft: '1px solid #a855f7', // 연한 보라색 구분선
             }}
           >
             <Typography variant="h6" gutterBottom sx={{ color: '#7c3aed', fontWeight: 'bold' }}>
@@ -745,7 +747,7 @@ const AgentApp: React.FC = () => {
                     sx={{
                       p: 2,
                       mb: 2,
-                      background: '#ffffff',
+                      background: '#e0dae8', // 연보라색 배경
                       borderRadius: '10px',
                       borderLeft: '4px solid #16a34a',
                       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
@@ -838,9 +840,9 @@ const AgentApp: React.FC = () => {
               borderRadius: 0,
               transition: 'all 0.3s ease',
               width: '100%',
-              background: '#d4d0e8', // 연보라색 배경
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-              border: '1px solid #e5e7eb',
+              background: '#d4d0e8', // 연보라색 배경 통일
+              boxShadow: '0 6px 16px rgba(0, 0, 0, 0.12)',
+              borderLeft: '3px solid #7c3aed', // 보라색 구분선
               position: 'relative',
               '&::before': {
                 content: '""',
@@ -1105,8 +1107,8 @@ const AgentApp: React.FC = () => {
               <Box
                 sx={{
                   p: 2,
-                  borderTop: '1px solid #e5e7eb',
-                  background: '#e8e4f0', // 연한 보라색 배경
+                  borderTop: '2px solid #7c3aed', // 보라색 구분선
+                  background: '#d4d0e8', // 연보라색 배경 통일
                 }}
               >
                 {/* 첨부 파일 표시 영역 */}
@@ -1165,6 +1167,10 @@ const AgentApp: React.FC = () => {
                     size="small"
                     sx={{
                       '& .MuiOutlinedInput-root': {
+                        backgroundColor: '#d4d0e8 !important', // 연보라색 배경 통일
+                        '& input': {
+                          backgroundColor: 'transparent',
+                        },
                         '& fieldset': {
                           borderColor: '#16a34a',
                         },
@@ -1174,6 +1180,15 @@ const AgentApp: React.FC = () => {
                         '&.Mui-focused fieldset': {
                           borderColor: '#16a34a',
                         },
+                        '&.Mui-focused': {
+                          backgroundColor: '#d4d0e8 !important',
+                        },
+                        '&:hover': {
+                          backgroundColor: '#d4d0e8 !important',
+                        }
+                      },
+                      '& .MuiInputBase-input': {
+                        backgroundColor: 'transparent !important',
                       }
                     }}
                   />
