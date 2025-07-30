@@ -163,12 +163,13 @@ class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
         builder.add_node("highlight", self._highlight_node)
         builder.add_node("save_html", self._save_html_node)
         
-        # 엣지 추가 (순차 실행)
+        # 엣지 추가 (순차 실행) - 하이라이트 노드 비활성화
         builder.add_edge(START, "fetch")
         builder.add_edge("fetch", "parse")
         builder.add_edge("parse", "generate_html")
-        builder.add_edge("generate_html", "highlight")
-        builder.add_edge("highlight", "save_html")
+        # builder.add_edge("generate_html", "highlight")  # 하이라이트 노드 비활성화
+        # builder.add_edge("highlight", "save_html")
+        builder.add_edge("generate_html", "save_html")  # 직접 save_html로 연결
         builder.add_edge("save_html", END)
         
         return builder.compile()
