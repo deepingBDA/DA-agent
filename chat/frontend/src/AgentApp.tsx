@@ -460,7 +460,7 @@ const AgentApp: React.FC = () => {
             position: 'absolute',
             left: 0,
             top: 0,
-            width: showSidebar ? '18%' : '0%',
+            width: showSidebar ? '19%' : '0%',
             opacity: showSidebar ? 1 : 0,
             visibility: showSidebar ? 'visible' : 'hidden',
             transition: 'all 0.3s ease',
@@ -698,9 +698,9 @@ const AgentApp: React.FC = () => {
           sx={{
             height: '100%',
             position: 'absolute',
-            left: showSidebar ? '21%' : '0%',
+            left: showSidebar ? '20%' : '0%',
             top: 0,
-            width: showSidebar ? '18%' : '23%',
+            width: showSidebar ? '20%' : '24%',
             transition: 'all 0.3s ease',
             zIndex: 5,
           }}
@@ -825,8 +825,8 @@ const AgentApp: React.FC = () => {
             position: 'absolute',
             right: 0,
             top: 0,
-            width: showSidebar ? '58%' : '73%',
-            left: showSidebar ? '42%' : '26%',
+            width: showSidebar ? '59%' : '75%',
+            left: showSidebar ? '41%' : '25%',
             transition: 'width 0.3s ease',
             willChange: 'width',
           }}
