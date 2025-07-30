@@ -474,12 +474,12 @@ const AgentApp: React.FC = () => {
               height: '100%',
               overflow: 'auto',
               borderRadius: 0,
-              bgcolor: 'background.paper',
+              bgcolor: '#d4d0e8', // 연보라색 배경
             }}
           >
-            <Typography variant="h6" gutterBottom sx={{ color: '#7c3aed', fontWeight: 'bold' }}>
-              🚀 MCP Tool Utilization Agent
-            </Typography>
+                          <Typography variant="h6" gutterBottom sx={{ color: '#7c3aed', fontWeight: 'bold' }}>
+                🏪 CU AI Agent
+              </Typography>
             <Divider sx={{ 
               my: 2,
               borderColor: 'rgba(124, 58, 237, 0.2)',
@@ -838,7 +838,7 @@ const AgentApp: React.FC = () => {
               borderRadius: 0,
               transition: 'all 0.3s ease',
               width: '100%',
-              background: '#ffffff', // 흰색 배경
+              background: '#d4d0e8', // 연보라색 배경
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
               border: '1px solid #e5e7eb',
               position: 'relative',
