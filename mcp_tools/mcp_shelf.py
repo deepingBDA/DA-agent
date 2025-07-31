@@ -739,7 +739,7 @@ def get_shelf_analysis_flexible(
         SELECT *
         FROM ranked
         WHERE rank <= 5
-    )
+    ),
     
     -- 픽업 전 Top5 결과
     before_results AS (

@@ -354,11 +354,10 @@ class StreamingResponse:
                 print(f"인자 타입: {type(tool_args)}")
                 if isinstance(tool_args, str):
                     try:
-                        import json
                         parsed_args = json.loads(tool_args)
                         print(f"JSON 파싱된 인자: {parsed_args}")
-                    except:
-                        print(f"JSON 파싱 실패, 원본 문자열: {repr(tool_args)}")
+                    except Exception as e:
+                        print(f"JSON 파싱 실패, 원본 문자열: {repr(tool_args)}, 오류: {e}")
             # 단순 문자열인 경우 처리
             elif isinstance(content, str):
                 self.accumulated_text.append(content)
@@ -397,11 +396,10 @@ class StreamingResponse:
                 print(f"인자 타입: {type(tool_args)}")
                 if isinstance(tool_args, str):
                     try:
-                        import json
                         parsed_args = json.loads(tool_args)
                         print(f"JSON 파싱된 인자: {parsed_args}")
-                    except:
-                        print(f"JSON 파싱 실패, 원본 문자열: {repr(tool_args)}")
+                    except Exception as e:
+                        print(f"JSON 파싱 실패, 원본 문자열: {repr(tool_args)}, 오류: {e}")
         # 도구 메시지인 경우 처리 (도구의 응답)
         elif hasattr(message_content, 'content') and isinstance(message_content, ToolMessage):
             tool_content = message_content.content
