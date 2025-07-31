@@ -197,10 +197,34 @@ def get_shelf_analysis_flexible(
     - target_shelves는 **첫 픽업한 진열대** 조건입니다 (단순 방문이 아님)
     - 결과가 비어있다면 조건에 맞는 고객이 없거나 해당 진열대가 존재하지 않을 수 있습니다
     - 응시 이벤트는 3회 이상 방문한 매대만 포함됩니다 (노이즈 제거)
+    
+    ## 🚨 AI 에이전트 사용 가이드
+    이 툴을 사용할 때는 **반드시 구체적인 조건**을 지정하세요:
+    
+    **❌ 잘못된 사용 (빈 파라미터):**
+    ```python
+    get_shelf_analysis_flexible()  # 모든 고객 대상으로 너무 많은 데이터
+    ```
+    
+    **✅ 올바른 사용 (구체적 조건):**
+    ```python
+    get_shelf_analysis_flexible(
+        target_shelves=['빵'],        # 특정 매대 지정 필수
+        age_groups=['20대'],          # 연령대 지정 권장  
+        gender_labels=['여자']        # 성별 지정 권장
+    )
+    ```
     """
     client = _create_clickhouse_client()
     if not client:
         return {"error": "ClickHouse 연결 실패"}
+    
+    # 안전장치: 너무 넓은 범위 쿼리 방지
+    if not target_shelves and not age_groups and not gender_labels:
+        return {
+            "error": "분석 범위가 너무 넓습니다. target_shelves, age_groups, gender_labels 중 최소 하나는 지정해야 합니다.",
+            "suggestion": "예: target_shelves=['빵'], age_groups=['20대'], gender_labels=['여자']"
+        }
     
     # 파라미터 처리
     exclude_dates = exclude_dates or ['2025-06-22']
