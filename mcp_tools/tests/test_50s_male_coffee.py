@@ -332,19 +332,32 @@ def test_50s_male_coffee_analysis():
             print("❌ 결과가 없습니다. 커피음료 매대 데이터가 없거나 조건에 맞는 고객이 없을 수 있습니다.")
             return []
         
-        print("\n📊 분석 결과:")
-        print("=" * 80)
-        print(f"{'No':>3} | {'픽업직전 마지막':^15} | {'비율':^8} | {'픽업후 첫번째':^15} | {'비율':^8}")
-        print("=" * 80)
+        # 결과를 BEFORE/AFTER로 분리해서 표시
+        before_results = []
+        after_results = []
         
         for row in result.result_rows:
-            no = row[0] if row[0] else "-"
-            before_shelf = row[1] if row[1] else "-"
-            before_pct = row[2] if row[2] else "-"
-            after_shelf = row[3] if row[3] else "-"
-            after_pct = row[4] if row[4] else "-"
+            analysis_type, no, shelf_name, pct = row
+            if analysis_type == 'BEFORE':
+                before_results.append((no, shelf_name, pct))
+            else:
+                after_results.append((no, shelf_name, pct))
+        
+        print("\n📊 픽업 전 Top5:")
+        print("=" * 40)
+        print(f"{'No':>3} | {'진열대':^15} | {'비율':^8}")
+        print("=" * 40)
+        for no, shelf_name, pct in before_results:
+            print(f"{no:>3} | {shelf_name:^15} | {pct:^8}")
+        
+        print("\n📊 픽업 후 Top5:")
+        print("=" * 40)
+        print(f"{'No':>3} | {'진열대':^15} | {'비율':^8}")
+        print("=" * 40)
+        for no, shelf_name, pct in after_results:
+            print(f"{no:>3} | {shelf_name:^15} | {pct:^8}")
             
-            print(f"{no:>3} | {before_shelf:^15} | {before_pct:^8} | {after_shelf:^15} | {after_pct:^8}")
+        print(f"\n💡 총 {len(before_results)}개 픽업 전 + {len(after_results)}개 픽업 후 결과")
             
         return result.result_rows
         

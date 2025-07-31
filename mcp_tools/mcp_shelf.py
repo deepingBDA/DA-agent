@@ -148,12 +148,19 @@ def get_shelf_analysis_flexible(
       - "both": 픽업 전후 모두 분석 (권장)
     
     ## 📈 반환값 형식
-    List[Tuple]: 각 행은 (순위, 픽업전_진열대, 픽업전_비율, 픽업후_진열대, 픽업후_비율)
+    List[Tuple]: 각 행은 (분석_구분, 순위, 진열대명, 비율)
+    - 분석_구분: 'BEFORE' (픽업 전) 또는 'AFTER' (픽업 후)
+    - 순위: 1~5 (해당 구분 내에서의 순위)
+    - 진열대명: 진열대 이름
+    - 비율: 백분율 문자열 (예: '45%')
     
     예시 결과:
-    [(1, '진열대없음', '48%', '진열대없음', '29%'),
-     (2, '빵', '34%', '빵', '12%'),
-     (3, '전자렌지', '4%', '도시락,김밥', '9%')]
+    [('BEFORE', 1, '진열대없음', '48%'),
+     ('BEFORE', 2, '빵', '34%'),
+     ('BEFORE', 3, '전자렌지', '4%'),
+     ('AFTER', 1, '진열대없음', '29%'),
+     ('AFTER', 2, '빵', '12%'),
+     ('AFTER', 3, '도시락,김밥', '9%')]
     
     ## 💡 사용 예시
     
@@ -700,19 +707,35 @@ def get_shelf_analysis_flexible(
         WHERE rank <= 5
     )
     
-    -- 최종 결과 (픽업 전/후 나란히 배치)
-    SELECT 
-        COALESCE(b.rank, a.rank) as no,
-        b.shelf_name as before_shelf,
-        CONCAT(CAST(b.percentage as String), '%') as before_pct,
-        a.shelf_name as after_shelf,
-        CONCAT(CAST(a.percentage as String), '%') as after_pct
-    FROM 
-        (SELECT * FROM top5 WHERE period = 'after') a
-    FULL OUTER JOIN 
-        (SELECT * FROM top5 WHERE period = 'before') b
-    ON a.rank = b.rank
-    ORDER BY COALESCE(b.rank, a.rank)
+    -- 픽업 전 Top5 결과
+    before_results AS (
+        SELECT 
+            'BEFORE' as analysis_type,
+            rank as no,
+            shelf_name,
+            CONCAT(CAST(percentage as String), '%') as pct
+        FROM top5 
+        WHERE period = 'before'
+        ORDER BY rank
+    ),
+    
+    -- 픽업 후 Top5 결과
+    after_results AS (
+        SELECT 
+            'AFTER' as analysis_type,
+            rank as no,
+            shelf_name,
+            CONCAT(CAST(percentage as String), '%') as pct
+        FROM top5 
+        WHERE period = 'after'
+        ORDER BY rank
+    )
+    
+    -- 최종 결과 (픽업 전/후 별도 테이블)
+    SELECT * FROM before_results
+    UNION ALL
+    SELECT * FROM after_results
+    ORDER BY analysis_type, no
     """
     
     try:
