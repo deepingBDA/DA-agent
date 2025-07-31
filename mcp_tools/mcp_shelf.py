@@ -79,15 +79,18 @@ def _create_clickhouse_client(database="plusinsight"):
         return None
 
 
-@mcp.tool()
+@mcp.tool(
+    name="get_shelf_analysis_flexible",
+    description="고객별 첫 픽업 전후 진열대 방문 패턴 분석 도구. 특정 날짜 범위, 연령대, 성별, 첫 픽업 진열대 조건으로 고객들의 픽업 전후 응시 패턴을 분석합니다."
+)
 def get_shelf_analysis_flexible(
     start_date: str = "2025-06-12",
     end_date: str = "2025-07-12",
+    target_shelves: List[str] = ["빵"],
+    age_groups: List[str] = ["10대"],
+    gender_labels: List[str] = ["여자"],
     exclude_dates: List[str] = None,
-    target_shelves: List[str] = None,
     exclude_shelves: List[str] = None,
-    age_groups: List[str] = None,
-    gender_labels: List[str] = None,
     top_n: int = 5,
     exclude_from_top: List[str] = None,
     period: str = "both"
