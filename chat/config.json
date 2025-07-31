@@ -34,6 +34,13 @@
     ],
     "transport": "stdio"
   },
+  "shelf": {
+    "command": "python3",
+    "args": [
+      "/app/mcp_tools/mcp_shelf.py"
+    ],
+    "transport": "stdio"
+  },
   "visitor_diagnose_excel": {
     "command": "python3",
     "args": [

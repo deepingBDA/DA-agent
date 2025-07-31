@@ -492,11 +492,11 @@ const AgentApp: React.FC = () => {
             <Accordion defaultExpanded>
               <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#7c3aed' }} />}>
                               <SettingsIcon sx={{ mr: 1, color: '#1cb454' }} />
-              <Typography sx={{ color: '#7c3aed', fontWeight: 'bold' }}>⚙️ 시스템 설정</Typography>
+              <Typography sx={{ color: '#7c3aed', fontWeight: 'bold' }}>시스템 설정</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                  <InputLabel sx={{ color: '#7c3aed' }}>🤖 모델 선택</InputLabel>
+                  <InputLabel sx={{ color: '#7c3aed' }}>모델 선택</InputLabel>
                   <Select
                     value={settings.selectedModel}
                     label="🤖 모델 선택"
