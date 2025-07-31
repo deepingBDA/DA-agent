@@ -348,7 +348,17 @@ class StreamingResponse:
                 self.accumulated_tool.append(formatted_tool)
                 
                 # 콘솔에 도구 호출 정보 출력 (디버깅용)
-                print(f"도구 호출 감지: {tool_name}, 인자: {tool_args}")
+                print(f"도구 호출 감지: {tool_name}")
+                print(f"원본 tool_call_info: {tool_call_info}")
+                print(f"파싱된 인자: {tool_args}")
+                print(f"인자 타입: {type(tool_args)}")
+                if isinstance(tool_args, str):
+                    try:
+                        import json
+                        parsed_args = json.loads(tool_args)
+                        print(f"JSON 파싱된 인자: {parsed_args}")
+                    except:
+                        print(f"JSON 파싱 실패, 원본 문자열: {repr(tool_args)}")
             # 단순 문자열인 경우 처리
             elif isinstance(content, str):
                 self.accumulated_text.append(content)
@@ -381,7 +391,17 @@ class StreamingResponse:
                 self.accumulated_tool.append(formatted_tool)
                 
                 # 콘솔에 도구 호출 정보 출력 (디버깅용)
-                print(f"도구 호출 감지(additional_kwargs): {tool_name}, 인자: {tool_args}")
+                print(f"도구 호출 감지(additional_kwargs): {tool_name}")
+                print(f"원본 additional_kwargs: {message_content.additional_kwargs}")
+                print(f"파싱된 인자: {tool_args}")
+                print(f"인자 타입: {type(tool_args)}")
+                if isinstance(tool_args, str):
+                    try:
+                        import json
+                        parsed_args = json.loads(tool_args)
+                        print(f"JSON 파싱된 인자: {parsed_args}")
+                    except:
+                        print(f"JSON 파싱 실패, 원본 문자열: {repr(tool_args)}")
         # 도구 메시지인 경우 처리 (도구의 응답)
         elif hasattr(message_content, 'content') and isinstance(message_content, ToolMessage):
             tool_content = message_content.content
