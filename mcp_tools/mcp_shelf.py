@@ -215,6 +215,16 @@ def get_shelf_analysis_flexible(
     )
     ```
     """
+    # 🔍 디버깅: 실제 전달받은 파라미터 로깅
+    print(f"🔍 [DEBUG] get_shelf_analysis_flexible 호출됨")
+    print(f"  start_date: {start_date}")
+    print(f"  end_date: {end_date}")
+    print(f"  target_shelves: {target_shelves}")
+    print(f"  age_groups: {age_groups}")
+    print(f"  gender_labels: {gender_labels}")
+    print(f"  exclude_dates: {exclude_dates}")
+    print(f"  top_n: {top_n}")
+    
     client = _create_clickhouse_client()
     if not client:
         return {"error": "ClickHouse 연결 실패"}
@@ -761,11 +771,35 @@ def get_shelf_analysis_flexible(
     """
     
     try:
+        print(f"🔍 [DEBUG] 쿼리 실행 시작 - 예상 조건:")
+        print(f"  날짜 범위: {start_date} ~ {end_date}")
+        print(f"  타겟 진열대: {target_shelves}")
+        print(f"  연령대: {age_groups}")
+        print(f"  성별: {gender_labels}")
+        
         result = client.query(analysis_query)
         print(f"✅ 진열대 분석 완료: {len(result.result_rows):,}행")
         return result.result_rows
     except Exception as e:
         print(f"❌ 쿼리 실행 실패: {e}")
+        print(f"🔍 [DEBUG] 쿼리 길이: {len(analysis_query)} 문자")
+        
+        # 구문 오류 위치 정보 추출
+        error_str = str(e)
+        if "position" in error_str:
+            import re
+            pos_match = re.search(r'position (\d+)', error_str)
+            if pos_match:
+                position = int(pos_match.group(1))
+                print(f"🔍 [DEBUG] 오류 위치: {position}번째 문자")
+                
+                # 오류 위치 주변 텍스트 표시
+                start = max(0, position - 100)
+                end = min(len(analysis_query), position + 100)
+                context = analysis_query[start:end]
+                print(f"🔍 [DEBUG] 오류 위치 주변:")
+                print(f"'{context}'")
+        
         return {"error": str(e)}
 
 if __name__ == "__main__":
