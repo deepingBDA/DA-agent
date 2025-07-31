@@ -349,9 +349,22 @@ class StreamingResponse:
                 
                 # 콘솔에 도구 호출 정보 출력 (디버깅용)
                 print(f"도구 호출 감지: {tool_name}")
-                print(f"원본 tool_call_info: {tool_call_info}")
-                print(f"파싱된 인자: {tool_args}")
-                print(f"인자 타입: {type(tool_args)}")
+                print(f"원본 tool_call_info 전체: {tool_call_info}")
+                print(f"tool_call_info.keys(): {list(tool_call_info.keys())}")
+                
+                # args 필드 직접 확인
+                if 'args' in tool_call_info:
+                    print(f"직접 args 필드: {tool_call_info['args']}")
+                    print(f"args 타입: {type(tool_call_info['args'])}")
+                
+                # arguments 필드 확인
+                if 'arguments' in tool_call_info:
+                    print(f"arguments 필드: {tool_call_info['arguments']}")
+                    print(f"arguments 타입: {type(tool_call_info['arguments'])}")
+                
+                print(f"get으로 파싱된 인자: {tool_args}")
+                print(f"파싱된 인자 타입: {type(tool_args)}")
+                
                 if isinstance(tool_args, str):
                     try:
                         parsed_args = json.loads(tool_args)
@@ -391,9 +404,25 @@ class StreamingResponse:
                 
                 # 콘솔에 도구 호출 정보 출력 (디버깅용)
                 print(f"도구 호출 감지(additional_kwargs): {tool_name}")
-                print(f"원본 additional_kwargs: {message_content.additional_kwargs}")
-                print(f"파싱된 인자: {tool_args}")
-                print(f"인자 타입: {type(tool_args)}")
+                print(f"원본 additional_kwargs 전체: {message_content.additional_kwargs}")
+                print(f"tool_calls 배열: {message_content.additional_kwargs.get('tool_calls', [])}")
+                
+                if message_content.additional_kwargs.get('tool_calls'):
+                    first_tool = message_content.additional_kwargs['tool_calls'][0]
+                    print(f"첫 번째 tool_call 전체: {first_tool}")
+                    print(f"tool_call keys: {list(first_tool.keys()) if isinstance(first_tool, dict) else 'Not dict'}")
+                    
+                    # function 필드 확인
+                    if 'function' in first_tool:
+                        func_info = first_tool['function']
+                        print(f"function 필드: {func_info}")
+                        if 'arguments' in func_info:
+                            print(f"function.arguments: {func_info['arguments']}")
+                            print(f"function.arguments 타입: {type(func_info['arguments'])}")
+                
+                print(f"get으로 파싱된 인자: {tool_args}")
+                print(f"파싱된 인자 타입: {type(tool_args)}")
+                
                 if isinstance(tool_args, str):
                     try:
                         parsed_args = json.loads(tool_args)
