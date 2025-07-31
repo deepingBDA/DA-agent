@@ -81,10 +81,10 @@ def _create_clickhouse_client(database="plusinsight"):
 
 @mcp.tool()
 def get_shelf_analysis_flexible(
+    target_shelves: List[str],
     start_date: str = "2025-06-12",
     end_date: str = "2025-07-12",
     exclude_dates: List[str] = None,
-    target_shelves: List[str] = None,
     exclude_shelves: List[str] = None,
     age_groups: List[str] = None,
     gender_labels: List[str] = None,
@@ -117,9 +117,11 @@ def get_shelf_analysis_flexible(
     - exclude_dates (List[str]): 제외할 특정 날짜들 (기본: ['2025-06-22'])
       예시: ['2025-06-22', '2025-06-30'] (휴일, 이벤트일 등)
     
-    ### 🏪 진열대 필터링
-    - target_shelves (List[str]): **첫 픽업한 진열대** 조건 (기본: None=모든 진열대)
+    ### 🏪 진열대 필터링 (필수)
+    - target_shelves (List[str]): **필수** 첫 픽업한 진열대 조건
       ⚠️ 중요: 이 진열대를 **첫 번째로 픽업한 고객만** 분석 대상
+      예시: ['빵 매대'] - 빵 매대를 첫 픽업한 고객들의 전후 패턴 분석
+      예시: ['전체'] - 모든 진열대를 첫 픽업한 고객들 분석
       예시: ['빵'] → 빵을 첫 픽업한 고객들의 픽업 전후 행동 분석
       예시: ['커피음료', '탄산음료'] → 커피음료 또는 탄산음료를 첫 픽업한 고객
     
@@ -229,11 +231,16 @@ def get_shelf_analysis_flexible(
     if not client:
         return {"error": "ClickHouse 연결 실패"}
     
+    # target_shelves가 '전체'인 경우 None으로 변환
+    if target_shelves and len(target_shelves) == 1 and target_shelves[0] in ['전체', '모든', '모든진열대', 'all']:
+        target_shelves = None
+        print(f"🔍 [DEBUG] target_shelves를 '전체'로 해석하여 None으로 변환")
+    
     # 안전장치: 너무 넓은 범위 쿼리 방지
     if not target_shelves and not age_groups and not gender_labels:
         return {
-            "error": "분석 범위가 너무 넓습니다. target_shelves, age_groups, gender_labels 중 최소 하나는 지정해야 합니다.",
-            "suggestion": "예: target_shelves=['빵'], age_groups=['20대'], gender_labels=['여자']"
+            "error": "분석 범위가 너무 넓습니다. age_groups 또는 gender_labels를 지정하거나, 구체적인 target_shelves를 제공해주세요.",
+            "suggestion": "예: target_shelves=['빵 매대'], age_groups=['10대'], gender_labels=['여자']"
         }
     
     # 파라미터 처리
