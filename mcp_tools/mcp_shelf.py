@@ -115,14 +115,20 @@ def get_shelf_analysis_flexible(
     )
     """
     # 🔍 디버깅: 실제 전달받은 파라미터 로깅
-    print(f"🔍 [DEBUG] get_shelf_analysis_flexible 호출됨")
-    print(f"  start_date: {start_date}")
-    print(f"  end_date: {end_date}")
-    print(f"  target_shelves: {target_shelves}")
-    print(f"  age_groups: {age_groups}")
-    print(f"  gender_labels: {gender_labels}")
-    print(f"  exclude_dates: {exclude_dates}")
-    print(f"  top_n: {top_n}")
+    print(f"🔍 [MCP_TOOL] get_shelf_analysis_flexible 실제 호출됨!")
+    print(f"🔍 [MCP_TOOL] 받은 파라미터:")
+    print(f"  start_date: {repr(start_date)}")
+    print(f"  end_date: {repr(end_date)}")
+    print(f"  target_shelves: {repr(target_shelves)}")
+    print(f"  age_groups: {repr(age_groups)}")
+    print(f"  gender_labels: {repr(gender_labels)}")
+    print(f"  exclude_dates: {repr(exclude_dates)}")
+    print(f"  exclude_shelves: {repr(exclude_shelves)}")
+    print(f"  top_n: {repr(top_n)}")
+    print(f"🔍 [MCP_TOOL] 파라미터 타입 체크:")
+    print(f"  target_shelves type: {type(target_shelves)}")
+    print(f"  age_groups type: {type(age_groups)}")
+    print(f"  gender_labels type: {type(gender_labels)}")
     
     client = _create_clickhouse_client()
     if not client:
