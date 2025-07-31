@@ -59,30 +59,6 @@ You should use tools to obtain specific numbers, then make suggestions based on 
 
 ----
 
-<TOOL_USAGE_GUIDE>
-🛒 get_shelf_analysis_flexible 도구 사용 필수 가이드:
-
-1. 사용자 요청 파싱 규칙:
-   - "10대 여성" → age_groups=["10대"], gender_labels=["여자"]
-   - "20대 남성" → age_groups=["20대"], gender_labels=["남자"]  
-   - "빵매대", "빵 매대" → target_shelves=["빵"]
-   - "커피음료", "음료" → target_shelves=["커피음료"]
-   - "진열대없음 제외", "전자렌지 제외" → exclude_shelves=["진열대없음", "전자렌지"]
-   - "6월 12일~7월 12일" → start_date="2025-06-12", end_date="2025-07-12"
-   - "6월 22일 제외" → exclude_dates=["2025-06-22"]
-
-2. 필수 파라미터 전달:
-   - 사용자가 명시한 조건은 반드시 해당 파라미터로 전달
-   - 빈 파라미터 {}로 호출하지 말 것
-   - 최소한 target_shelves, age_groups, gender_labels 중 하나는 반드시 설정
-
-3. 예시:
-   "10대 여성의 빵매대 첫픽업 전후 분석, 진열대없음 제외"
-   → target_shelves=["빵"], age_groups=["10대"], gender_labels=["여자"], exclude_shelves=["진열대없음"]
-</TOOL_USAGE_GUIDE>
-
-----
-
 <INSTRUCTIONS>
 Step 1: Analyze the question
 - Analyze user's question and final goal.
@@ -335,7 +311,6 @@ class StreamingResponse:
     def __init__(self):
         self.accumulated_text = []
         self.accumulated_tool = []
-        self.tool_call_count = 0  # 도구 호출 횟수 추적
         print(f"accumulated_text: {self.accumulated_text}")
         print(f"accumulated_tool: {self.accumulated_tool}")
     
@@ -372,12 +347,11 @@ class StreamingResponse:
                 and message_content.tool_calls
                 and len(message_content.tool_calls[0]["name"]) > 0
             ):
-                self.tool_call_count += 1
                 # 🔍 원시 tool_calls 데이터 확인
-                print(f"🔍 [RAW #{self.tool_call_count}] message_content.tool_calls 전체: {message_content.tool_calls}")
-                print(f"🔍 [RAW #{self.tool_call_count}] tool_calls 개수: {len(message_content.tool_calls)}")
-                print(f"🔍 [RAW #{self.tool_call_count}] 첫 번째 tool_call 원본: {message_content.tool_calls[0]}")
-                print(f"🔍 [RAW #{self.tool_call_count}] 첫 번째 tool_call 타입: {type(message_content.tool_calls[0])}")
+                print(f"🔍 [RAW] message_content.tool_calls 전체: {message_content.tool_calls}")
+                print(f"🔍 [RAW] tool_calls 개수: {len(message_content.tool_calls)}")
+                print(f"🔍 [RAW] 첫 번째 tool_call 원본: {message_content.tool_calls[0]}")
+                print(f"🔍 [RAW] 첫 번째 tool_call 타입: {type(message_content.tool_calls[0])}")
                 tool_call_info = message_content.tool_calls[0]
                 tool_name = tool_call_info.get("name", "알 수 없음")
                 tool_args = tool_call_info.get("arguments", {})
@@ -387,9 +361,9 @@ class StreamingResponse:
                 self.accumulated_tool.append(formatted_tool)
                 
                 # 콘솔에 도구 호출 정보 출력 (디버깅용)
-                print(f"🔍 [CALL #{self.tool_call_count}] 도구 호출 감지: {tool_name}")
-                print(f"🔍 [CALL #{self.tool_call_count}] 원본 tool_call_info 전체: {tool_call_info}")
-                print(f"🔍 [CALL #{self.tool_call_count}] tool_call_info.keys(): {list(tool_call_info.keys())}")
+                print(f"도구 호출 감지: {tool_name}")
+                print(f"원본 tool_call_info 전체: {tool_call_info}")
+                print(f"tool_call_info.keys(): {list(tool_call_info.keys())}")
                 
                 # args 필드 직접 확인
                 if 'args' in tool_call_info:
@@ -476,7 +450,7 @@ class StreamingResponse:
             self.accumulated_tool.append(formatted_tool)
             
             # 콘솔에 도구 응답 정보 출력 (디버깅용)
-            print(f"🔍 [RESPONSE] 도구 응답 내용: {tool_content[:200]}..." if len(tool_content) > 200 else tool_content)
+            print(f"도구 응답 내용: {tool_content[:200]}..." if len(tool_content) > 200 else tool_content)
         # 일반 텍스트 응답 처리
         elif hasattr(message_content, 'content') and isinstance(message_content.content, str):
             self.accumulated_text.append(message_content.content)
@@ -487,9 +461,8 @@ class StreamingResponse:
         final_text = "".join(self.accumulated_text)
         final_tool = "".join(self.accumulated_tool)
         
-        print(f"🔍 [SUMMARY] 총 도구 호출 횟수: {self.tool_call_count}")
-        print(f"🔍 [SUMMARY] 최종 텍스트 길이: {len(final_text)}")
-        print(f"🔍 [SUMMARY] 최종 도구 정보 길이: {len(final_tool)}")
+        print(f"최종 텍스트 길이: {len(final_text)}")
+        print(f"최종 도구 정보 길이: {len(final_tool)}")
         
         return final_text, final_tool
 
