@@ -311,6 +311,7 @@ class StreamingResponse:
     def __init__(self):
         self.accumulated_text = []
         self.accumulated_tool = []
+        self.tool_call_count = 0  # 도구 호출 횟수 추적
         print(f"accumulated_text: {self.accumulated_text}")
         print(f"accumulated_tool: {self.accumulated_tool}")
     
@@ -347,11 +348,12 @@ class StreamingResponse:
                 and message_content.tool_calls
                 and len(message_content.tool_calls[0]["name"]) > 0
             ):
+                self.tool_call_count += 1
                 # 🔍 원시 tool_calls 데이터 확인
-                print(f"🔍 [RAW] message_content.tool_calls 전체: {message_content.tool_calls}")
-                print(f"🔍 [RAW] tool_calls 개수: {len(message_content.tool_calls)}")
-                print(f"🔍 [RAW] 첫 번째 tool_call 원본: {message_content.tool_calls[0]}")
-                print(f"🔍 [RAW] 첫 번째 tool_call 타입: {type(message_content.tool_calls[0])}")
+                print(f"🔍 [RAW #{self.tool_call_count}] message_content.tool_calls 전체: {message_content.tool_calls}")
+                print(f"🔍 [RAW #{self.tool_call_count}] tool_calls 개수: {len(message_content.tool_calls)}")
+                print(f"🔍 [RAW #{self.tool_call_count}] 첫 번째 tool_call 원본: {message_content.tool_calls[0]}")
+                print(f"🔍 [RAW #{self.tool_call_count}] 첫 번째 tool_call 타입: {type(message_content.tool_calls[0])}")
                 tool_call_info = message_content.tool_calls[0]
                 tool_name = tool_call_info.get("name", "알 수 없음")
                 tool_args = tool_call_info.get("arguments", {})
@@ -361,9 +363,9 @@ class StreamingResponse:
                 self.accumulated_tool.append(formatted_tool)
                 
                 # 콘솔에 도구 호출 정보 출력 (디버깅용)
-                print(f"도구 호출 감지: {tool_name}")
-                print(f"원본 tool_call_info 전체: {tool_call_info}")
-                print(f"tool_call_info.keys(): {list(tool_call_info.keys())}")
+                print(f"🔍 [CALL #{self.tool_call_count}] 도구 호출 감지: {tool_name}")
+                print(f"🔍 [CALL #{self.tool_call_count}] 원본 tool_call_info 전체: {tool_call_info}")
+                print(f"🔍 [CALL #{self.tool_call_count}] tool_call_info.keys(): {list(tool_call_info.keys())}")
                 
                 # args 필드 직접 확인
                 if 'args' in tool_call_info:
@@ -450,7 +452,7 @@ class StreamingResponse:
             self.accumulated_tool.append(formatted_tool)
             
             # 콘솔에 도구 응답 정보 출력 (디버깅용)
-            print(f"도구 응답 내용: {tool_content[:200]}..." if len(tool_content) > 200 else tool_content)
+            print(f"🔍 [RESPONSE] 도구 응답 내용: {tool_content[:200]}..." if len(tool_content) > 200 else tool_content)
         # 일반 텍스트 응답 처리
         elif hasattr(message_content, 'content') and isinstance(message_content.content, str):
             self.accumulated_text.append(message_content.content)
@@ -461,8 +463,9 @@ class StreamingResponse:
         final_text = "".join(self.accumulated_text)
         final_tool = "".join(self.accumulated_tool)
         
-        print(f"최종 텍스트 길이: {len(final_text)}")
-        print(f"최종 도구 정보 길이: {len(final_tool)}")
+        print(f"🔍 [SUMMARY] 총 도구 호출 횟수: {self.tool_call_count}")
+        print(f"🔍 [SUMMARY] 최종 텍스트 길이: {len(final_text)}")
+        print(f"🔍 [SUMMARY] 최종 도구 정보 길이: {len(final_tool)}")
         
         return final_text, final_tool
 
