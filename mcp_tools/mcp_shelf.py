@@ -137,35 +137,59 @@ def get_shelf_analysis_flexible(
     
     # 파라미터 처리
     exclude_dates = exclude_dates or ['2025-06-22']
-    exclude_shelves = exclude_shelves or ['진열대없음', '계산대']
+    exclude_shelves = exclude_shelves or ['계산대']
     exclude_from_top = exclude_from_top or []
     
     # 날짜 조건
     exclude_dates_str = "', '".join(exclude_dates)
     date_condition = f"AND cbe.date NOT IN ('{exclude_dates_str}')"
     
-    # 연령대 조건
+    # 연령대 조건 (실제 age 컬럼 기반)
     age_condition = ""
     if age_groups:
-        age_groups_str = "', '".join(age_groups)
-        age_condition = f"AND age_group IN ('{age_groups_str}')"
+        age_conditions = []
+        for age_group in age_groups:
+            if age_group == '10대':
+                age_conditions.append("(cbe.age >= 10 AND cbe.age < 20)")
+            elif age_group == '20대':
+                age_conditions.append("(cbe.age >= 20 AND cbe.age < 30)")
+            elif age_group == '30대':
+                age_conditions.append("(cbe.age >= 30 AND cbe.age < 40)")
+            elif age_group == '40대':
+                age_conditions.append("(cbe.age >= 40 AND cbe.age < 50)")
+            elif age_group == '50대':
+                age_conditions.append("(cbe.age >= 50 AND cbe.age < 60)")
+            elif age_group == '60대 이상':
+                age_conditions.append("(cbe.age >= 60)")
+            elif age_group == '미상':
+                age_conditions.append("(cbe.age IS NULL)")
+        if age_conditions:
+            age_condition = f"AND ({' OR '.join(age_conditions)})"
     
-    # 성별 조건
+    # 성별 조건 (실제 gender 컬럼 기반: 0=남자, 1=여자)
     gender_condition = ""
     if gender_labels:
-        gender_labels_str = "', '".join(gender_labels)
-        gender_condition = f"AND gender_label IN ('{gender_labels_str}')"
+        gender_conditions = []
+        for gender_label in gender_labels:
+            if gender_label == '남자':
+                gender_conditions.append("cbe.gender = 0")
+            elif gender_label == '여자':
+                gender_conditions.append("cbe.gender = 1")
+            elif gender_label == '미상':
+                gender_conditions.append("cbe.gender IS NULL")
+        if gender_conditions:
+            gender_condition = f"AND ({' OR '.join(gender_conditions)})"
     
-    # 진열대 필터 조건
+    # 진열대 필터 조건 (첫 픽업 진열대)
     target_shelf_condition = ""
     if target_shelves:
         target_shelves_str = "', '".join(target_shelves)
-        target_shelf_condition = f"AND shelf_name IN ('{target_shelves_str}')"
+        target_shelf_condition = f"AND z.name IN ('{target_shelves_str}')"
     
     exclude_shelf_condition = ""
     if exclude_shelves:
         exclude_shelves_str = "', '".join(exclude_shelves)
-        exclude_shelf_condition = f"AND shelf_name NOT IN ('{exclude_shelves_str}')"
+        exclude_shelf_condition = f"AND COALESCE(NULLIF(shelf_name, ''), '진열대없음') NOT IN ('{exclude_shelves_str}')"
     
     exclude_from_top_condition = ""
     if exclude_from_top:
@@ -194,11 +218,14 @@ def get_shelf_analysis_flexible(
         FROM customer_behavior_event cbe
         LEFT JOIN customer_behavior_area cba ON cbe.customer_behavior_area_id = cba.id
         LEFT JOIN zone z ON cba.attention_target_zone_id = z.id
-        WHERE cbe.date BETWEEN '2025-06-12' AND '2025-07-12'
-            AND cbe.date != '2025-06-22'
+        WHERE cbe.date BETWEEN '{start_date}' AND '{end_date}'
+            {date_condition}
             AND cbe.event_type = 1  -- 픽업
             AND (cbe.is_staff IS NULL OR cbe.is_staff != 1)
             AND z.name IS NOT NULL
+            {age_condition}
+            {gender_condition}
+            {target_shelf_condition}
         GROUP BY
             cbe.person_seq,
             cbe.age,
@@ -220,11 +247,13 @@ def get_shelf_analysis_flexible(
         FROM customer_behavior_event cbe
         LEFT JOIN customer_behavior_area cba ON cbe.customer_behavior_area_id = cba.id
         LEFT JOIN zone z ON cba.attention_target_zone_id = z.id
-        WHERE cbe.date BETWEEN '2025-06-12' AND '2025-07-12'
-            AND cbe.date != '2025-06-22'
+        WHERE cbe.date BETWEEN '{start_date}' AND '{end_date}'
+            {date_condition}
             AND cbe.event_type = 0  -- 응시
             AND (cbe.is_staff IS NULL OR cbe.is_staff != 1)
             AND z.name IS NOT NULL
+            {age_condition}
+            {gender_condition}
         GROUP BY
             cbe.person_seq,
             cbe.age,
@@ -600,6 +629,7 @@ def get_shelf_analysis_flexible(
             COALESCE(NULLIF(before_pickup_gaze_1st, ''), '진열대없음') as shelf_name
         FROM pivot
         WHERE COALESCE(NULLIF(before_pickup_gaze_1st, ''), '진열대없음') != '계산대'
+            {exclude_shelf_condition}
         
         UNION ALL
         
@@ -609,6 +639,7 @@ def get_shelf_analysis_flexible(
             COALESCE(NULLIF(after_pickup_gaze_1st, ''), '진열대없음') as shelf_name
         FROM pivot
         WHERE COALESCE(NULLIF(after_pickup_gaze_1st, ''), '진열대없음') != '계산대'
+            {exclude_shelf_condition}
     ),
     
     -- 진열대별 집계 및 비율 계산
