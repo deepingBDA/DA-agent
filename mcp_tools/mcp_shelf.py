@@ -716,7 +716,6 @@ def get_shelf_analysis_flexible(
             CONCAT(CAST(percentage as String), '%') as pct
         FROM top5 
         WHERE period = 'before'
-        ORDER BY rank
     ),
     
     -- 픽업 후 Top5 결과
@@ -728,7 +727,6 @@ def get_shelf_analysis_flexible(
             CONCAT(CAST(percentage as String), '%') as pct
         FROM top5 
         WHERE period = 'after'
-        ORDER BY rank
     )
     
     -- 최종 결과 (픽업 전/후 별도 테이블)
