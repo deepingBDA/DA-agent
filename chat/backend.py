@@ -267,6 +267,14 @@ async def initialize_agent(thread_id: str, model: str = "gpt-4o", mcp_config=Non
         tools = await client.get_tools()  # get_tools 메서드가 이제 비동기식입니다
         tool_count = len(tools)  # 전역 변수에 할당
         
+        print(f"🔍 [TOOLS] 사용 가능한 도구 개수: {tool_count}")
+        for i, tool in enumerate(tools[:3]):  # 처음 3개만 출력
+            print(f"🔍 [TOOLS] 도구 {i+1}: {getattr(tool, 'name', 'name 없음')}")
+            if hasattr(tool, 'description'):
+                print(f"  설명: {tool.description[:100]}...")
+        if len(tools) > 3:
+            print(f"🔍 [TOOLS] ... 외 {len(tools)-3}개 더")
+        
         # OpenAI 모델 사용
         model_info = OUTPUT_TOKEN_INFO[model]
         llm_kwargs = {
@@ -339,6 +347,11 @@ class StreamingResponse:
                 and message_content.tool_calls
                 and len(message_content.tool_calls[0]["name"]) > 0
             ):
+                # 🔍 원시 tool_calls 데이터 확인
+                print(f"🔍 [RAW] message_content.tool_calls 전체: {message_content.tool_calls}")
+                print(f"🔍 [RAW] tool_calls 개수: {len(message_content.tool_calls)}")
+                print(f"🔍 [RAW] 첫 번째 tool_call 원본: {message_content.tool_calls[0]}")
+                print(f"🔍 [RAW] 첫 번째 tool_call 타입: {type(message_content.tool_calls[0])}")
                 tool_call_info = message_content.tool_calls[0]
                 tool_name = tool_call_info.get("name", "알 수 없음")
                 tool_args = tool_call_info.get("arguments", {})
@@ -475,6 +488,7 @@ async def process_query(thread_id: str, query: str, timeout_seconds=60, recursio
             
             try:                
                 messages = [HumanMessage(content=query)]
+                print(f"🔍 [AGENT] 에이전트에게 전송하는 메시지: {query}")
                 
                 response = await asyncio.wait_for(
                     astream_graph(
