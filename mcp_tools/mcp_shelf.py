@@ -185,11 +185,27 @@ def get_shelf_analysis_flexible(
         if gender_conditions:
             gender_condition = f"AND ({' OR '.join(gender_conditions)})"
     
-    # 진열대 필터 조건 (첫 픽업 진열대)
-    target_shelf_condition = ""
+    # pivot 테이블 필터링 조건들 (리버스 엔지니어링으로 발견한 올바른 방식)
+    target_shelf_filter = "1=1"  # 기본값
     if target_shelves:
         target_shelves_str = "', '".join(target_shelves)
-        target_shelf_condition = f"AND z.name IN ('{target_shelves_str}')"
+        target_shelf_filter = f"first_pickup_zone IN ('{target_shelves_str}')"
+    
+    age_filter = "1=1"  # 기본값
+    if age_groups:
+        age_filters = []
+        for age_group in age_groups:
+            age_filters.append(f"age_group = '{age_group}'")
+        if age_filters:
+            age_filter = f"({' OR '.join(age_filters)})"
+    
+    gender_filter = "1=1"  # 기본값
+    if gender_labels:
+        gender_filters = []
+        for gender_label in gender_labels:
+            gender_filters.append(f"gender_label = '{gender_label}'")
+        if gender_filters:
+            gender_filter = f"({' OR '.join(gender_filters)})"
     
     exclude_shelf_condition = ""
     if exclude_shelves:
@@ -208,7 +224,7 @@ def get_shelf_analysis_flexible(
     elif period == "after":
         period_condition = "AND period = 'after'"
     
-    # 복잡한 분석 쿼리
+    # 올바른 분석 쿼리 - 초기에 조건 필터링 하지 않고 나중에 pivot에서 필터링
     analysis_query = f"""
     WITH pickup_visit_counts AS (
         SELECT
@@ -228,9 +244,7 @@ def get_shelf_analysis_flexible(
             AND cbe.event_type = 1  -- 픽업
             AND (cbe.is_staff IS NULL OR cbe.is_staff != 1)
             AND z.name IS NOT NULL
-            {age_condition}
-            {gender_condition}
-            {target_shelf_condition}
+            -- 초기 필터링 제거: age_condition, gender_condition, target_shelf_condition
         GROUP BY
             cbe.person_seq,
             cbe.age,
@@ -257,8 +271,7 @@ def get_shelf_analysis_flexible(
             AND cbe.event_type = 0  -- 응시
             AND (cbe.is_staff IS NULL OR cbe.is_staff != 1)
             AND z.name IS NOT NULL
-            {age_condition}
-            {gender_condition}
+            -- 초기 필터링 제거: age_condition, gender_condition
         GROUP BY
             cbe.person_seq,
             cbe.age,
@@ -627,12 +640,21 @@ def get_shelf_analysis_flexible(
     FROM integrated_routes
     ORDER BY person_seq
     )
+    , filtered_pivot AS (
+        -- pivot 테이블에서 조건 필터링 (리버스 엔지니어링으로 발견한 올바른 방식)
+        SELECT *
+        FROM pivot
+        WHERE first_pickup_zone IS NOT NULL  -- 픽업이 있는 고객만
+            AND ({target_shelf_filter})
+            AND ({age_filter})
+            AND ({gender_filter})
+    )
     , shelf_analysis AS (
         -- 픽업 직전 마지막 응시매대 (1st만, 계산대 제외)
         SELECT 
             'before' as period,
             COALESCE(NULLIF(before_pickup_gaze_1st, ''), '진열대없음') as shelf_name
-        FROM pivot
+        FROM filtered_pivot
         WHERE COALESCE(NULLIF(before_pickup_gaze_1st, ''), '진열대없음') != '계산대'
             {exclude_shelf_condition}
         
@@ -642,7 +664,7 @@ def get_shelf_analysis_flexible(
         SELECT 
             'after' as period,
             COALESCE(NULLIF(after_pickup_gaze_1st, ''), '진열대없음') as shelf_name
-        FROM pivot
+        FROM filtered_pivot
         WHERE COALESCE(NULLIF(after_pickup_gaze_1st, ''), '진열대없음') != '계산대'
             {exclude_shelf_condition}
     ),
