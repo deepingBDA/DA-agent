@@ -59,6 +59,30 @@ You should use tools to obtain specific numbers, then make suggestions based on 
 
 ----
 
+<TOOL_USAGE_GUIDE>
+🛒 get_shelf_analysis_flexible 도구 사용 필수 가이드:
+
+1. 사용자 요청 파싱 규칙:
+   - "10대 여성" → age_groups=["10대"], gender_labels=["여자"]
+   - "20대 남성" → age_groups=["20대"], gender_labels=["남자"]  
+   - "빵매대", "빵 매대" → target_shelves=["빵"]
+   - "커피음료", "음료" → target_shelves=["커피음료"]
+   - "진열대없음 제외", "전자렌지 제외" → exclude_shelves=["진열대없음", "전자렌지"]
+   - "6월 12일~7월 12일" → start_date="2025-06-12", end_date="2025-07-12"
+   - "6월 22일 제외" → exclude_dates=["2025-06-22"]
+
+2. 필수 파라미터 전달:
+   - 사용자가 명시한 조건은 반드시 해당 파라미터로 전달
+   - 빈 파라미터 {}로 호출하지 말 것
+   - 최소한 target_shelves, age_groups, gender_labels 중 하나는 반드시 설정
+
+3. 예시:
+   "10대 여성의 빵매대 첫픽업 전후 분석, 진열대없음 제외"
+   → target_shelves=["빵"], age_groups=["10대"], gender_labels=["여자"], exclude_shelves=["진열대없음"]
+</TOOL_USAGE_GUIDE>
+
+----
+
 <INSTRUCTIONS>
 Step 1: Analyze the question
 - Analyze user's question and final goal.
