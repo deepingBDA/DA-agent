@@ -83,13 +83,13 @@ def _create_clickhouse_client(database="plusinsight"):
 def get_shelf_analysis_flexible(
     start_date: str = "2025-06-12",
     end_date: str = "2025-07-12",
-    exclude_dates: List[str] = None,
-    target_shelves: List[str] = None,
-    exclude_shelves: List[str] = None,
-    age_groups: List[str] = None,
-    gender_labels: List[str] = None,
+    exclude_dates: List[str] = [],
+    target_shelves: List[str] = [],
+    exclude_shelves: List[str] = [],
+    age_groups: List[str] = [],
+    gender_labels: List[str] = [],
     top_n: int = 5,
-    exclude_from_top: List[str] = None,
+    exclude_from_top: List[str] = [],
     period: str = "both"
 ):
     """
@@ -135,15 +135,13 @@ def get_shelf_analysis_flexible(
             "suggestion": "예: target_shelves=['빵'], age_groups=['20대'], gender_labels=['여자']"
         }
     
-    # 파라미터 처리
-    exclude_dates = exclude_dates or ['2025-06-22']
-    # 계산대는 무조건 제외하고, 추가 제외 진열대가 있으면 합침 (하지만 쿼리에서 하드코딩으로도 제외됨)
-    base_exclude_shelves = ['계산대']
-    if exclude_shelves:
-        exclude_shelves = list(set(base_exclude_shelves + exclude_shelves))
-    else:
-        exclude_shelves = base_exclude_shelves
-    exclude_from_top = exclude_from_top or []
+    # 파라미터 처리 - 빈 리스트 기본값 사용 (FastMCP 호환)
+    if not exclude_dates:
+        exclude_dates = ['2025-06-22']
+    if not exclude_shelves:
+        exclude_shelves = []
+    if not exclude_from_top:
+        exclude_from_top = []
     
     # 날짜 조건
     exclude_dates_str = "', '".join(exclude_dates)
