@@ -784,8 +784,8 @@ def pickup_gaze_summary(
         exclude_str = "', '".join(exclude_dates)
         exclude_condition = f"AND cbe.date NOT IN ('{exclude_str}')"
 
-    # 원본 쿼리 템플릿 (완전한 버전)
-    query_template = """
+    # 원본 쿼리 그대로 사용 (f-string으로 날짜/제외조건만 삽입)
+    query_filled = f"""
 WITH pickup_visit_counts AS (
     SELECT
         cbe.person_seq AS person_seq,
@@ -912,6 +912,28 @@ integrated_routes AS (
             gender = 1, '여자',
             '미상'
         ) AS gender_label,
+        -- 시간순으로 정렬된 통합 경로 (이벤트 타입 포함)
+        arrayStringConcat(
+            arrayMap(x -> concat(x.2, '(', x.4, ')'), arraySort(
+                groupArray((first_event_date, zone_name, coords, event_type_label))
+            )), ' → '
+        ) AS integrated_route,
+        -- 시간순 존 이름들
+        arrayMap(x -> x.2,
+            arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))
+        ) AS zone_names,
+        -- 시간순 좌표들
+        arrayMap(x -> x.3,
+            arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))
+        ) AS zone_coords,
+        -- 시간순 이벤트 발생시간들
+        arrayMap(x -> x.1,
+            arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))
+        ) AS event_timestamps,
+        -- 시간순 이벤트 타입들
+        arrayMap(x -> x.4,
+            arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))
+        ) AS event_types,
         -- 첫 번째 픽업 전 매대 방문 수 (응시 이벤트만) - 픽업이 없으면 0
         multiIf(
             arrayFirstIndex(x -> x = 'P', 
@@ -941,25 +963,245 @@ integrated_routes AS (
                     length(arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))))
                 )
             )
-        ) AS gaze_count_after_first_pickup
+        ) AS gaze_count_after_first_pickup,
+        -- 첫 번째 픽업한 매대 이름
+        arrayElement(
+            arrayMap(x -> x.2,
+                arrayFilter(y -> y.4 = 'P', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+            ), 1
+        ) AS first_pickup_zone,
+        -- 첫 번째 픽업 시간
+        arrayElement(
+            arrayMap(x -> x.1,
+                arrayFilter(y -> y.4 = 'P', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+            ), 1
+        ) AS first_pickup_time,
+        -- 픽업 전 응시 매대 경로 (시간순)
+        arrayStringConcat(
+            arrayMap(x -> x.2,
+                arraySlice(
+                    arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                    1,
+                    arrayFirstIndex(x -> x = 'P', 
+                        arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                    ) - 1
+                )
+            ), ' → '
+        ) AS gaze_route_before_first_pickup,
+        -- 픽업 직전 1번째 응시 매대 (가장 마지막)
+        arrayElement(
+            arrayReverse(
+                arrayMap(x -> x.2,
+                    arraySlice(
+                        arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                        1,
+                        arrayFirstIndex(x -> x = 'P', 
+                            arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                        ) - 1
+                    )
+                )
+            ), 1
+        ) AS before_pickup_gaze_1st,
+        -- 픽업 직전 2번째 응시 매대
+        arrayElement(
+            arrayReverse(
+                arrayMap(x -> x.2,
+                    arraySlice(
+                        arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                        1,
+                        arrayFirstIndex(x -> x = 'P', 
+                            arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                        ) - 1
+                    )
+                )
+            ), 2
+        ) AS before_pickup_gaze_2nd,
+        -- 픽업 직전 3번째 응시 매대
+        arrayElement(
+            arrayReverse(
+                arrayMap(x -> x.2,
+                    arraySlice(
+                        arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                        1,
+                        arrayFirstIndex(x -> x = 'P', 
+                            arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                        ) - 1
+                    )
+                )
+            ), 3
+        ) AS before_pickup_gaze_3rd,
+        -- 픽업 직전 4번째 응시 매대
+        arrayElement(
+            arrayReverse(
+                arrayMap(x -> x.2,
+                    arraySlice(
+                        arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                        1,
+                        arrayFirstIndex(x -> x = 'P', 
+                            arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                        ) - 1
+                    )
+                )
+            ), 4
+        ) AS before_pickup_gaze_4th,
+        -- 픽업 직전 5번째 응시 매대
+        arrayElement(
+            arrayReverse(
+                arrayMap(x -> x.2,
+                    arraySlice(
+                        arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                        1,
+                        arrayFirstIndex(x -> x = 'P', 
+                            arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                        ) - 1
+                    )
+                )
+            ), 5
+        ) AS before_pickup_gaze_5th,
+        -- 픽업 후 응시 매대 경로 (시간순)
+        arrayStringConcat(
+            arrayMap(x -> x.2,
+                arraySlice(
+                    arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                    arrayCount(x -> x = 'G', 
+                        arraySlice(
+                            arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                            1,
+                            arrayFirstIndex(x -> x = 'P', 
+                                arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                            ) - 1
+                        )
+                    ) + 1,
+                    length(arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))))
+                )
+            ), ' → '
+        ) AS gaze_route_after_first_pickup,
+        -- 픽업 후 1번째 응시 매대
+        arrayElement(
+            arrayMap(x -> x.2,
+                arraySlice(
+                    arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                    arrayCount(x -> x = 'G', 
+                        arraySlice(
+                            arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                            1,
+                            arrayFirstIndex(x -> x = 'P', 
+                                arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                            ) - 1
+                        )
+                    ) + 1,
+                    length(arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))))
+                )
+            ), 1
+        ) AS after_pickup_gaze_1st,
+        -- 픽업 후 2번째 응시 매대
+        arrayElement(
+            arrayMap(x -> x.2,
+                arraySlice(
+                    arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                    arrayCount(x -> x = 'G', 
+                        arraySlice(
+                            arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                            1,
+                            arrayFirstIndex(x -> x = 'P', 
+                                arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                            ) - 1
+                        )
+                    ) + 1,
+                    length(arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))))
+                )
+            ), 2
+        ) AS after_pickup_gaze_2nd,
+        -- 픽업 후 3번째 응시 매대
+        arrayElement(
+            arrayMap(x -> x.2,
+                arraySlice(
+                    arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                    arrayCount(x -> x = 'G', 
+                        arraySlice(
+                            arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                            1,
+                            arrayFirstIndex(x -> x = 'P', 
+                                arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                            ) - 1
+                        )
+                    ) + 1,
+                    length(arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))))
+                )
+            ), 3
+        ) AS after_pickup_gaze_3rd,
+        -- 픽업 후 4번째 응시 매대
+        arrayElement(
+            arrayMap(x -> x.2,
+                arraySlice(
+                    arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                    arrayCount(x -> x = 'G', 
+                        arraySlice(
+                            arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                            1,
+                            arrayFirstIndex(x -> x = 'P', 
+                                arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                            ) - 1
+                        )
+                    ) + 1,
+                    length(arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))))
+                )
+            ), 4
+        ) AS after_pickup_gaze_4th,
+        -- 픽업 후 5번째 응시 매대
+        arrayElement(
+            arrayMap(x -> x.2,
+                arraySlice(
+                    arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                    arrayCount(x -> x = 'G', 
+                        arraySlice(
+                            arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                            1,
+                            arrayFirstIndex(x -> x = 'P', 
+                                arrayMap(z -> z.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                            ) - 1
+                        )
+                    ) + 1,
+                    length(arrayFilter(y -> y.4 = 'G', arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))))
+                )
+            ), 5
+        ) AS after_pickup_gaze_5th
     FROM combined_events
     GROUP BY person_seq, age, gender
-),
-summary as (
-    SELECT age_group, gender_label,
-           avg(gaze_count_before_first_pickup) as avg_before,
-           avg(gaze_count_after_first_pickup) as avg_after
-    FROM integrated_routes
-    GROUP BY age_group, gender_label
 )
-SELECT * FROM summary
+, pivot as (
+SELECT
+    person_seq,
+    age_group,
+    gender_label,
+    integrated_route,      -- 픽업과 응시가 시간순으로 통합된 경로
+    zone_names,            -- 시간순 존 이름 배열
+    zone_coords,           -- 시간순 좌표 배열
+    event_timestamps,      -- 시간순 이벤트 발생시간 배열
+    event_types,           -- 시간순 이벤트 타입 배열 (P: 픽업, G: 응시)
+    gaze_count_before_first_pickup,  -- 첫 번째 픽업 전 응시 매대 수
+    gaze_count_after_first_pickup,   -- 첫 번째 픽업 후 응시 매대 수
+    first_pickup_zone,               -- 첫 번째 픽업한 매대 이름
+    first_pickup_time,               -- 첫 번째 픽업 시간
+    gaze_route_before_first_pickup,  -- 픽업 전 응시 매대 경로
+    gaze_route_after_first_pickup,   -- 픽업 후 응시 매대 경로
+    before_pickup_gaze_1st,          -- 픽업 직전 1번째 응시 매대 (가장 마지막)
+    before_pickup_gaze_2nd,          -- 픽업 직전 2번째 응시 매대
+    before_pickup_gaze_3rd,          -- 픽업 직전 3번째 응시 매대
+    before_pickup_gaze_4th,          -- 픽업 직전 4번째 응시 매대
+    before_pickup_gaze_5th,          -- 픽업 직전 5번째 응시 매대
+    after_pickup_gaze_1st,           -- 픽업 후 1번째 응시 매대
+    after_pickup_gaze_2nd,           -- 픽업 후 2번째 응시 매대
+    after_pickup_gaze_3rd,           -- 픽업 후 3번째 응시 매대
+    after_pickup_gaze_4th,           -- 픽업 후 4번째 응시 매대
+    after_pickup_gaze_5th            -- 픽업 후 5번째 응시 매대
+FROM integrated_routes
+ORDER BY person_seq
+)
+select  age_group, gender_label, avg(gaze_count_before_first_pickup), avg(gaze_count_after_first_pickup)
+from   pivot
+group by age_group, gender_label
 """
-    # 날짜 및 exclude 조건 삽입
-    query_filled = query_template.format(
-        start_date=start_date,
-        end_date=end_date,
-        exclude_condition=exclude_condition
-    )
 
     try:
         result = client.query(query_filled)
