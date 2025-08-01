@@ -757,5 +757,218 @@ def get_shelf_analysis_flexible(
         
         return {"error": str(e)}
 
+# NEW TOOL: 픽업-응시 요약 분석
+
+@mcp.tool()
+def pickup_gaze_summary(
+    start_date: str = "2025-06-12",
+    end_date: str = "2025-07-12",
+    exclude_dates: List[str] = ["2025-06-22"],
+) -> list:
+    """첫 픽업 전 후 응시 매대 개수 평균을 연령 성별별로 요약
+
+    반환 컬럼:
+        age_group, gender_label, avg_gaze_before, avg_gaze_after
+    """
+    print("🔍 [DEBUG] pickup_gaze_summary 호출")
+    print(f"  start_date: {start_date} ~ {end_date}")
+    print(f"  exclude_dates: {exclude_dates}")
+
+    client = _create_clickhouse_client()
+    if not client:
+        return {"error": "ClickHouse 연결 실패"}
+
+    # 날짜 조건 문자열 생성
+    exclude_condition = ""
+    if exclude_dates:
+        exclude_str = "', '".join(exclude_dates)
+        exclude_condition = f"AND cbe.date NOT IN ('{exclude_str}')"
+
+    # 원본 쿼리 템플릿 (완전한 버전)
+    query_template = """
+WITH pickup_visit_counts AS (
+    SELECT
+        cbe.person_seq AS person_seq,
+        cba.attention_target_zone_id AS attention_target_zone_id,
+        z.name AS zone_name,
+        z.coords AS coords,
+        MIN(cbe.`timestamp`) AS first_event_date,
+        cbe.age AS age,
+        cbe.gender AS gender,
+        COUNT(*) AS visit_count
+    FROM customer_behavior_event cbe
+    LEFT JOIN customer_behavior_area cba ON cbe.customer_behavior_area_id = cba.id
+    LEFT JOIN zone z ON cba.attention_target_zone_id = z.id
+    WHERE cbe.date BETWEEN '{start_date}' AND '{end_date}'
+        {exclude_condition}
+        AND cbe.event_type = 1  -- 픽업
+        AND (cbe.is_staff IS NULL OR cbe.is_staff != 1)
+        AND z.name IS NOT NULL
+    GROUP BY
+        cbe.person_seq,
+        cbe.age,
+        cbe.gender,
+        cba.attention_target_zone_id,
+        z.name,
+        z.coords
+),
+gaze_visit_counts AS (
+    SELECT
+        cbe.person_seq AS person_seq,
+        cba.attention_target_zone_id AS attention_target_zone_id,
+        z.name AS zone_name,
+        z.coords AS coords,
+        MIN(cbe.`timestamp`) AS first_event_date,
+        cbe.age AS age,
+        cbe.gender AS gender,
+        COUNT(*) AS visit_count
+    FROM customer_behavior_event cbe
+    LEFT JOIN customer_behavior_area cba ON cbe.customer_behavior_area_id = cba.id
+    LEFT JOIN zone z ON cba.attention_target_zone_id = z.id
+    WHERE cbe.date BETWEEN '{start_date}' AND '{end_date}'
+        {exclude_condition}
+        AND cbe.event_type = 0  -- 응시
+        AND (cbe.is_staff IS NULL OR cbe.is_staff != 1)
+        AND z.name IS NOT NULL
+    GROUP BY
+        cbe.person_seq,
+        cbe.age,
+        cbe.gender,
+        cba.attention_target_zone_id,
+        z.name,
+        z.coords
+),
+pickup_df AS (
+    SELECT
+        person_seq,
+        attention_target_zone_id,
+        zone_name,
+        coords,
+        first_event_date,
+        age,
+        gender,
+        visit_count,
+        ROW_NUMBER() OVER (
+            PARTITION BY person_seq
+            ORDER BY first_event_date
+        ) AS pickup_order
+    FROM pickup_visit_counts
+),
+gaze_df AS (
+    SELECT
+        person_seq,
+        attention_target_zone_id,
+        zone_name,
+        coords,
+        first_event_date,
+        age,
+        gender,
+        visit_count,
+        ROW_NUMBER() OVER (
+            PARTITION BY person_seq
+            ORDER BY first_event_date
+        ) AS gaze_order
+    FROM gaze_visit_counts
+    WHERE visit_count >= 3
+),
+combined_events AS (
+    -- 픽업 이벤트 (모든 방문)
+    SELECT 
+        person_seq,
+        first_event_date,
+        zone_name,
+        coords,
+        age,
+        gender,
+        'P' as event_type_label  -- P for Pickup
+    FROM pickup_df
+    UNION ALL
+    -- 응시 이벤트 (3회 이상 방문한 존만)
+    SELECT 
+        person_seq,
+        first_event_date,
+        zone_name,
+        coords,
+        age,
+        gender,
+        'G' as event_type_label  -- G for Gaze
+    FROM gaze_df
+),
+integrated_routes AS (
+    SELECT
+        person_seq,
+        multiIf(
+            age >= 60, '60대 이상',
+            age >= 50, '50대',
+            age >= 40, '40대',
+            age >= 30, '30대',
+            age >= 20, '20대',
+            age >= 10, '10대',
+            age IS NULL, '미상',
+            '10세 미만'
+        ) AS age_group,
+        multiIf(
+            gender = 0, '남자',
+            gender = 1, '여자',
+            '미상'
+        ) AS gender_label,
+        -- 첫 번째 픽업 전 매대 방문 수 (응시 이벤트만) - 픽업이 없으면 0
+        multiIf(
+            arrayFirstIndex(x -> x = 'P', 
+                arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+            ) = 0, 0,
+            arrayCount(x -> x = 'G', 
+                arraySlice(
+                    arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                    1,
+                    arrayFirstIndex(x -> x = 'P', 
+                        arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                    ) - 1
+                )
+            )
+        ) AS gaze_count_before_first_pickup,
+        -- 첫 번째 픽업 직후 매대 방문 수 (응시 이벤트만) - 픽업이 없으면 0
+        multiIf(
+            arrayFirstIndex(x -> x = 'P', 
+                arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+            ) = 0, 0,
+            arrayCount(x -> x = 'G',
+                arraySlice(
+                    arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))),
+                    arrayFirstIndex(x -> x = 'P', 
+                        arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label))))
+                    ) + 1,
+                    length(arrayMap(x -> x.4, arraySort(groupArray((first_event_date, zone_name, coords, event_type_label)))))
+                )
+            )
+        ) AS gaze_count_after_first_pickup
+    FROM combined_events
+    GROUP BY person_seq, age, gender
+),
+summary as (
+    SELECT age_group, gender_label,
+           avg(gaze_count_before_first_pickup) as avg_before,
+           avg(gaze_count_after_first_pickup) as avg_after
+    FROM integrated_routes
+    GROUP BY age_group, gender_label
+)
+SELECT * FROM summary
+"""
+    # 날짜 및 exclude 조건 삽입
+    query_filled = query_template.format(
+        start_date=start_date,
+        end_date=end_date,
+        exclude_condition=exclude_condition
+    )
+
+    try:
+        result = client.query(query_filled)
+        print(f"✅ 요약 분석 완료: {len(result.result_rows):,}행")
+        return result.result_rows
+    except Exception as e:
+        print(f"❌ 쿼리 실행 실패: {e}")
+        return {"error": str(e)}
+
+
 if __name__ == "__main__":
     mcp.run()
