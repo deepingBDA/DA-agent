@@ -7,15 +7,33 @@ site_db_connection_config 테이블에서 가져온 연결 정보를 통해
 """
 
 import os
+import sys
+import logging
 import clickhouse_connect
 from typing import Optional, List, Dict, Any
 from dotenv import load_dotenv
 
 load_dotenv()
 
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
+
+def debug_print(message: str):
+    """디버깅 메시지를 즉시 출력"""
+    print(message)
+    sys.stdout.flush()
+    logger.info(message)
+
 def _create_config_client() -> Optional[Any]:
     """설정 데이터베이스 클라이언트 생성 (SSH 터널링 지원)"""
-    print(f"🔧 [DEBUG] 설정 DB 연결 시도:")
+    debug_print(f"🔧 [DEBUG] 설정 DB 연결 시도:")
     try:
         # SSH 터널링이 필요한 경우
         ssh_host = os.getenv("SSH_HOST")
@@ -99,7 +117,7 @@ def get_site_connection_info(site: str) -> Optional[Dict[str, Any]]:
 
 def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
     """특정 매장의 ClickHouse 클라이언트 생성"""
-    print(f"🔍 [DEBUG] 매장 '{site}' 연결 시도 시작")
+    debug_print(f"🔍 [DEBUG] 매장 '{site}' 연결 시도 시작")
     
     conn_info = get_site_connection_info(site)
     if not conn_info:

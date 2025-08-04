@@ -1,5 +1,8 @@
 FROM python:3.12-slim
 
+# Python 버퍼링 비활성화 (로그 즉시 출력)
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
 # Node.js 설치
