@@ -17,32 +17,35 @@ from datetime import datetime
 
 load_dotenv()
 
-# 로그 디렉토리 생성 (환경에 따라 동적 설정)
-try:
-    # 컨테이너 환경 시도
-    log_dir = Path("/app/logs")
-    log_dir.mkdir(parents=True, exist_ok=True)
-except (OSError, PermissionError):
-    # 로컬 환경 폴백
-    log_dir = Path("./logs")
-    log_dir.mkdir(parents=True, exist_ok=True)
+# 컨테이너 환경에서만 로그 파일 생성
+log_dir = None
+connection_log_file = None
 
-# 로그 파일 경로
-connection_log_file = log_dir / "database_connections.log"
+# 컨테이너 환경 체크 (/app 디렉토리 존재 여부)
+if Path("/app").exists():
+    try:
+        log_dir = Path("/app/logs")
+        log_dir.mkdir(parents=True, exist_ok=True)
+        connection_log_file = log_dir / "database_connections.log"
+        print(f"📋 로그 파일: {connection_log_file}")
+    except Exception as e:
+        print(f"⚠️ 로그 파일 생성 실패: {e}")
+        connection_log_file = None
 
-# 로깅 설정 (파일과 콘솔 모두)
+# 로깅 설정 (콘솔만 또는 콘솔+파일)
+handlers = [logging.StreamHandler(sys.stdout)]
+if connection_log_file:
+    handlers.append(logging.FileHandler(connection_log_file, encoding='utf-8'))
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler(connection_log_file, encoding='utf-8')
-    ]
+    handlers=handlers
 )
 logger = logging.getLogger(__name__)
 
 def log_connection_attempt(action: str, site: str = None, details: Dict[str, Any] = None):
-    """데이터베이스 연결 시도를 로그 파일에 기록"""
+    """데이터베이스 연결 시도를 로그에 기록 (컨테이너에서만 파일 기록)"""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_entry = f"[{timestamp}] {action}"
     
@@ -57,10 +60,14 @@ def log_connection_attempt(action: str, site: str = None, details: Dict[str, Any
     
     logger.info(log_entry)
     
-    # 추가로 별도 연결 로그 파일에도 기록
-    with open(connection_log_file, 'a', encoding='utf-8') as f:
-        f.write(log_entry + '\n')
-        f.flush()
+    # 컨테이너 환경에서만 파일에 추가 기록
+    if connection_log_file:
+        try:
+            with open(connection_log_file, 'a', encoding='utf-8') as f:
+                f.write(log_entry + '\n')
+                f.flush()
+        except Exception as e:
+            print(f"⚠️ 로그 파일 쓰기 실패: {e}")
 
 def debug_print(message: str):
     """디버깅 메시지를 즉시 출력"""
