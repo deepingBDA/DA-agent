@@ -92,15 +92,34 @@ def _create_config_client() -> Optional[Any]:
         ssh_host = os.getenv("SSH_HOST") 
         if ssh_host:
             try:
-                # Paramiko 호환성 문제 해결을 위한 import 순서 조정
+                # Paramiko 환경 디버깅 및 호환성 처리
                 import paramiko
-                # DSSKey 호환성 체크
+                print(f"🔍 Paramiko 버전: {paramiko.__version__}")
+                print(f"🔍 Paramiko 경로: {paramiko.__file__}")
+                print(f"🔍 DSSKey 존재: {hasattr(paramiko, 'DSSKey')}")
+                
+                # 사용 가능한 키 타입들 출력
+                key_types = [attr for attr in dir(paramiko) if 'Key' in attr and not attr.startswith('_')]
+                print(f"🔍 사용 가능한 키 타입들: {key_types}")
+                
+                # DSSKey 속성이 없으면 더미 클래스 추가
                 if not hasattr(paramiko, 'DSSKey'):
-                    print("⚠️ Paramiko DSSKey 호환성 문제 감지, RSA 키만 사용")
+                    print("⚠️ Paramiko DSSKey 호환성 문제 감지, 더미 클래스 생성")
+                    # 더미 DSSKey 클래스 생성
+                    class DummyDSSKey:
+                        def __init__(self, *args, **kwargs):
+                            raise NotImplementedError("DSS keys are not supported in this paramiko version")
+                        
+                        @classmethod
+                        def from_private_key_file(cls, *args, **kwargs):
+                            raise NotImplementedError("DSS keys are not supported in this paramiko version")
+                    
+                    paramiko.DSSKey = DummyDSSKey
+                    print("✅ DSSKey 더미 클래스 생성 완료")
                 
                 from sshtunnel import SSHTunnelForwarder
                 
-                # SSH 터널 설정 - 더 안정적인 옵션 추가
+                # SSH 터널 설정 - 호환성 강화
                 ssh_tunnel = SSHTunnelForwarder(
                     (ssh_host, int(os.getenv("SSH_PORT", "22"))),
                     ssh_username=os.getenv("SSH_USERNAME"),
@@ -110,7 +129,9 @@ def _create_config_client() -> Optional[Any]:
                     # 호환성을 위한 추가 옵션
                     ssh_config_file=None,
                     allow_agent=False,
-                    host_pkey_directories=None
+                    host_pkey_directories=None,
+                    # 키 타입 제한
+                    ssh_pkey=None
                 )
                 ssh_tunnel.start()
                 print(f"설정 DB SSH 터널 생성: localhost:{ssh_tunnel.local_bind_port}")
