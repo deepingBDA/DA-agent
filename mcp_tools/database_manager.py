@@ -27,9 +27,9 @@ logger = logging.getLogger(__name__)
 
 def debug_print(message: str):
     """디버깅 메시지를 즉시 출력"""
-    print(message)
-    sys.stdout.flush()
-    logger.info(message)
+    print(message, file=sys.stderr)  # stderr로 출력
+    sys.stderr.flush()
+    logger.error(message)  # ERROR 레벨로 강제 출력
 
 def _create_config_client() -> Optional[Any]:
     """설정 데이터베이스 클라이언트 생성 (SSH 터널링 지원)"""

@@ -141,7 +141,12 @@ range_cnt AS (
 tot_cnt   AS (SELECT day_type, sum(visit_cnt) AS total_cnt FROM range_cnt GROUP BY day_type),
 range_pct AS (
     SELECT r.day_type, r.time_range, r.visit_cnt,
-           toUInt64(round(r.visit_cnt / t.total_cnt * 100)) AS pct
+           toUInt64(round(
+               CASE 
+                   WHEN t.total_cnt > 0 THEN r.visit_cnt / t.total_cnt * 100
+                   ELSE 0
+               END
+           )) AS pct
     FROM range_cnt r JOIN tot_cnt t USING(day_type)
 ),
 rank_slot AS (
@@ -160,14 +165,24 @@ final AS (
     FROM avg_dayType WHERE day_type='weekend'
     UNION ALL
     SELECT '성별경향', gender, avg_cnt,
-           toUInt64(round(avg_cnt / (SELECT cnt FROM overall_cnt) * 100)) AS value_pct,
+           toUInt64(round(
+               CASE 
+                   WHEN (SELECT cnt FROM overall_cnt) > 0 THEN avg_cnt / (SELECT cnt FROM overall_cnt) * 100
+                   ELSE 0
+               END
+           )) AS value_pct,
            10 + if(gender='남성',0,1) AS ord
     FROM avg_gender WHERE gender IN ('남성','여성')
     UNION ALL
     SELECT '연령대경향',
            concat(toString(rk),'위_',age_group)                         AS label,
            avg_cnt,
-           toUInt64(round(avg_cnt / (SELECT cnt FROM overall_cnt) * 100)) AS value_pct,
+           toUInt64(round(
+               CASE 
+                   WHEN (SELECT cnt FROM overall_cnt) > 0 THEN avg_cnt / (SELECT cnt FROM overall_cnt) * 100
+                   ELSE 0
+               END
+           )) AS value_pct,
            20 + rk AS ord
     FROM rank_age WHERE rk<=3
     UNION ALL
