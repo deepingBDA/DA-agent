@@ -17,9 +17,15 @@ from datetime import datetime
 
 load_dotenv()
 
-# 로그 디렉토리 생성 (컨테이너 환경 대응)
-log_dir = Path("/app/logs")
-log_dir.mkdir(parents=True, exist_ok=True)
+# 로그 디렉토리 생성 (환경에 따라 동적 설정)
+try:
+    # 컨테이너 환경 시도
+    log_dir = Path("/app/logs")
+    log_dir.mkdir(parents=True, exist_ok=True)
+except (OSError, PermissionError):
+    # 로컬 환경 폴백
+    log_dir = Path("./logs")
+    log_dir.mkdir(parents=True, exist_ok=True)
 
 # 로그 파일 경로
 connection_log_file = log_dir / "database_connections.log"
@@ -79,14 +85,25 @@ def _create_config_client() -> Optional[Any]:
         ssh_host = os.getenv("SSH_HOST") 
         if ssh_host:
             try:
+                # Paramiko 호환성 문제 해결을 위한 import 순서 조정
+                import paramiko
+                # DSSKey 호환성 체크
+                if not hasattr(paramiko, 'DSSKey'):
+                    print("⚠️ Paramiko DSSKey 호환성 문제 감지, RSA 키만 사용")
+                
                 from sshtunnel import SSHTunnelForwarder
                 
+                # SSH 터널 설정 - 더 안정적인 옵션 추가
                 ssh_tunnel = SSHTunnelForwarder(
                     (ssh_host, int(os.getenv("SSH_PORT", "22"))),
                     ssh_username=os.getenv("SSH_USERNAME"),
                     ssh_password=os.getenv("SSH_PASSWORD"),
                     remote_bind_address=(os.getenv("CONFIG_DB_HOST", "localhost"), int(os.getenv("CONFIG_DB_PORT", "8123"))),
                     local_bind_address=("localhost", 0),
+                    # 호환성을 위한 추가 옵션
+                    ssh_config_file=None,
+                    allow_agent=False,
+                    host_pkey_directories=None
                 )
                 ssh_tunnel.start()
                 print(f"설정 DB SSH 터널 생성: localhost:{ssh_tunnel.local_bind_port}")
@@ -103,8 +120,12 @@ def _create_config_client() -> Optional[Any]:
                 
             except Exception as e:
                 print(f"설정 DB SSH 터널 생성 실패: {e}, 직접 연결 시도")
-                log_connection_attempt("CONFIG_DB_SSH_TUNNEL_FAILED", details={"error": str(e)})
-                host = os.getenv("CONFIG_DB_HOST", "localhost")
+                log_connection_attempt("CONFIG_DB_SSH_TUNNEL_FAILED", details={
+                    "error": str(e),
+                    "error_type": type(e).__name__
+                })
+                # SSH 실패 시 원격 호스트로 직접 연결 시도
+                host = ssh_host
                 port = int(os.getenv("CONFIG_DB_PORT", "8123"))
         else:
             # 직접 연결
@@ -118,13 +139,20 @@ def _create_config_client() -> Optional[Any]:
         print(f"  - Password: {'***' if os.getenv('CLICKHOUSE_PASSWORD') else 'None'}")
         print(f"  - Database: cu_base")
         
+        # ClickHouse 연결 시도 (재시도 로직 포함)
         client = clickhouse_connect.get_client(
             host=host,
             port=port,
             username=os.getenv("CLICKHOUSE_USER"),
             password=os.getenv("CLICKHOUSE_PASSWORD"),
-            database="cu_base"
+            database="cu_base",
+            # 연결 타임아웃 설정
+            connect_timeout=10,
+            send_receive_timeout=30
         )
+        
+        # 연결 테스트
+        client.query("SELECT 1")
         print(f"✅ [SUCCESS] 설정 DB 연결 성공: {host}:{port}")
         
         # 연결 성공 로그
@@ -217,6 +245,11 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
         print(f"  - 원격 DB: {conn_info['db_host']}:{conn_info['db_port']}")
         
         try:
+            # Paramiko 호환성 문제 해결
+            import paramiko
+            if not hasattr(paramiko, 'DSSKey'):
+                print("⚠️ Paramiko DSSKey 호환성 문제 감지, RSA 키만 사용")
+            
             from sshtunnel import SSHTunnelForwarder
             
             ssh_tunnel = SSHTunnelForwarder(
@@ -225,6 +258,10 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
                 ssh_password=os.getenv("SSH_PASSWORD"),
                 remote_bind_address=(conn_info["db_host"], conn_info["db_port"]),
                 local_bind_address=("localhost", 0),
+                # 호환성을 위한 추가 옵션
+                ssh_config_file=None,
+                allow_agent=False,
+                host_pkey_directories=None
             )
             ssh_tunnel.start()
             print(f"✅ [SUCCESS] SSH 터널 생성: {site} -> localhost:{ssh_tunnel.local_bind_port}")
@@ -242,8 +279,12 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
         except Exception as e:
             print(f"❌ [ERROR] SSH 터널 생성 실패: {e}")
             print(f"🔄 [INFO] 직접 연결로 전환")
-            log_connection_attempt("SITE_SSH_TUNNEL_FAILED", site=site, details={"error": str(e)})
-            host = conn_info["db_host"]
+            log_connection_attempt("SITE_SSH_TUNNEL_FAILED", site=site, details={
+                "error": str(e),
+                "error_type": type(e).__name__
+            })
+            # SSH 실패 시 원격 호스트로 직접 연결 시도
+            host = conn_info["ssh_host"] if conn_info["ssh_host"] else conn_info["db_host"]
             port = conn_info["db_port"]
     else:
         print(f"🔗 [DEBUG] 직접 연결 모드")
@@ -258,13 +299,20 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
     print(f"  - Database: plusinsight")
     
     try:
+        # ClickHouse 연결 시도 (타임아웃 설정)
         client = clickhouse_connect.get_client(
             host=host,
             port=port,
             username=os.getenv("CLICKHOUSE_USER"),
             password=os.getenv("CLICKHOUSE_PASSWORD"),
-            database='plusinsight'
+            database='plusinsight',
+            # 연결 타임아웃 설정
+            connect_timeout=10,
+            send_receive_timeout=30
         )
+        
+        # 연결 테스트
+        client.query("SELECT 1")
         print(f"✅ [SUCCESS] 매장 '{site}' 연결 성공: {host}:{port}")
         
         # 연결 성공 로그
