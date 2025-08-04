@@ -47,8 +47,8 @@ def _create_config_client() -> Optional[Any]:
         client = clickhouse_connect.get_client(
             host=host,
             port=port,
-            username=os.getenv("CLICKHOUSE_USER", "default"),
-            password=os.getenv("CLICKHOUSE_PASSWORD", ""),
+            username=os.getenv("CLICKHOUSE_USER"),
+            password=os.getenv("CLICKHOUSE_PASSWORD"),
             database="cu_base"
         )
         print(f"설정 DB 연결 성공: {host}:{port}")
@@ -88,7 +88,7 @@ def get_site_connection_info(site: str) -> Optional[Dict[str, Any]]:
         print(f"매장 '{site}' 연결 정보 조회 실패: {e}")
         return None
 
-def get_site_client(site: str, database: str = None) -> Optional[Any]:
+def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
     """특정 매장의 ClickHouse 클라이언트 생성"""
     conn_info = get_site_connection_info(site)
     if not conn_info:
@@ -105,7 +105,7 @@ def get_site_client(site: str, database: str = None) -> Optional[Any]:
                 ssh_username=os.getenv("SSH_USERNAME"),
                 ssh_password=os.getenv("SSH_PASSWORD"),
                 remote_bind_address=(conn_info["db_host"], conn_info["db_port"]),
-                local_bind_address=("localhost", 0),
+                local_bind_address=("localhost"),
             )
             ssh_tunnel.start()
             print(f"SSH 터널 생성: {site} -> localhost:{ssh_tunnel.local_bind_port}")
@@ -122,17 +122,15 @@ def get_site_client(site: str, database: str = None) -> Optional[Any]:
         host = conn_info["db_host"]
         port = conn_info["db_port"]
     
-    db_name = database or conn_info["db_name"]
-    
     try:
         client = clickhouse_connect.get_client(
             host=host,
             port=port,
-            username=os.getenv("CLICKHOUSE_USER", "default"),
-            password=os.getenv("CLICKHOUSE_PASSWORD", ""),
-            database=db_name
+            username=os.getenv("CLICKHOUSE_USER"),
+            password=os.getenv("CLICKHOUSE_PASSWORD"),
+            database='plusinsight'
         )
-        print(f"매장 '{site}' 연결 성공: {host}:{port}, db={db_name}")
+        print(f"매장 '{site}' 연결 성공: {host}:{port}")
         return client
     except Exception as e:
         print(f"매장 '{site}' 연결 실패: {e}")
