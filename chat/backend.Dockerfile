@@ -5,13 +5,10 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Node.js 및 SSH 관련 시스템 의존성 설치
+# Node.js 및 최소한의 SSH 의존성만 설치
 RUN apt-get update && apt-get install -y \
     curl \
     openssh-client \
-    libffi-dev \
-    libssl-dev \
-    build-essential \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
