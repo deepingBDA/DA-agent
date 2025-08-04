@@ -2,7 +2,6 @@ from fastmcp import FastMCP
 import clickhouse_connect
 import os
 from dotenv import load_dotenv
-import tiktoken
 import logging
 import sys
 import time
@@ -10,6 +9,9 @@ from pathlib import Path
 
 from utils import create_transition_data
 from map_config import item2zone
+from database_manager import get_site_client
+from mcp_utils import is_token_limit_exceeded, DEFAULT_MODEL
+from typing import Optional
 
 # SSH 터널링 관련 import
 try:
@@ -48,117 +50,36 @@ logger.info(f"=== 새 세션 시작: {time.strftime('%Y-%m-%d %H:%M:%S')} ===")
 os.environ["FASTMCP_DEBUG"] = "1"
 os.environ["FASTMCP_LOG_LEVEL"] = "DEBUG"
 
-load_dotenv()
-
-CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST")
-CLICKHOUSE_PORT = os.getenv("CLICKHOUSE_PORT")
-CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
-CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
-
-# SSH 설정
-SSH_HOST = os.getenv("SSH_HOST")
-SSH_PORT = int(os.getenv("SSH_PORT", "22"))
-SSH_USERNAME = os.getenv("SSH_USERNAME")
-SSH_PASSWORD = os.getenv("SSH_PASSWORD")
-
-# 전역 SSH 터널 관리
-_ssh_tunnel = None
-
-
-def get_clickhouse_client(database="plusinsight"):
-    """ClickHouse 클라이언트를 가져옵니다. SSH 터널링 지원."""
-    global _ssh_tunnel
-    
-    # SSH 터널링이 필요한 경우
-    if SSH_AVAILABLE and SSH_HOST:
-        try:
-            # 기존 터널이 없거나 비활성 상태면 새로 생성
-            if not _ssh_tunnel or not _ssh_tunnel.is_active:
-                if _ssh_tunnel:
-                    _ssh_tunnel.stop()
-                
-                _ssh_tunnel = SSHTunnelForwarder(
-                    (SSH_HOST, SSH_PORT),
-                    ssh_username=SSH_USERNAME,
-                    ssh_password=SSH_PASSWORD,
-                    remote_bind_address=(CLICKHOUSE_HOST, int(CLICKHOUSE_PORT)),
-                    local_bind_address=("localhost", 0),
-                )
-                _ssh_tunnel.start()
-                logger.info(f"SSH 터널 생성: localhost:{_ssh_tunnel.local_bind_port}")
-            
-            # SSH 터널을 통해 연결
-            host = "localhost"
-            port = _ssh_tunnel.local_bind_port
-            
-        except Exception as e:
-            logger.error(f"SSH 터널 생성 실패: {e}, 직접 연결 시도")
-            host = CLICKHOUSE_HOST
-            port = int(CLICKHOUSE_PORT)
-    else:
-        # 직접 연결
-        host = CLICKHOUSE_HOST
-        port = int(CLICKHOUSE_PORT)
-    
-    try:
-        client = clickhouse_connect.get_client(
-            host=host,
-            port=port,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database=database,
-        )
-        logger.info(f"ClickHouse 연결 성공: {host}:{port}, db={database}")
-        return client
-    except Exception as e:
-        logger.error(f"ClickHouse 연결 실패: {e}")
-        return None
-
-model_name = "gpt-4o"
-model_max_tokens = {
-    "gpt-4o": 128000,
-}
-
-db_list = {
-    # '갈매점': 'plusinsight_bgf_galmae',
-    # '강북센터피스점':'plusinsight_bgf_gangbuk_centerpiece',
-    # '강동센트럴점': 'plusinsight_bgf_gangdong_central',
-    # '금천프라임점': 'plusinsight_bgf_geumcheon_prime',
-    # '마천점': 'plusinsight_bgf_macheon',
-    # '마천힐스테이트점': 'plusinsight_bgf_manchon_hillstate',
-    # 'BGF사옥점': 'plusinsight_bgf_saok',
-    # '신촌르메이르점': 'plusinsight_bgf_sinchon_lemeilleur',
-    # '수성캐슬점': 'plusinsight_bgf_suseong_castle',
-    # '타워팰리스점': 'plusinsight_bgf_tower_palace',
-    # '역삼점': 'plusinsight_bgf_yeoksam',
-    '망우혜원점': 'plusinsight'
-}
-
-def num_tokens_from_string(string: str, model: str) -> int:
-    encoding = tiktoken.encoding_for_model(model)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
-
-def is_token_limit_exceeded(text: str, model: str, reserved_tokens: int = 1000) -> bool:
-    token_count = num_tokens_from_string(text, model)
-    max_tokens = model_max_tokens.get(model, 4096)  # 기본값 4096
-    return token_count > (max_tokens - reserved_tokens)
+# 토큰 관련 함수들은 mcp_utils로 이동됨
 
 mcp = FastMCP("diagnose")
 
 @mcp.tool()
-def get_db_name() -> str:
-    """편의점 이름과 데이터베이스 매핑 조회"""
-    answer = "편의점 이름과 데이터베이스 매핑"
-    for store, db in db_list.items():
-        answer += f"\n{store}: {db}"
-    return answer
+def get_db_name(site: str) -> str:
+    """사용 가능한 매장 목록 조회 (diagnose 툴용)"""
+    try:
+        sites = get_all_sites()
+        if not sites:
+            return "사용 가능한 매장이 없습니다."
+        
+        answer = "📋 **진단 가능한 매장 목록:**\n"
+        for i, site in enumerate(sites, 1):
+            answer += f"{i}. {site}\n"
+        answer += f"\n총 {len(sites)}개 매장에서 진단 가능합니다."
+        return answer
+    except Exception as e:
+        return f"매장 목록 조회 실패: {e}"
 
 @mcp.tool()
-def diagnose_avg_in(start_date: str, end_date: str) -> str:
+def diagnose_avg_in(start_date: str, end_date: str, site: str) -> str:
     """[VISITOR_DIAGNOSE]
     Diagnose **average daily visitors** and related trends (gender, age,
     time-slot) for a given period.
+
+    Args:
+        start_date: 시작 날짜 (YYYY-MM-DD)
+        end_date: 종료 날짜 (YYYY-MM-DD)  
+        site: 매장명 (필수)
 
     Trigger words (case-insensitive):
         - "방문객 진단", "유입 진단", "visitor diagnose", "average visitors"
@@ -168,7 +89,7 @@ def diagnose_avg_in(start_date: str, end_date: str) -> str:
     Excel) about store visitors within a date range.
     """
     # 파라미터 기록
-    param_log = f"diagnose_avg_in 호출됨: start_date={start_date}, end_date={end_date}"
+    param_log = f"diagnose_avg_in 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
     logger.info(param_log)
     
     query = f"""
@@ -268,83 +189,82 @@ FROM final
 ORDER BY ord
 """
 
-    answer = ""
-    for store, db in db_list.items():
-        try:
-            client = get_clickhouse_client(database=db)
-            result = client.query(query)
-
-            if len(result.result_rows) > 0:
-                # 섹션별로 데이터 분류
-                sections = {
-                    '일평균': [],
-                    '성별경향': [],
-                    '연령대경향': [],
-                    '시간대경향': []
-                }
-                
-                for row in result.result_rows:
-                    section, label, value_cnt, value_pct = row
-                    sections[section].append((label, value_cnt, value_pct))
-                
-                # 표 형태로 포맷팅
-                store_answer = f"\n=== {store} ===\n"
-                
-                # 1. 일평균 방문객수
-                store_answer += "일평균 방문객수\n"
-                for label, cnt, _ in sections['일평균']:
-                    store_answer += f"  {label}: {cnt}명\n"
-                
-                # 2. 성별경향
-                store_answer += "\n성별경향\n"
-                for label, cnt, pct in sections['성별경향']:
-                    gender_display = 'M' if label == '남성' else 'F'
-                    store_answer += f"  {gender_display}: {pct}%\n"
-                
-                # 3. 연령대별 순위 (상위 3개)
-                store_answer += "\n연령대별 순위\n"
-                for label, cnt, pct in sections['연령대경향']:
-                    rank = label.split('위_')[0]
-                    age_group = label.split('위_')[1]
-                    store_answer += f"  {rank}: {age_group} - {pct}%\n"
-                
-                # 4. 주요 방문시간대
-                store_answer += "\n주요 방문시간대\n"
-                
-                # 시간대 명칭 매핑
-                time_names = {
-                    '22-01': '심야',
-                    '02-05': '새벽',
-                    '06-09': '아침',
-                    '10-13': '낮',
-                    '14-17': '오후',
-                    '18-21': '저녁'
-                }
-                
-                # 평일 시간대 분리
-                weekday_slots = [item for item in sections['시간대경향'] if '평일_' in item[0]]
-                weekend_slots = [item for item in sections['시간대경향'] if '주말_' in item[0]]
-                
-                store_answer += "  평일:\n"
-                for label, cnt, pct in weekday_slots:
-                    rank = label.split('_')[1]
-                    time_range = label.split('_')[2]
-                    time_name = time_names.get(time_range, time_range)
-                    store_answer += f"    {rank}: {time_name}({time_range}) - {pct}%\n"
-                
-                store_answer += "  주말:\n"
-                for label, cnt, pct in weekend_slots:
-                    rank = label.split('_')[1]
-                    time_range = label.split('_')[2]
-                    time_name = time_names.get(time_range, time_range)
-                    store_answer += f"    {rank}: {time_name}({time_range}) - {pct}%\n"
-                
-                answer += store_answer
-            else:
-                answer += f"\n{store} 데이터가 없습니다."
+    try:
+        client = get_site_client(site)
+        if not client:
+            return f"❌ {site}: 연결 실패"
             
-        except Exception as e:
-            answer += f"\n{store} 데이터 조회 오류: {e}"
+        result = client.query(query)
+
+        if len(result.result_rows) > 0:
+            # 섹션별로 데이터 분류
+            sections = {
+                '일평균': [],
+                '성별경향': [],
+                '연령대경향': [],
+                '시간대경향': []
+            }
+            
+            for row in result.result_rows:
+                section, label, value_cnt, value_pct = row
+                sections[section].append((label, value_cnt, value_pct))
+            
+            # 표 형태로 포맷팅
+            answer = f"=== {site} ===\n"
+            
+            # 1. 일평균 방문객수
+            answer += "일평균 방문객수\n"
+            for label, cnt, _ in sections['일평균']:
+                answer += f"  {label}: {cnt}명\n"
+            
+            # 2. 성별경향
+            answer += "\n성별경향\n"
+            for label, cnt, pct in sections['성별경향']:
+                gender_display = 'M' if label == '남성' else 'F'
+                answer += f"  {gender_display}: {pct}%\n"
+            
+            # 3. 연령대별 순위 (상위 3개)
+            answer += "\n연령대별 순위\n"
+            for label, cnt, pct in sections['연령대경향']:
+                rank = label.split('위_')[0]
+                age_group = label.split('위_')[1]
+                answer += f"  {rank}: {age_group} - {pct}%\n"
+            
+            # 4. 주요 방문시간대
+            answer += "\n주요 방문시간대\n"
+            
+            # 시간대 명칭 매핑
+            time_names = {
+                '22-01': '심야',
+                '02-05': '새벽',
+                '06-09': '아침',
+                '10-13': '낮',
+                '14-17': '오후',
+                '18-21': '저녁'
+            }
+                
+            # 평일 시간대 분리
+            weekday_slots = [item for item in sections['시간대경향'] if '평일_' in item[0]]
+            weekend_slots = [item for item in sections['시간대경향'] if '주말_' in item[0]]
+            
+            answer += "  평일:\n"
+            for label, cnt, pct in weekday_slots:
+                rank = label.split('_')[1]
+                time_range = label.split('_')[2]
+                time_name = time_names.get(time_range, time_range)
+                answer += f"    {rank}: {time_name}({time_range}) - {pct}%\n"
+            
+            answer += "  주말:\n"
+            for label, cnt, pct in weekend_slots:
+                rank = label.split('_')[1]
+                time_range = label.split('_')[2]
+                time_name = time_names.get(time_range, time_range)
+                answer += f"    {rank}: {time_name}({time_range}) - {pct}%\n"
+        else:
+            answer = f"⚠️ {site}: 데이터가 없습니다."
+        
+    except Exception as e:
+        answer = f"❌ {site}: 데이터 조회 오류 - {e}"
 
     # log answer
     logger.info(f"diagnose_avg_in 답변: {answer}")
@@ -352,10 +272,16 @@ ORDER BY ord
     return answer
 
 @mcp.tool()
-def diagnose_avg_sales(start_date: str, end_date: str) -> str:
-    """일평균 판매 건수 진단"""
+def diagnose_avg_sales(start_date: str, end_date: str, site: str) -> str:
+    """일평균 판매 건수 진단
+    
+    Args:
+        start_date: 시작 날짜 (YYYY-MM-DD)
+        end_date: 종료 날짜 (YYYY-MM-DD)  
+        site: 매장명 (필수)
+    """
     # 파라미터 기록
-    param_log = f"diagnose_avg_sales 호출됨: start_date={start_date}, end_date={end_date}"
+    param_log = f"diagnose_avg_sales 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
     logger.info(param_log)
     
     query = f"""
@@ -381,19 +307,22 @@ def diagnose_avg_sales(start_date: str, end_date: str) -> str:
     """
 
     try:
-        client = get_clickhouse_client(database='cu_base')
+        client = get_site_client(site, database='cu_base')
+        if not client:
+            return f"❌ {site}: 연결 실패"
+            
         result = client.query(query)
+        client.close()
 
         if len(result.result_rows) > 0:
-            answer = "(지점, 판매 건수)"
+            answer = f"📊 **{site}** 일평균 판매 건수:"
             for row in result.result_rows:
-                answer += f"\n{row}"
-
+                answer += f"\n  - {row[0]}: {row[1]}"
         else:
-            answer = "데이터가 없습니다."
-        
+            answer = f"⚠️ {site}: 데이터가 없습니다."
+                
     except Exception as e:
-        answer = f"데이터 조회 오류: {e}"
+        answer = f"❌ {site}: 오류 - {e}"
 
     # log answer
     logger.info(f"diagnose_avg_sales 답변: {answer}")
@@ -401,8 +330,14 @@ def diagnose_avg_sales(start_date: str, end_date: str) -> str:
     return answer
 
 @mcp.tool()
-def check_zero_visits(start_date: str, end_date: str, database: str) -> str:
-    """방문객수 데이터 이상 조회"""
+def check_zero_visits(start_date: str, end_date: str, site: str) -> str:
+    """방문객수 데이터 이상 조회
+    
+    Args:
+        start_date: 시작 날짜 (YYYY-MM-DD)
+        end_date: 종료 날짜 (YYYY-MM-DD)  
+        site: 매장명 (필수)
+    """
     query = f"""WITH
 start_date AS (SELECT toDate('{start_date}') AS value),
 end_date AS (SELECT toDate('{end_date}') AS value),
@@ -476,18 +411,22 @@ FROM final_zero_dates
 ORDER BY date"""
 
     try:
-        client = get_clickhouse_client(database=database)
+        client = get_site_client(site)
+        if not client:
+            return f"❌ {site}: 연결 실패"
+            
         result = client.query(query)
+        client.close()
 
         if len(result.result_rows) > 0:
-            answer = "방문객수 데이터 이상한 날"
+            answer = f"🚨 **{site}** 방문객수 데이터 이상한 날:"
             for row in result.result_rows:
-                answer += f"\n{row}"
+                answer += f"\n  - {row[0]}: {row[1]}"
         else:
-            answer = "이상 없습니다."
-        
+            answer = f"✅ {site}: 이상 없습니다."
+            
     except Exception as e:
-        answer = f"데이터 조회 오류: {e}"
+        answer = f"❌ {site}: 오류 - {e}"
 
     # log answer
     logger.info(f"check_zero_visits 답변: {answer}")
@@ -496,15 +435,21 @@ ORDER BY date"""
     return answer
 
 @mcp.tool()
-def diagnose_purchase_conversion_rate(start_date: str, end_date: str) -> str:
-    """구매전환율 진단"""
+def diagnose_purchase_conversion_rate(start_date: str, end_date: str, site: str) -> str:
+    """구매전환율 진단
+    
+    Args:
+        start_date: 시작 날짜 (YYYY-MM-DD)
+        end_date: 종료 날짜 (YYYY-MM-DD)  
+        site: 매장명 (필수)
+    """
     # 파라미터 기록
-    param_log = f"get_purchase_conversion_rate 호출됨: start_date={start_date}, end_date={end_date}"
+    param_log = f"get_purchase_conversion_rate 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
     logger.info(param_log)
     
     # 방문객 수와 판매 건수 조회
-    avg_in_result = diagnose_avg_in(start_date, end_date)
-    avg_sales_result = diagnose_avg_sales(start_date, end_date)
+    avg_in_result = diagnose_avg_in(start_date, end_date, site)
+    avg_sales_result = diagnose_avg_sales(start_date, end_date, site)
 
     # 구매전환율 계산
     answer = f"구매전환율 = (판매 건수 / 방문객 수) * 100 % 라는 공식이야. 일평균 방문객 수를 조회하고, 일평균 판매 건수를 조회해서, 구매전환율을 추정해줘. 구매전환율이 100%를 넘으면 방문객 수가 잘못 측정된거야. 참고해."
@@ -516,8 +461,14 @@ def diagnose_purchase_conversion_rate(start_date: str, end_date: str) -> str:
     return answer
 
 @mcp.tool()
-def diagnose_exploratory_tendency(start_date: str, end_date: str) -> str:
-    """탐색 경향성 진단"""
+def diagnose_exploratory_tendency(start_date: str, end_date: str, site: str) -> str:
+    """탐색 경향성 진단
+    
+    Args:
+        start_date: 시작 날짜 (YYYY-MM-DD)
+        end_date: 종료 날짜 (YYYY-MM-DD)  
+        site: 매장명 (필수)
+    """
 
     query = f"""WITH sales_funnel AS (
     SELECT
@@ -564,31 +515,35 @@ def diagnose_exploratory_tendency(start_date: str, end_date: str) -> str:
     CROSS JOIN visitor_count vc
     """
 
-    total_funnel = ""
-    for store, db in db_list.items():
-        store_answer = f"{store} - "
-        try:
-            client = get_clickhouse_client(database=db)
-            result = client.query(query.strip())
+    try:
+        client = get_site_client(site)
+        if not client:
+            return f"❌ {site}: 연결 실패"
             
-            if len(result.result_rows) > 0:
-                for row in result.result_rows:
-                    store_answer += f"1인당 진열대 방문: {row[0]}, 1인당 진열대 노출: {row[1]}, 1인당 진열대 픽업: {row[2]}"
+        result = client.query(query.strip())
+        client.close()
 
-                total_funnel += f"{store_answer}\n"
-            else:
-                store_answer += f"데이터가 없습니다."
-                total_funnel += f"{store_answer}\n"
-        except Exception as e:
-            store_answer += f"데이터 조회 오류: {e}"
-            total_funnel += f"{store_answer}\n"
+        if len(result.result_rows) > 0:
+            answer = f"📊 **{site}** 탐색 경향성:"
+            for row in result.result_rows:
+                answer += f"\n  - 1인당 진열대 방문: {row[0]}, 1인당 진열대 노출: {row[1]}, 1인당 진열대 픽업: {row[2]}"
+        else:
+            answer = f"⚠️ {site}: 데이터가 없습니다."
+            
+    except Exception as e:
+        answer = f"❌ {site}: 오류 - {e}"
 
-    answer = f"주어진 기간의 지점별 sales funnel 데이터: {total_funnel}"
     return answer
 
 @mcp.tool()
-def diagnose_shelf(start_date: str, end_date: str) -> str:
-    """진열대 진단"""
+def diagnose_shelf(start_date: str, end_date: str, site: str) -> str:
+    """진열대 진단
+    
+    Args:
+        start_date: 시작 날짜 (YYYY-MM-DD)
+        end_date: 종료 날짜 (YYYY-MM-DD)  
+        site: 매장명 (필수)
+    """
     query = f"""WITH base AS (
 SELECT
     shelf_name,
@@ -686,25 +641,23 @@ CASE metric
     WHEN 'pickup_rate_cold' THEN 10
 END"""
 
-    answer = "진열대 진단 결과. hot은 관심이 많고, cold은 관심이 적은 진열대를 의미함."
-    for store, db in db_list.items():
-        store_answer = f"{store}:"
+    try:
+        client = get_site_client(site)
+        if not client:
+            return f"❌ {site}: 연결 실패"
+            
+        result = client.query(query)
+        client.close()
 
-        try:
-            client = get_clickhouse_client(database=db)
-
-            result = client.query(query)
-
-            if len(result.result_rows) > 0:
-                for row in result.result_rows:
-                    store_answer += f"\n{row}"
-            else:
-                store_answer += "데이터가 없습니다."
-
-        except Exception as e:
-            store_answer += f"데이터 조회 오류: {e}"
-
-        answer += f"\n{store_answer}"
+        if len(result.result_rows) > 0:
+            answer = f"🛍️ **{site}** 진열대 진단 (hot=관심많음, cold=관심적음):"
+            for row in result.result_rows:
+                answer += f"\n  - {row[0]}: {row[1]} ({row[2]}방문, {row[3]}노출, {row[4]}픽업)"
+        else:
+            answer = f"⚠️ {site}: 데이터가 없습니다."
+            
+    except Exception as e:
+        answer = f"❌ {site}: 오류 - {e}"
 
     # log answer
     logger.info(f"diagnose_shelf 답변: {answer}")
@@ -713,8 +666,14 @@ END"""
         
 
 @mcp.tool()
-def diagnose_table_occupancy(start_date: str, end_date: str) -> str:
-    """시식대 혼잡도 진단"""
+def diagnose_table_occupancy(start_date: str, end_date: str, site: str) -> str:
+    """시식대 혼잡도 진단
+    
+    Args:
+        start_date: 시작 날짜 (YYYY-MM-DD)
+        end_date: 종료 날짜 (YYYY-MM-DD)  
+        site: 매장명 (필수)
+    """
 
     query = f"""
 WITH minute_data AS (
@@ -757,30 +716,32 @@ ALL LEFT JOIN session_data s ON m.zone_id = s.zone_id
 ORDER BY zone_name ASC
 """
 
-    answer = ""
-    for store, db in db_list.items():
-        store_answer = f"{store}:"
+    try:
+        client = get_site_client(site)
+        if not client:
+            return f"❌ {site}: 연결 실패"
+            
+        result = client.query(query)
+        client.close()
 
-        try:
-            client = get_clickhouse_client(database=db)
-
-            result = client.query(query)
-
-            if len(result.result_rows) > 0:
-                for row in result.result_rows:
-                    store_answer += f"\n{row}"
-            else:
-                store_answer += "데이터가 없습니다."
-
-        except Exception as e:
-            store_answer += f"데이터 조회 오류: {e}"
-
-        answer += f"\n{store_answer}"
+        if len(result.result_rows) > 0:
+            answer = f"🍽️ **{site}** 시식대 혼잡도:"
+            for row in result.result_rows:
+                answer += f"\n  - {row[0]}: 평균{row[1]}, 최대{row[2]}, 세션{row[3]}, 평균시간{row[4]}"
+        else:
+            answer = f"⚠️ {site}: 데이터가 없습니다."
+            
+    except Exception as e:
+        answer = f"❌ {site}: 오류 - {e}"
 
     # log answer
     logger.info(f"diagnose_table_occupancy 답변: {answer}")
 
     return answer
+
+# 3. 새로운 함수를 생성하는건 데이터베이스 생성하는것뿐이다 (위의 get_db_name 함수로 대체됨)
+
+# get_available_sites 기능은 mcp_agent_helper.py로 분리됨
 
 if __name__ == "__main__":
     print("FastMCP 서버 시작 - diagnose", file=sys.stderr)

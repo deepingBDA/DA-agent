@@ -1,109 +1,17 @@
 from fastmcp import FastMCP
-import clickhouse_connect
-import os
-from dotenv import load_dotenv
-import tiktoken
-import logging
-import sys
-import time
-from pathlib import Path
+from typing import List
 
-# SSH 터널링 관련 import
-try:
-    from sshtunnel import SSHTunnelForwarder
-    SSH_AVAILABLE = True
-except ImportError:
-    SSH_AVAILABLE = False
-    logging.warning("sshtunnel 패키지가 설치되어 있지 않습니다.")
+# 데이터베이스 매니저 및 공통 유틸리티 import
+from database_manager import get_site_client
+from mcp_utils import is_token_limit_exceeded, DEFAULT_MODEL
 
 from utils import create_transition_data
 from map_config import item2zone
 
-load_dotenv()
-
-CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST")
-CLICKHOUSE_PORT = os.getenv("CLICKHOUSE_PORT")
-CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
-CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
-
-# SSH 설정
-SSH_HOST = os.getenv("SSH_HOST")
-SSH_PORT = int(os.getenv("SSH_PORT", "22"))
-SSH_USERNAME = os.getenv("SSH_USERNAME")
-SSH_PASSWORD = os.getenv("SSH_PASSWORD")
-
-# 전역 SSH 터널 관리
-_ssh_tunnel = None
-
-
-def get_clickhouse_client(database="plusinsight"):
-    """ClickHouse 클라이언트를 가져옵니다. SSH 터널링 지원."""
-    global _ssh_tunnel
-    
-    # SSH 터널링이 필요한 경우
-    if SSH_AVAILABLE and SSH_HOST:
-        try:
-            # 기존 터널이 없거나 비활성 상태면 새로 생성
-            if not _ssh_tunnel or not _ssh_tunnel.is_active:
-                if _ssh_tunnel:
-                    _ssh_tunnel.stop()
-                
-                _ssh_tunnel = SSHTunnelForwarder(
-                    (SSH_HOST, SSH_PORT),
-                    ssh_username=SSH_USERNAME,
-                    ssh_password=SSH_PASSWORD,
-                    remote_bind_address=(CLICKHOUSE_HOST, int(CLICKHOUSE_PORT)),
-                    local_bind_address=("localhost", 0),
-                )
-                _ssh_tunnel.start()
-                print(f"SSH 터널 생성: localhost:{_ssh_tunnel.local_bind_port}")
-            
-            # SSH 터널을 통해 연결
-            host = "localhost"
-            port = _ssh_tunnel.local_bind_port
-            
-        except Exception as e:
-            print(f"SSH 터널 생성 실패: {e}, 직접 연결 시도")
-            host = CLICKHOUSE_HOST
-            port = int(CLICKHOUSE_PORT)
-    else:
-        # 직접 연결
-        host = CLICKHOUSE_HOST
-        port = int(CLICKHOUSE_PORT)
-    
-    try:
-        client = clickhouse_connect.get_client(
-            host=host,
-            port=port,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database=database,
-        )
-        print(f"ClickHouse 연결 성공: {host}:{port}, db={database}")
-        return client
-    except Exception as e:
-        print(f"ClickHouse 연결 실패: {e}")
-        return None
-
-model_name = "gpt-4o"
-model_max_tokens = {
-    "gpt-4o": 128000,
-}
-
-def num_tokens_from_string(string: str, model: str) -> int:
-    encoding = tiktoken.encoding_for_model(model)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
-
-def is_token_limit_exceeded(text: str, model: str, reserved_tokens: int = 1000) -> bool:
-    token_count = num_tokens_from_string(text, model)
-    max_tokens = model_max_tokens.get(model, 4096)  # 기본값 4096
-    return token_count > (max_tokens - reserved_tokens)
-
 mcp = FastMCP("insight")
 
 @mcp.tool()
-def pickup_transition(database: str, start_date: str, end_date: str) -> int:
+def pickup_transition(database: str, start_date: str, end_date: str, site: str) -> str:
     """픽업 구역 전환 데이터 조회"""
     try:
         query = f"""WITH transitions AS 
@@ -158,7 +66,9 @@ def pickup_transition(database: str, start_date: str, end_date: str) -> int:
     ORDER BY
         transition_count DESC"""
 
-        client = get_clickhouse_client(database=database)
+        client = get_site_client(site, database)
+        if not client:
+            return f"❌ {site} 매장 연결 실패"
 
         result = client.query(query)
         
@@ -169,15 +79,15 @@ def pickup_transition(database: str, start_date: str, end_date: str) -> int:
         else:
             answer = "데이터가 없습니다."
 
-        if is_token_limit_exceeded(answer, model_name):
+        if is_token_limit_exceeded(answer, DEFAULT_MODEL):
             return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
 
         return answer
     except Exception as e:
-        return f"오류가 발생했습니다: {e}"
+        return f"❌ {site} 매장 오류: {e}"
 
 @mcp.tool()
-def sales_funnel(database: str, start_date: str, end_date: str) -> str:
+def sales_funnel(database: str, start_date: str, end_date: str, site: str) -> str:
     """sales_funnel: 방문, 노출, 픽업의 전환율 조회"""
     try:
         query = f"""SELECT
@@ -192,7 +102,9 @@ def sales_funnel(database: str, start_date: str, end_date: str) -> str:
     ORDER BY pickup_rate DESC"""
 
         # 클라이언트 생성
-        db = get_clickhouse_client(database=database)
+        db = get_site_client(site, database)
+        if not db:
+            return f"❌ {site} 매장 연결 실패"
 
         result = db.query(query.strip())
 
@@ -203,15 +115,15 @@ def sales_funnel(database: str, start_date: str, end_date: str) -> str:
         else:
             answer = "데이터가 없습니다."
 
-        if is_token_limit_exceeded(answer, model_name):
+        if is_token_limit_exceeded(answer, DEFAULT_MODEL):
             return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
 
         return answer
     except Exception as e:
-        return f"오류가 발생했습니다: {e}"
+        return f"❌ {site} 매장 오류: {e}"
 
 @mcp.tool()
-def representative_movement(database: str, start_date: str, end_date: str, limit: int = 20) -> str:
+def representative_movement(database: str, start_date: str, end_date: str, site: str, limit: int = 20) -> str:
     """대표적인 이동 경로 리스트 조회"""
     try:
         query = f"""
@@ -243,7 +155,9 @@ ORDER BY
     total_people DESC
 LIMIT {limit}"""
 
-        client = get_clickhouse_client(database=database)
+        client = get_site_client(site, database)
+        if not client:
+            return f"❌ {site} 매장 연결 실패"
 
         result = client.query(query)
 
@@ -320,15 +234,15 @@ LEFT JOIN closest_zones cz ON tz.zone_name = cz.from_zone
         else:
             answer = "데이터가 없습니다."
 
-        if is_token_limit_exceeded(answer, model_name):
+        if is_token_limit_exceeded(answer, DEFAULT_MODEL):
             return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
 
         return answer
     except Exception as e:
-        return f"오류가 발생했습니다: {e}"
+        return f"❌ {site} 매장 오류: {e}"
 
 @mcp.tool()
-def inflow_by_entrance_line(database: str, start_date: str, end_date: str) -> str:
+def inflow_by_entrance_line(database: str, start_date: str, end_date: str, site: str) -> str:
     """유입률 분석"""
     try:
         query = f"""
@@ -379,7 +293,9 @@ ORDER BY
     visitor_count DESC,
     traffic_count DESC"""
 
-        client = get_clickhouse_client(database=database)
+        client = get_site_client(site, database)
+        if not client:
+            return f"❌ {site} 매장 연결 실패"
 
         result = client.query(query)
         
@@ -398,12 +314,14 @@ ORDER BY
         else:
             answer = "데이터가 없습니다."
 
-        if is_token_limit_exceeded(answer, model_name):
+        if is_token_limit_exceeded(answer, DEFAULT_MODEL):
             return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
 
         return answer
     except Exception as e:
-        return f"오류가 발생했습니다: {e}"
+        return f"❌ {site} 매장 오류: {e}"
             
+# get_available_sites 기능은 mcp_agent_helper.py로 분리됨
+
 if __name__ == "__main__":
     mcp.run()

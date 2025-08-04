@@ -9,6 +9,9 @@
 import os
 import sys
 from typing import Dict, Any, List, Union, Optional
+
+# 새로운 데이터베이스 매니저 import
+from database_manager import get_site_client
 from fastmcp import FastMCP
 from dotenv import load_dotenv
 
@@ -17,7 +20,6 @@ load_dotenv()
 
 # FastMCP 인스턴스
 mcp = FastMCP("shelf_optimization")
-
 
 def _create_clickhouse_client(database="plusinsight"):
     """ClickHouse 클라이언트 생성"""
@@ -78,9 +80,9 @@ def _create_clickhouse_client(database="plusinsight"):
         print(f"ClickHouse 연결 실패: {e}")
         return None
 
-
 @mcp.tool()
 def get_shelf_analysis_flexible(
+    site: str,
     start_date: str = "2025-06-12",
     end_date: str = "2025-07-12",
     exclude_dates: List[str] = [],
@@ -124,7 +126,9 @@ def get_shelf_analysis_flexible(
     print(f"  exclude_dates: {exclude_dates}")
     print(f"  top_n: {top_n}")
     
-    client = _create_clickhouse_client()
+    client = get_site_client(site, "plusinsight")
+    if not client:
+        return f"❌ {site} 매장 연결 실패"
     if not client:
         return {"error": "ClickHouse 연결 실패"}
     
@@ -761,10 +765,11 @@ def get_shelf_analysis_flexible(
 
 @mcp.tool()
 def pickup_gaze_summary(
+    site: str,
     start_date: str = "2025-06-12",
     end_date: str = "2025-07-12",
     exclude_dates: List[str] = ["2025-06-22"],
-) -> list:
+) -> str:
     """첫 픽업 전 후 응시 매대 개수 평균을 연령 성별별로 요약
 
     반환 컬럼:
@@ -774,7 +779,9 @@ def pickup_gaze_summary(
     print(f"  start_date: {start_date} ~ {end_date}")
     print(f"  exclude_dates: {exclude_dates}")
 
-    client = _create_clickhouse_client()
+    client = get_site_client(site, "plusinsight")
+    if not client:
+        return f"❌ {site} 매장 연결 실패"
     if not client:
         return {"error": "ClickHouse 연결 실패"}
 
@@ -1211,6 +1218,7 @@ group by age_group, gender_label
         print(f"❌ 쿼리 실행 실패: {e}")
         return {"error": str(e)}
 
+# get_available_sites 기능은 mcp_agent_helper.py로 분리됨
 
 if __name__ == "__main__":
     mcp.run()

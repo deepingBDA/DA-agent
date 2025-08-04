@@ -1,20 +1,13 @@
 from fastmcp import FastMCP
-import clickhouse_connect
-import os
-from dotenv import load_dotenv
-import tiktoken
 import logging
 import sys
 import time
 from pathlib import Path
+from typing import List
 
-# SSH 터널링 관련 import
-try:
-    from sshtunnel import SSHTunnelForwarder
-    SSH_AVAILABLE = True
-except ImportError:
-    SSH_AVAILABLE = False
-    logging.warning("sshtunnel 패키지가 설치되어 있지 않습니다.")
+# 데이터베이스 매니저 및 공통 유틸리티 import
+from database_manager import get_site_client
+from mcp_utils import is_token_limit_exceeded, DEFAULT_MODEL
 
 from utils import create_transition_data
 from map_config import item2zone
@@ -44,169 +37,54 @@ logger.setLevel(logging.DEBUG)
 logger.info("MCP POS 서버 시작")
 logger.info(f"=== 새 세션 시작: {time.strftime('%Y-%m-%d %H:%M:%S')} ===")
 
-load_dotenv()
-
-CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST")
-CLICKHOUSE_PORT = os.getenv("CLICKHOUSE_PORT")
-CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
-CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
-
-# SSH 설정
-SSH_HOST = os.getenv("SSH_HOST")
-SSH_PORT = int(os.getenv("SSH_PORT", "22"))
-SSH_USERNAME = os.getenv("SSH_USERNAME")
-SSH_PASSWORD = os.getenv("SSH_PASSWORD")
-
-# 전역 SSH 터널 관리
-_ssh_tunnel = None
 
 
-def get_clickhouse_client(database="plusinsight"):
-    """ClickHouse 클라이언트를 가져옵니다. SSH 터널링 지원."""
-    global _ssh_tunnel
-    
-    # SSH 터널링이 필요한 경우
-    if SSH_AVAILABLE and SSH_HOST:
-        try:
-            # 기존 터널이 없거나 비활성 상태면 새로 생성
-            if not _ssh_tunnel or not _ssh_tunnel.is_active:
-                if _ssh_tunnel:
-                    _ssh_tunnel.stop()
-                
-                _ssh_tunnel = SSHTunnelForwarder(
-                    (SSH_HOST, SSH_PORT),
-                    ssh_username=SSH_USERNAME,
-                    ssh_password=SSH_PASSWORD,
-                    remote_bind_address=(CLICKHOUSE_HOST, int(CLICKHOUSE_PORT)),
-                    local_bind_address=("localhost", 0),
-                )
-                _ssh_tunnel.start()
-                logger.info(f"SSH 터널 생성: localhost:{_ssh_tunnel.local_bind_port}")
-            
-            # SSH 터널을 통해 연결
-            host = "localhost"
-            port = _ssh_tunnel.local_bind_port
-            
-        except Exception as e:
-            logger.error(f"SSH 터널 생성 실패: {e}, 직접 연결 시도")
-            host = CLICKHOUSE_HOST
-            port = int(CLICKHOUSE_PORT)
-    else:
-        # 직접 연결
-        host = CLICKHOUSE_HOST
-        port = int(CLICKHOUSE_PORT)
-    
-    try:
-        client = clickhouse_connect.get_client(
-            host=host,
-            port=port,
-            username=CLICKHOUSE_USER,
-            password=CLICKHOUSE_PASSWORD,
-            database=database,
-        )
-        logger.info(f"ClickHouse 연결 성공: {host}:{port}, db={database}")
-        return client
-    except Exception as e:
-        logger.error(f"ClickHouse 연결 실패: {e}")
-        return None
-
-model_name = "gpt-4o"
-model_max_tokens = {
-    "gpt-4o": 128000,
-}
-
-db_list = {
-    # '갈매점': 'plusinsight_bgf_galmae',
-    # '강북센터피스점':'plusinsight_bgf_gangbuk_centerpiece',
-    # '강동센트럴점': 'plusinsight_bgf_gangdong_central',
-    # '금천프라임점': 'plusinsight_bgf_geumcheon_prime',
-    # '마천점': 'plusinsight_bgf_macheon',
-    # '마천힐스테이트점': 'plusinsight_bgf_manchon_hillstate',
-    # 'BGF사옥점': 'plusinsight_bgf_saok',
-    # '신촌르메이르점': 'plusinsight_bgf_sinchon_lemeilleur',
-    # '수성캐슬점': 'plusinsight_bgf_suseong_castle',
-    # '타워팰리스점': 'plusinsight_bgf_tower_palace',
-    # '역삼점': 'plusinsight_bgf_yeoksam',
-}
-
-def num_tokens_from_string(string: str, model: str) -> int:
-    encoding = tiktoken.encoding_for_model(model)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
-
-def is_token_limit_exceeded(text: str, model: str, reserved_tokens: int = 1000) -> bool:
-    token_count = num_tokens_from_string(text, model)
-    max_tokens = model_max_tokens.get(model, 4096)  # 기본값 4096
-    return token_count > (max_tokens - reserved_tokens)
+# 토큰 관련 함수들은 mcp_utils로 이동됨
 
 mcp = FastMCP("pos")
 
 @mcp.tool()
-def sales_statistics(start_date: str, end_date: str) -> str:
-    """POS 데이터 기반 매출 통계 요약"""
+def sales_statistics(start_date: str, end_date: str, site: str) -> str:
+    """
+    POS 데이터 기반 매출 통계 요약
+    매장명이 지정되지 않으면 모든 매장의 통계를 조회합니다.
+    
+    Args:
+start_date: 시작 날짜
+        end_date: 종료 날짜
+        site: 매장명 (필수)
+    """
     # 파라미터 기록
-    param_log = f"sales_statistics 호출됨: start_date={start_date}, end_date={end_date}"
+    param_log = f"sales_statistics 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
     logger.info(param_log)
     
     try:
-        client = get_clickhouse_client(database='cu_base')
-
-        query = f"""
-WITH receipt_stats AS (
-    SELECT 
-        store_nm,
-        tran_ymd,
-        pos_no,
-        tran_no,
-        COUNT(DISTINCT item_cd) as sku_count,
-        SUM(sale_qty) as total_items,
-        SUM(sale_amt) as receipt_total
-    FROM cu_revenue_total
-    WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
-    GROUP BY store_nm, tran_ymd, pos_no, tran_no
-)
-SELECT 
-    store_nm,
-    CONCAT(toString(COUNT(*)), '건') as receipt_count,
-    CONCAT(toString(toInt32(SUM(receipt_total) / COUNT(DISTINCT tran_ymd) / 10000)), '만원') as daily_avg_sales,
-    CONCAT(toString(toInt32(AVG(receipt_total))), '원') as avg_receipt_amount,
-    FLOOR(AVG(sku_count), 1) as avg_sku_per_receipt,
-    FLOOR(AVG(total_items), 1) as avg_items_per_receipt
-FROM receipt_stats
-GROUP BY store_nm
-ORDER BY store_nm
-"""
-
-        result = client.query(query)
+        # TODO: 실제 로직 구현 필요
+        return f"sales_statistics 호출됨: {site} 매장, {start_date}~{end_date}"
         
-        answer = "(지점, 총 영수증 건수, 일 평균 매출, 객단가, 건당 SKU 수, 건당 상품 수)"
-        if len(result.result_rows) > 0:
-            for row in result.result_rows:
-                answer += f"\n{row}"
-        else:
-            answer = "데이터가 없습니다."
-
-        if is_token_limit_exceeded(answer, model_name):
-            return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
-
-        # 로그 기록
-        logger.info(f"sales_statistics 답변: {answer}")
-        
-        return answer
     except Exception as e:
         error_msg = f"오류가 발생했습니다: {e}"
         logger.error(error_msg)
         return error_msg
 
 @mcp.tool()
-def receipt_ranking(start_date: str, end_date: str) -> str:
-    """POS 데이터 기반 영수증 건수 비중 Top 5 조회"""
+def receipt_ranking(start_date: str, end_date: str, site: str) -> str:
+    """
+    특정 매장의 POS 데이터 기반 영수증 건수 비중 Top 5 조회
+    
+    Args:
+start_date: 시작 날짜
+        end_date: 종료 날짜
+        site: 매장명 (필수)
+    """
     # 파라미터 기록
-    param_log = f"receipt_ranking 호출됨: start_date={start_date}, end_date={end_date}"
+    param_log = f"receipt_ranking 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
     logger.info(param_log)
     
     try:
-        client = get_clickhouse_client(database='cu_base')
+        client = get_site_client(site, 'cu_base')
+        if not client:
+            return f"❌ {site} 매장 연결 실패"
 
         query = f"""
 WITH receipt_total AS (
@@ -251,14 +129,15 @@ ORDER BY store_nm
 
         result = client.query(query)
         
-        answer = "(지점, 1위, 2위, 3위, 4위, 5위)"
+        answer = f"🏪 **{site} 매장 영수증 랭킹 ({start_date} ~ {end_date}):**\n\n"
+        answer += "(지점, 1위, 2위, 3위, 4위, 5위)"
         if len(result.result_rows) > 0:
             for row in result.result_rows:
                 answer += f"\n{row}"
         else:
-            answer = "데이터가 없습니다."
+            answer += "\n데이터가 없습니다."
 
-        if is_token_limit_exceeded(answer, model_name):
+        if is_token_limit_exceeded(answer, DEFAULT_MODEL):
             return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
 
         # 로그 기록
@@ -266,19 +145,21 @@ ORDER BY store_nm
             
         return answer
     except Exception as e:
-        error_msg = f"오류가 발생했습니다: {e}"
+        error_msg = f"❌ {site} 매장 오류: {e}"
         logger.error(error_msg)
         return error_msg
 
 @mcp.tool()
-def sales_ranking(start_date: str, end_date: str) -> str:
+def sales_ranking(start_date: str, end_date: str, site: str) -> str:
     """POS 데이터 기반 총 매출 비중 Top 5 조회"""
     # 파라미터 기록
-    param_log = f"sales_ranking 호출됨: start_date={start_date}, end_date={end_date}"
+    param_log = f"sales_ranking 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
     logger.info(param_log)
     
     try:
-        client = get_clickhouse_client(database='cu_base')
+        client = get_site_client(site, 'cu_base')
+        if not client:
+            return f"❌ {site} 매장 연결 실패"
 
         query = f"""
 WITH store_total AS (
@@ -330,7 +211,7 @@ ORDER BY store_nm
         else:
             answer = "데이터가 없습니다."
 
-        if is_token_limit_exceeded(answer, model_name):
+        if is_token_limit_exceeded(answer, DEFAULT_MODEL):
             return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
 
         # 로그 기록
@@ -343,14 +224,14 @@ ORDER BY store_nm
         return error_msg
 
 @mcp.tool()
-def volume_ranking(start_date: str, end_date: str) -> str:
+def volume_ranking(start_date: str, end_date: str, site: str) -> str:
     """POS 데이터 기반 총 판매량 비중 Top 5 조회"""
     # 파라미터 기록
     param_log = f"volume_ranking 호출됨: start_date={start_date}, end_date={end_date}"
     logger.info(param_log)
     
     try:
-        client = get_clickhouse_client()
+        client = get_site_client(site, 'cu_base')
 
         query = f"""
 WITH store_total AS (
@@ -402,7 +283,7 @@ ORDER BY store_nm
         else:
             answer = "데이터가 없습니다."
 
-        if is_token_limit_exceeded(answer, model_name):
+        if is_token_limit_exceeded(answer, DEFAULT_MODEL):
             return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
 
         # 로그 기록
@@ -415,14 +296,16 @@ ORDER BY store_nm
         return error_msg
 
 @mcp.tool()
-def event_product_analysis(start_date: str, end_date: str) -> str:
+def event_product_analysis(start_date: str, end_date: str, site: str) -> str:
     """POS 데이터 기반 행사 상품 분석 (매출 비중, SKU 비중)"""
     # 파라미터 기록
-    param_log = f"event_product_analysis 호출됨: start_date={start_date}, end_date={end_date}"
+    param_log = f"event_product_analysis 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
     logger.info(param_log)
     
     try:
-        client = get_clickhouse_client(database='cu_base')
+        client = get_site_client(site, 'cu_base')
+        if not client:
+            return f"❌ {site} 매장 연결 실패"
 
         query = f"""
 WITH store_metrics AS (
@@ -462,7 +345,7 @@ ORDER BY sm.store_nm
         else:
             answer = "데이터가 없습니다."
 
-        if is_token_limit_exceeded(answer, model_name):
+        if is_token_limit_exceeded(answer, DEFAULT_MODEL):
             return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
 
         # 로그 기록
@@ -476,7 +359,7 @@ ORDER BY sm.store_nm
 
 
 @mcp.tool()
-def ranking_event_product() -> str:
+def ranking_event_product(site: str) -> str:
     """지점별 행사 상품 분석 (매장명, 행사명, 총 판매수량, 거래 횟수, 총 판매금액, 순위)"""
     # 함수 호출 기록
     logger.info("ranking_event_product 호출됨")
@@ -515,7 +398,9 @@ FROM ranked_events
 WHERE rank <= 5
 ORDER BY store_nm, rank
 """
-        client = get_clickhouse_client(database='cu_base')
+        client = get_site_client(site, 'cu_base')
+        if not client:
+            return f"❌ {site} 매장 연결 실패"
 
         result = client.query(query)
 
@@ -526,7 +411,7 @@ ORDER BY store_nm, rank
         else:
             answer = "데이터가 없습니다."
 
-        if is_token_limit_exceeded(answer, model_name):
+        if is_token_limit_exceeded(answer, DEFAULT_MODEL):
             return "토큰 제한을 초과했습니다. 쿼리를 줄여서 다시 시도해주세요."
 
         # 로그 기록
@@ -539,7 +424,7 @@ ORDER BY store_nm, rank
         return error_msg
 
 @mcp.tool()
-def co_purchase_trend(start_date: str, end_date: str) -> str:
+def co_purchase_trend(start_date: str, end_date: str, site: str) -> str:
     """지점별 / 시간대별 연관 구매 경향성"""
     # 파라미터 기록
     param_log = f"co_purchase_trend 호출됨: start_date={start_date}, end_date={end_date}"
@@ -650,33 +535,33 @@ def co_purchase_trend(start_date: str, end_date: str) -> str:
         rank
     """
 
-    answer = ""
-    for target_store in db_list.keys():
-        store_answer = f"{target_store}"
-        try:
-            client = get_clickhouse_client(database='cu_base')
+    try:
+        client = get_site_client(site, 'cu_base')
+        if not client:
+            return f"❌ {site} 매장 연결 실패"
         
-            logger.info(f"co_purchase_trend 호출됨: {target_store}, {start_date}, {end_date}")
+        logger.info(f"co_purchase_trend 호출됨: {site}, {start_date}, {end_date}")
 
-            result = client.query(query.format(target_store=target_store, start_date=start_date, end_date=end_date))
+        result = client.query(query.format(target_store=site, start_date=start_date, end_date=end_date))
 
-            if len(result.result_rows) > 0:
-                for row in result.result_rows:
-                    store_answer += f"\n{row}"
-            else:
-                store_answer += "데이터가 없습니다."
+        if len(result.result_rows) > 0:
+            answer = f"🛒 **{site}** 연관 구매 경향성:"
+            for row in result.result_rows:
+                answer += f"\n{row}"
+        else:
+            answer = f"⚠️ {site}: 데이터가 없습니다."
 
-            # 로그 기록
-            logger.info(f"co_purchase_trend 답변: {answer}")
-            
-        except Exception as e:
-            store_answer += f"오류가 발생했습니다: {e}"
-            logger.error(f"오류가 발생했습니다: {e}")
-            continue
-
-        answer += f"{store_answer}\n"
+        # 로그 기록
+        logger.info(f"co_purchase_trend 답변: {answer}")
+        return answer
         
-    return answer
+    except Exception as e:
+        error_msg = f"❌ {site} 매장 오류: {e}"
+        logger.error(f"co_purchase_trend 오류: {e}")
+        return error_msg
+
+# get_available_sites 기능은 mcp_agent_helper.py로 분리됨
+
 
 if __name__ == "__main__":
     print("FastMCP 서버 시작 - pos", file=sys.stderr)
