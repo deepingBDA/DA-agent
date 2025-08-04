@@ -9,6 +9,7 @@ onetime/
 tmp*
 branch_clean.sh
 .vscode
+mcp_tools/tests
 
 chat/frontend/node_modules
 

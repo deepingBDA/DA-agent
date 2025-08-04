@@ -13,13 +13,6 @@
     ],
     "transport": "stdio"
   },
-  "report": {
-    "command": "python3",
-    "args": [
-      "/app/mcp_tools/mcp_report.py"
-    ],
-    "transport": "stdio"
-  },
   "pos": {
     "command": "python3",
     "args": [
