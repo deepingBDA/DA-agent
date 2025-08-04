@@ -12,18 +12,49 @@ import logging
 import clickhouse_connect
 from typing import Optional, List, Dict, Any
 from dotenv import load_dotenv
+from pathlib import Path
+from datetime import datetime
 
 load_dotenv()
 
-# 로깅 설정
+# 로그 디렉토리 생성 (컨테이너 환경 대응)
+log_dir = Path("/app/logs")
+log_dir.mkdir(parents=True, exist_ok=True)
+
+# 로그 파일 경로
+connection_log_file = log_dir / "database_connections.log"
+
+# 로깅 설정 (파일과 콘솔 모두)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.StreamHandler(sys.stdout)
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(connection_log_file, encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
+
+def log_connection_attempt(action: str, site: str = None, details: Dict[str, Any] = None):
+    """데이터베이스 연결 시도를 로그 파일에 기록"""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"[{timestamp}] {action}"
+    
+    if site:
+        log_entry += f" - 매장: {site}"
+    
+    if details:
+        for key, value in details.items():
+            if 'password' in key.lower():
+                value = '***' if value else 'None'
+            log_entry += f" | {key}: {value}"
+    
+    logger.info(log_entry)
+    
+    # 추가로 별도 연결 로그 파일에도 기록
+    with open(connection_log_file, 'a', encoding='utf-8') as f:
+        f.write(log_entry + '\n')
+        f.flush()
 
 def debug_print(message: str):
     """디버깅 메시지를 즉시 출력"""
@@ -34,9 +65,18 @@ def debug_print(message: str):
 def _create_config_client() -> Optional[Any]:
     """설정 데이터베이스 클라이언트 생성 (SSH 터널링 지원)"""
     debug_print(f"🔧 [DEBUG] 설정 DB 연결 시도:")
+    
+    # 연결 시도 로그
+    log_connection_attempt("CONFIG_DB_CONNECTION_START", details={
+        "ssh_host": os.getenv("SSH_HOST"),
+        "config_db_host": os.getenv("CONFIG_DB_HOST", "localhost"),
+        "config_db_port": os.getenv("CONFIG_DB_PORT", "8123"),
+        "username": os.getenv("CLICKHOUSE_USER")
+    })
+    
     try:
         # SSH 터널링이 필요한 경우
-        ssh_host = os.getenv("SSH_HOST")
+        ssh_host = os.getenv("SSH_HOST") 
         if ssh_host:
             try:
                 from sshtunnel import SSHTunnelForwarder
@@ -51,11 +91,19 @@ def _create_config_client() -> Optional[Any]:
                 ssh_tunnel.start()
                 print(f"설정 DB SSH 터널 생성: localhost:{ssh_tunnel.local_bind_port}")
                 
+                # SSH 터널 성공 로그
+                log_connection_attempt("CONFIG_DB_SSH_TUNNEL_SUCCESS", details={
+                    "local_port": ssh_tunnel.local_bind_port,
+                    "remote_host": os.getenv("CONFIG_DB_HOST", "localhost"),
+                    "remote_port": os.getenv("CONFIG_DB_PORT", "8123")
+                })
+                
                 host = "localhost"
                 port = ssh_tunnel.local_bind_port
                 
             except Exception as e:
                 print(f"설정 DB SSH 터널 생성 실패: {e}, 직접 연결 시도")
+                log_connection_attempt("CONFIG_DB_SSH_TUNNEL_FAILED", details={"error": str(e)})
                 host = os.getenv("CONFIG_DB_HOST", "localhost")
                 port = int(os.getenv("CONFIG_DB_PORT", "8123"))
         else:
@@ -78,10 +126,25 @@ def _create_config_client() -> Optional[Any]:
             database="cu_base"
         )
         print(f"✅ [SUCCESS] 설정 DB 연결 성공: {host}:{port}")
+        
+        # 연결 성공 로그
+        log_connection_attempt("CONFIG_DB_CONNECTION_SUCCESS", details={
+            "final_host": host,
+            "final_port": port,
+            "database": "cu_base"
+        })
+        
         return client
     except Exception as e:
         print(f"❌ [ERROR] 설정 데이터베이스 연결 실패: {e}")
         print(f"🔍 [DEBUG] 설정 DB 연결 실패 상세: {type(e).__name__}: {str(e)}")
+        
+        # 연결 실패 로그
+        log_connection_attempt("CONFIG_DB_CONNECTION_FAILED", details={
+            "error_type": type(e).__name__,
+            "error_message": str(e)
+        })
+        
         return None
 
 def get_site_connection_info(site: str) -> Optional[Dict[str, Any]]:
@@ -119,9 +182,15 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
     """특정 매장의 ClickHouse 클라이언트 생성"""
     debug_print(f"🔍 [DEBUG] 매장 '{site}' 연결 시도 시작")
     
+    # 매장 연결 시도 로그
+    log_connection_attempt("SITE_CONNECTION_START", site=site, details={
+        "requested_database": database
+    })
+    
     conn_info = get_site_connection_info(site)
     if not conn_info:
         print(f"❌ [ERROR] 매장 '{site}'의 연결 정보를 찾을 수 없습니다.")
+        log_connection_attempt("SITE_CONNECTION_INFO_NOT_FOUND", site=site)
         return None
     
     print(f"📋 [DEBUG] 매장 '{site}' 연결 정보:")
@@ -130,6 +199,15 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
     print(f"  - DB Host: {conn_info.get('db_host', 'None')}")
     print(f"  - DB Port: {conn_info.get('db_port', 'None')}")
     print(f"  - DB Name: {conn_info.get('db_name', 'None')}")
+    
+    # 연결 정보 로그
+    log_connection_attempt("SITE_CONNECTION_INFO_FOUND", site=site, details={
+        "ssh_host": conn_info.get('ssh_host'),
+        "ssh_port": conn_info.get('ssh_port'),
+        "db_host": conn_info.get('db_host'),
+        "db_port": conn_info.get('db_port'),
+        "db_name": conn_info.get('db_name')
+    })
     
     # SSH 터널링 처리
     if conn_info["ssh_host"]:
@@ -151,12 +229,20 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
             ssh_tunnel.start()
             print(f"✅ [SUCCESS] SSH 터널 생성: {site} -> localhost:{ssh_tunnel.local_bind_port}")
             
+            # SSH 터널 성공 로그
+            log_connection_attempt("SITE_SSH_TUNNEL_SUCCESS", site=site, details={
+                "local_port": ssh_tunnel.local_bind_port,
+                "remote_host": conn_info["db_host"],
+                "remote_port": conn_info["db_port"]
+            })
+            
             host = "localhost"
             port = ssh_tunnel.local_bind_port
             
         except Exception as e:
             print(f"❌ [ERROR] SSH 터널 생성 실패: {e}")
             print(f"🔄 [INFO] 직접 연결로 전환")
+            log_connection_attempt("SITE_SSH_TUNNEL_FAILED", site=site, details={"error": str(e)})
             host = conn_info["db_host"]
             port = conn_info["db_port"]
     else:
@@ -180,10 +266,27 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
             database='plusinsight'
         )
         print(f"✅ [SUCCESS] 매장 '{site}' 연결 성공: {host}:{port}")
+        
+        # 연결 성공 로그
+        log_connection_attempt("SITE_CONNECTION_SUCCESS", site=site, details={
+            "final_host": host,
+            "final_port": port,
+            "database": "plusinsight"
+        })
+        
         return client
     except Exception as e:
         print(f"❌ [ERROR] 매장 '{site}' 연결 실패: {e}")
         print(f"🔍 [DEBUG] 연결 실패 상세 정보: {type(e).__name__}: {str(e)}")
+        
+        # 연결 실패 로그
+        log_connection_attempt("SITE_CONNECTION_FAILED", site=site, details={
+            "error_type": type(e).__name__,
+            "error_message": str(e),
+            "attempted_host": host,
+            "attempted_port": port
+        })
+        
         return None
 
 def get_all_sites() -> List[str]:
