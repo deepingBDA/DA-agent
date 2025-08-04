@@ -9,7 +9,7 @@ from pathlib import Path
 
 from utils import create_transition_data
 from map_config import item2zone
-from database_manager import get_site_client
+from database_manager import get_site_client, get_site_connection_info
 from mcp_utils import is_token_limit_exceeded, DEFAULT_MODEL
 from typing import Optional
 
@@ -56,19 +56,16 @@ mcp = FastMCP("diagnose")
 
 @mcp.tool()
 def get_db_name(site: str) -> str:
-    """사용 가능한 매장 목록 조회 (diagnose 툴용)"""
+    """특정 매장의 데이터베이스명 조회"""
     try:
-        sites = get_all_sites()
-        if not sites:
-            return "사용 가능한 매장이 없습니다."
+        connection_info = get_site_connection_info(site)
+        if not connection_info:
+            return f"❌ {site} 매장 정보를 찾을 수 없습니다."
         
-        answer = "📋 **진단 가능한 매장 목록:**\n"
-        for i, site in enumerate(sites, 1):
-            answer += f"{i}. {site}\n"
-        answer += f"\n총 {len(sites)}개 매장에서 진단 가능합니다."
-        return answer
+        db_name = connection_info.get('db_name', 'plusinsight')
+        return f"📋 **{site} 매장 정보:**\n데이터베이스명: {db_name}"
     except Exception as e:
-        return f"매장 목록 조회 실패: {e}"
+        return f"❌ {site} 매장 DB명 조회 실패: {e}"
 
 @mcp.tool()
 def diagnose_avg_in(start_date: str, end_date: str, site: str) -> str:
