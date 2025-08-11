@@ -34,6 +34,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, END, START
 
 from base_workflow import BaseWorkflow, BaseState
+from database_manager import get_site_client
 
 
 class VisitorDiagnoseState(BaseState):
@@ -178,12 +179,6 @@ class VisitorDiagnoseWorkflow(BaseWorkflow[VisitorDiagnoseState]):
     def _query_db_node(self, state: VisitorDiagnoseState) -> VisitorDiagnoseState:
         """diagnose_avg_in 로직을 직접 구현하여 DB에서 데이터 조회"""
         start, end = state["period"].split("~")
-        
-        # ClickHouse 클라이언트 생성
-        client = self._create_clickhouse_client()
-        if not client:
-            state["raw_answer"] = "데이터베이스 연결 실패"
-            return state
             
         # mcp_diagnose.py의 diagnose_avg_in 쿼리를 그대로 사용
         query = f"""
@@ -298,10 +293,21 @@ ORDER BY ord
                 continue
                 
             # 실제 매장인 경우 DB 조회
-            database = 'plusinsight'  # 기본 데이터베이스
+            database = "plusinsight"  # 기본 데이터베이스
+            store_client = None
             try:
-                # 특정 데이터베이스로 클라이언트 재생성
-                store_client = self._create_clickhouse_client(database=database)
+                # 매장별 연결 정보 기반 클라이언트 시도
+                store_client = get_site_client(store, database=database)
+                if not store_client:
+                    # 폴백: 환경변수 기반 기본 연결
+                    self.logger.warning(
+                        f"{store}: get_site_client 실패, 기본 환경 연결로 폴백 시도"
+                    )
+                    store_client = self._create_clickhouse_client(database=database)
+                if not store_client:
+                    answer += f"\n{store} 데이터베이스 연결 실패"
+                    continue
+
                 result = store_client.query(query)
 
                 if len(result.result_rows) > 0:
@@ -376,6 +382,12 @@ ORDER BY ord
             except Exception as e:
                 self.logger.error(f"{store} 데이터 조회 오류: {e}")
                 answer += f"\n{store} 데이터 조회 오류: {e}"
+            finally:
+                try:
+                    if store_client:
+                        store_client.close()
+                except Exception:
+                    pass
 
         state["raw_answer"] = answer
         return state
