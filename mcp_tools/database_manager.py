@@ -281,10 +281,10 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
             from sshtunnel import SSHTunnelForwarder
             
             ssh_tunnel = SSHTunnelForwarder(
-                (conn_info["ssh_host"], conn_info["ssh_port"]),
+                (conn_info["ssh_host"], int(conn_info["ssh_port"])),
                 ssh_username=os.getenv("SSH_USERNAME"),
                 ssh_password=os.getenv("SSH_PASSWORD"),
-                remote_bind_address=(conn_info["db_host"], conn_info["db_port"]),
+                remote_bind_address=(conn_info["db_host"], int(conn_info["db_port"])),
                 local_bind_address=("localhost", 0),
                 # 호환성을 위한 추가 옵션
                 ssh_config_file=None,

@@ -125,13 +125,13 @@ df AS (
       AND l.entrance  = 1
 ),
 daily_all     AS (SELECT visit_date, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date),
-avg_all       AS (SELECT toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_all),
+avg_all       AS (SELECT toUInt64(round(CASE WHEN isFinite(avg(ucnt)) THEN avg(ucnt) ELSE 0 END)) AS avg_cnt FROM daily_all),
 daily_dayType AS (SELECT visit_date, day_type, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, day_type),
-avg_dayType   AS (SELECT day_type, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_dayType GROUP BY day_type),
+avg_dayType   AS (SELECT day_type, toUInt64(round(CASE WHEN isFinite(avg(ucnt)) THEN avg(ucnt) ELSE 0 END)) AS avg_cnt FROM daily_dayType GROUP BY day_type),
 daily_gender  AS (SELECT visit_date, gender, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, gender),
-avg_gender    AS (SELECT gender, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_gender GROUP BY gender),
+avg_gender    AS (SELECT gender, toUInt64(round(CASE WHEN isFinite(avg(ucnt)) THEN avg(ucnt) ELSE 0 END)) AS avg_cnt FROM daily_gender GROUP BY gender),
 daily_age     AS (SELECT visit_date, age_group, uniqExact(visitor_id) AS ucnt FROM df GROUP BY visit_date, age_group),
-avg_age       AS (SELECT age_group, toUInt64(round(avg(ucnt))) AS avg_cnt FROM daily_age GROUP BY age_group),
+avg_age       AS (SELECT age_group, toUInt64(round(CASE WHEN isFinite(avg(ucnt)) THEN avg(ucnt) ELSE 0 END)) AS avg_cnt FROM daily_age GROUP BY age_group),
 rank_age      AS (SELECT *, row_number() OVER (ORDER BY avg_cnt DESC) AS rk FROM avg_age),
 overall_cnt   AS (SELECT avg_cnt AS cnt FROM avg_all),
 range_cnt AS (
