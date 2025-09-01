@@ -738,7 +738,20 @@ def get_shelf_analysis_flexible(
         
         result = client.query(analysis_query)
         print(f"✅ 진열대 분석 완료: {len(result.result_rows):,}행")
-        return result.result_rows
+        client.close()
+        
+        if result.result_rows:
+            # 데이터를 포맷팅하여 문자열로 반환
+            answer = f"📊 **{site}** 진열대 분석 결과:\n"
+            for row in result.result_rows:
+                period = row[0]  # 'BEFORE' or 'AFTER'
+                rank = row[1]
+                shelf_name = row[2]
+                percentage = row[3]
+                answer += f"  {period} - {rank}위: {shelf_name} ({percentage})\n"
+            return answer
+        else:
+            return f"⚠️ {site}: 분석할 데이터가 없습니다."
     except Exception as e:
         print(f"❌ 쿼리 실행 실패: {e}")
         print(f"🔍 [DEBUG] 쿼리 길이: {len(analysis_query)} 문자")
@@ -1213,10 +1226,23 @@ group by age_group, gender_label
     try:
         result = client.query(query_filled)
         print(f"✅ 요약 분석 완료: {len(result.result_rows):,}행")
-        return result.result_rows
+        client.close()
+        
+        if result.result_rows:
+            # 데이터를 포맷팅하여 문자열로 반환
+            answer = f"📊 **{site}** 탐색 경향성:\n"
+            for row in result.result_rows:
+                age_group = row[0]
+                gender_label = row[1]
+                avg_gaze_before = round(row[2], 2)
+                avg_gaze_after = round(row[3], 2)
+                answer += f"  - {age_group} {gender_label}: 픽업 전 {avg_gaze_before}개, 픽업 후 {avg_gaze_after}개 진열대 응시\n"
+            return answer
+        else:
+            return f"⚠️ {site}: 분석할 데이터가 없습니다."
     except Exception as e:
         print(f"❌ 쿼리 실행 실패: {e}")
-        return {"error": str(e)}
+        return f"❌ {site} 픽업-응시 분석 오류: {e}"
 
 # get_available_sites 기능은 mcp_agent_helper.py로 분리됨
 
