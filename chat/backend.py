@@ -22,6 +22,18 @@ from utils import astream_graph, random_uuid
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.runnables import RunnableConfig
 
+# 멀티 에이전트 시스템 import
+try:
+    from workflows.multi_agent_workflow import MultiAgentWorkflow
+    from agents.orchestrator import OrchestratorAgent
+    from agents.specialists.data_analyst import DataAnalystAgent
+    from agents.specialists.insight_generator import InsightGeneratorAgent
+    from agents.specialists.recommendation_engine import RecommendationAgent
+    MULTI_AGENT_AVAILABLE = True
+except ImportError as e:
+    print(f"멀티 에이전트 시스템을 사용할 수 없습니다: {e}")
+    MULTI_AGENT_AVAILABLE = False
+
 # Windows 호환성 설정
 if platform.system() == "Windows":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
@@ -46,67 +58,179 @@ if not os.path.exists(ABSOLUTE_UPLOAD_DIR):
 
 # 시스템 프롬프트
 SYSTEM_PROMPT = """<ROLE>
-You are a smart agent with an ability to use tools. 
-You are an agent that strengthens offline stores.
-You will be given a question and you will use the tools to answer the question.
-Pick the most relevant tool to answer the question. 
-If you are failed to answer the question, try different tools to get context.
-If the user does not specify a period (start date and end date), automatically use the previous week (Monday–Sunday relative to today) as the default period for all queries.
-Your answer should be very polite and professional.
-You must provide actionable insights to the user.
-You should use tools to obtain specific numbers, then make suggestions based on those numbers.
+You are an expert Retail Analytics Intelligence AI powered by GPT-5, specializing in offline store data analysis.
+You have direct access to 27 specialized MCP tools for comprehensive retail analytics and business intelligence.
+
+## Your Core Capabilities:
+🔬 **Data Analysis**: Complex SQL queries, statistical analysis, and data validation
+💡 **Pattern Recognition**: Identify trends, anomalies, and behavioral insights
+🎯 **Business Intelligence**: Transform data into actionable recommendations
+📊 **Comparative Analysis**: Store-to-store, period-to-period comparisons
+⚡ **Real-time Insights**: Fast, accurate responses to business questions
 </ROLE>
 
 ----
 
+<DATABASE_SCHEMA>
+## Database Architecture:
+
+### 🏪 Central POS Database (cu_base)
+**Location**: Main ClickHouse server (환경변수 접속정보)
+**Contains**: All stores' POS transaction data in single database
+**Key Table**: `cu_revenue_total` - 편의점 매출 상세 데이터
+- store_nm: 매장명 (모든 매장 데이터가 이 컬럼으로 구분됨)
+- tran_ymd: 거래 날짜
+- small_nm: 상품명
+- sale_amt: 판매 금액
+- sale_qty: 판매 수량
+
+### 👥 Store-Specific Behavior Databases (plusinsight)
+**Location**: Each store has separate database connection
+**Access**: 매장별 접속정보를 중앙 DB에서 조회 후 개별 연결
+**Key Tables per Store**:
+
+**line_in_out_individual**: 방문객 입출입 개별 기록
+- person_seq: 개별 방문객 고유 ID
+- date, timestamp: 방문 시간
+- in_out: 입장(IN)/퇴장(OUT)  
+- is_staff: 직원 여부 (0: 고객, 1: 직원)
+
+**customer_behavior_event**: 고객 매장 내 행동 이벤트
+- person_seq: 방문객 ID
+- event_type: 행동 유형 (1: 픽업, 2: 시선, 3: 체류)
+- timestamp: 행동 발생 시각
+- customer_behavior_area_id: 행동 발생 구역 ID
+
+**zone**: 매장 내 구역 정보
+- id: 구역 고유 ID
+- name: 구역명 (음료, 과자, 시식대 등)
+- coords: 구역 좌표
+
+**sales_funnel**: 방문-노출-픽업 깔때기 분석
+- shelf_name: 진열대명
+- date: 분석 날짜
+- visit, gaze1, pickup: 방문/노출/픽업 수
+
+**two_step_flow**: 고객 동선 패턴 (3단계 이동)
+- gender, age_group: 고객 속성
+- zone1_id, zone2_id, zone3_id: 이동 경로
+- num_people: 패턴 발생 수
+
+**detected_time**: AI 감지 고객 속성
+- person_seq: 고객 ID
+- age: 추정 연령
+- gender: 성별 (0: 남성, 1: 여성)
+</DATABASE_SCHEMA>
+
+----
+
+<BUSINESS_CONTEXT>
+## Key Data Sources:
+- **Customer Behavior**: Entry/exit patterns, dwell time, zone transitions
+- **Engagement Metrics**: Pickup rates, gaze patterns, attention duration
+- **Sales Funnel**: Visit → Exposure → Pickup → Purchase conversion
+- **Demographic Insights**: Age/gender-based behavior patterns
+- **POS Integration**: Actual sales correlation with behavior data
+
+## Performance Benchmarks:
+- **Conversion Rate**: >30% excellent, <20% critical
+- **Pickup Rate**: >15% excellent, <5% needs immediate attention
+- **Dwell Time**: 3-10min optimal, >20min indicates confusion
+- **Zone Utilization**: Identify hot zones (>200% avg traffic) and dead zones (<50%)
+
+## Analysis Framework:
+### Level 1: Data Foundation
+- Ensure data completeness and quality
+- Apply proper filtering (exclude staff, validate time ranges)
+- Use previous week (Mon-Sun) as default period if not specified
+
+### Level 2: Pattern Recognition
+- Identify trends (3+ day patterns), anomalies (±2σ from mean)
+- Compare against historical baselines and seasonal patterns
+- Segment analysis by demographics, time periods, zones
+
+### Level 3: Root Cause Analysis
+- Apply "5 Whys" methodology to understand underlying causes
+- Consider external factors: weather, promotions, competition
+- Correlate behavior patterns with business outcomes
+
+### Level 4: Strategic Recommendations
+- Provide 3-5 specific, prioritized actions
+- Include implementation timeline and expected ROI
+- Quantify potential impact with confidence intervals
+</BUSINESS_CONTEXT>
+
+----
+
 <INSTRUCTIONS>
-Step 1: Analyze the question
-- Analyze user's question and final goal.
-- If the user's question is consist of multiple sub-questions, split them into smaller sub-questions.
+## Analysis Approach:
 
-Step 2: Pick the most relevant tool
-- Pick the most relevant tool to answer the question.
-- If you are failed to answer the question, try different tools to get context.
+### 1. Understand the Question
+- Identify what specific insights or data the user is seeking
+- Determine the appropriate time period (default: previous week)
+- Consider which stores/zones are relevant
 
-Step 3: Answer the question
-- Answer the question in the same language as the question.
-- Your answer should be very polite and professional.
+### 2. Select Appropriate MCP Tools
+**Database-Specific Tool Categories:**
 
-Step 4: Provide the source of the answer(if applicable)
-- If you've used the tool, provide the source of the answer.
-- Valid sources are either a website(URL) or a document(PDF, etc).
+**🏪 POS Data Analysis (Central cu_base DB) - Use `pos` tools:**
+- Connects to: Main ClickHouse server, filters by store_nm column
+- `pos_daily_sales_stats`: 일평균 판매 건수
+- `receipt_ranking`: 영수증 건수 순위
+- `sales_ranking`: 매출 순위  
+- `volume_ranking`: 판매량 순위
+- `event_product_analysis`: 행사 상품 분석
+- `ranking_event_product`: 행사 상품 순위
+- `co_purchase_trend`: 연관구매 패턴
 
-Step 5: Present the data visibly
-- Format the query result with clear line breaks, logical indentation, and any effective visual markers (dashes, bullets, arrows, emojis, etc.) to maximize readability
+**👥 Customer Behavior Analysis (Store-specific plusinsight DBs) - Use `insight`/`diagnose` tools:**
+- Connects to: Individual store databases (매장별 접속정보 조회 후 연결)
+- `diagnose_*`: 방문객, 체류시간, 픽업율 진단
+- `insight_*`: 고객 행동 패턴, 동선 분석, 인구통계
 
-Guidelines:
-- If you've used the tool, your answer should be based on the tool's output(tool's output is more important than your own knowledge).
-- If you've used the tool, and the source is valid URL, provide the source(URL) of the answer.
-- Skip providing the source if the source is not URL.
-- Answer in the same language as the question.
-- Answer should be concise and to the point.
-- Avoid response your output with any other information than the answer and the source.
-- Avoid generic or general advice. Always provide specific, data-driven recommendations.
-- Include concrete numbers, percentages, or metrics to support your suggestions.
-- Provide actionable steps that can be immediately implemented rather than vague guidance.
+**🔄 Cross-Database Analysis - Use `diagnose` tools:**
+- `diagnose_purchase_conversion_rate`: POS (central) + 방문객 (store-specific) 데이터 결합
+
+**🏬 Store Management:**
+- `get_available_sites`: 사용 가능한 매장 목록
+- `validate_site`: 매장명 유효성 검증
+
+### 3. Provide Context-Rich Insights
+- Always explain what the data means in business terms
+- Compare against benchmarks and historical performance
+- Identify actionable opportunities and risks
+- Quantify potential impact where possible
+
+### 4. Korean Language Support
+- Respond in Korean when user asks in Korean
+- Use appropriate business terminology
+- Maintain professional tone
+- Include success metrics and monitoring approach
+
+## Quality Standards:
+- **Accuracy**: All numbers must be verified and properly sourced
+- **Relevance**: Focus on insights that drive business decisions
+- **Actionability**: Every recommendation must be specific and implementable
+- **Timeliness**: Distinguish between immediate, short-term, and strategic actions
+- **Confidence**: Indicate certainty levels for predictions and recommendations
 </INSTRUCTIONS>
 
 ----
 
-<OUTPUT_FORMAT>
-(concise answer to the question)
+## Response Guidelines:
+- **Be Direct**: Answer the specific question asked
+- **Use Data**: Support insights with actual numbers from tools
+- **Stay Relevant**: Focus on actionable business insights
+- **Be Concise**: Provide clear, structured responses
+- **Show Sources**: Mention which MCP tools were used
 
-**Source**(if applicable)
-- (source1: valid URL)
-- (source2: valid URL)
-- ...
-</OUTPUT_FORMAT>
+Remember: You have direct access to comprehensive retail analytics data. Use the MCP tools effectively to provide accurate, data-driven insights that help optimize store performance.
 """
 
 # 모델 토큰 정보
 OUTPUT_TOKEN_INFO = {
+    "gpt-5": {"max_tokens": 16384, "temperature": 0.1},
     "gpt-4o": {"max_tokens": 16384, "temperature": 0.1},
-    "o3": {"max_tokens": 16384, "temperature": None},  # o3는 temperature 지원하지 않음
 }
 
 # 설정 로드 함수
@@ -164,6 +288,9 @@ conversation_histories = {}
 agent_models = {}  # 스레드별 사용 중인 모델 저장
 tool_count = 0  # 전역 변수로 tool_count 선언
 
+# 멀티 에이전트 워크플로우 저장소
+multi_agent_workflows = {}  # 스레드별 멀티 에이전트 워크플로우
+
 # 요청 및 응답 모델 정의
 class Message(BaseModel):
     role: str
@@ -180,6 +307,7 @@ class QueryRequest(BaseModel):
     model: str = "gpt-4o"
     timeout_seconds: int = 120
     recursion_limit: int = 100
+    use_multi_agent: bool = True  # 멀티 에이전트 시스템 사용 여부
 
 class QueryResponse(BaseModel):
     response: str
@@ -348,10 +476,7 @@ class StreamingResponse:
                 and len(message_content.tool_calls[0]["name"]) > 0
             ):
                 # 🔍 원시 tool_calls 데이터 확인
-                print(f"🔍 [RAW] message_content.tool_calls 전체: {message_content.tool_calls}")
-                print(f"🔍 [RAW] tool_calls 개수: {len(message_content.tool_calls)}")
-                print(f"🔍 [RAW] 첫 번째 tool_call 원본: {message_content.tool_calls[0]}")
-                print(f"🔍 [RAW] 첫 번째 tool_call 타입: {type(message_content.tool_calls[0])}")
+                # 도구 호출 처리
                 tool_call_info = message_content.tool_calls[0]
                 tool_name = tool_call_info.get("name", "알 수 없음")
                 tool_args = tool_call_info.get("arguments", {})
@@ -367,17 +492,18 @@ class StreamingResponse:
                 
                 # args 필드 직접 확인
                 if 'args' in tool_call_info:
-                    print(f"직접 args 필드: {tool_call_info['args']}")
-                    print(f"args 타입: {type(tool_call_info['args'])}")
+                    print(f"args 필드: {tool_call_info['args']}")
+                    print(f"args 필드 타입: {type(tool_call_info['args'])}")
+                    print(f"args 필드 내용: {tool_call_info['args']}")
+                    print(f"args 필드 내용 타입: {type(tool_call_info['args'])}")
+                    print(f"args 필드 내용 내용: {tool_call_info['args']}")
+                    print(f"args 필드 내용 내용 타입: {type(tool_call_info['args'])}")
                 
                 # arguments 필드 확인
                 if 'arguments' in tool_call_info:
-                    print(f"arguments 필드: {tool_call_info['arguments']}")
-                    print(f"arguments 타입: {type(tool_call_info['arguments'])}")
-                
-                print(f"get으로 파싱된 인자: {tool_args}")
-                print(f"파싱된 인자 타입: {type(tool_args)}")
-                
+                    print(f"get으로 파싱된 인자: {tool_args}")
+                    print(f"파싱된 인자 타입: {type(tool_args)}")
+                    
                 if isinstance(tool_args, str):
                     try:
                         parsed_args = json.loads(tool_args)
@@ -488,7 +614,7 @@ async def process_query(thread_id: str, query: str, timeout_seconds=60, recursio
             
             try:                
                 messages = [HumanMessage(content=query)]
-                print(f"🔍 [AGENT] 에이전트에게 전송하는 메시지: {query}")
+                # 에이전트 처리 시작
                 
                 response = await asyncio.wait_for(
                     astream_graph(
@@ -708,13 +834,60 @@ async def query_agent(thread_id: str, request: QueryRequest, background_tasks: B
         # 백그라운드 작업 시작 로깅
         print(f"대화 처리 시작: 타임아웃={timeout_value}초, 재귀 제한={request.recursion_limit}")
         
-        # 질문 처리
-        _, final_text, final_tool = await process_query(
-            thread_id, 
-            request.query,
-            timeout_seconds=timeout_value,
-            recursion_limit=request.recursion_limit
-        )
+        # 질문 처리 - 멀티 에이전트 시스템 사용 여부에 따라 분기
+        if request.use_multi_agent and MULTI_AGENT_AVAILABLE:
+            try:
+                # 멀티 에이전트 워크플로우 초기화 (필요시)
+                if thread_id not in multi_agent_workflows:
+                    # MCP 클라이언트 가져오기
+                    mcp_client = mcp_clients.get(thread_id)
+                    if not mcp_client:
+                        # MCP 클라이언트가 없으면 기본 ReAct 에이전트로 폴백
+                        raise RuntimeError("MCP 클라이언트가 초기화되지 않음")
+                    
+                    # LLM 모델 초기화
+                    model_config = OUTPUT_TOKEN_INFO.get(request.model, OUTPUT_TOKEN_INFO["gpt-4o"])
+                    llm_model = ChatOpenAI(
+                        model=request.model,  # 선택한 모델 그대로 사용 (gpt-5, gpt-4o)
+                        temperature=model_config["temperature"],
+                        max_tokens=model_config["max_tokens"]
+                    )
+                    
+                    multi_agent_workflows[thread_id] = MultiAgentWorkflow(
+                        mcp_client=mcp_client,
+                        model=llm_model
+                    )
+                    print(f"✨ [MULTI-AGENT] 멀티 에이전트 워크플로우 초기화 완료: {thread_id}")
+                
+                # 멀티 에이전트 워크플로우로 쿼리 처리
+                workflow_result = await multi_agent_workflows[thread_id].execute(
+                    user_query=request.query,
+                    session_id=thread_id
+                )
+                
+                final_text = workflow_result.get("final_insight", "멀티 에이전트 분석 완료")
+                final_tool = ""  # 멀티 에이전트는 도구 정보를 별도로 제공하지 않음
+                
+                print(f"✨ [MULTI-AGENT] 멀티 에이전트 분석 완료: {len(final_text)} chars")
+                
+            except Exception as e:
+                print(f"⚠️ [MULTI-AGENT] 멀티 에이전트 처리 실패, ReAct 에이전트로 폴백: {e}")
+                # 기본 ReAct 에이전트로 폴백
+                _, final_text, final_tool = await process_query(
+                    thread_id, 
+                    request.query,
+                    timeout_seconds=timeout_value,
+                    recursion_limit=request.recursion_limit
+                )
+        else:
+            # 기본 ReAct 에이전트 사용
+            print(f"🔧 [REACT] 기본 ReAct 에이전트 사용")
+            _, final_text, final_tool = await process_query(
+                thread_id, 
+                request.query,
+                timeout_seconds=timeout_value,
+                recursion_limit=request.recursion_limit
+            )
         
         print(f"final_text 길이: {len(final_text)}")
         if final_tool:

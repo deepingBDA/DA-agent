@@ -183,9 +183,8 @@ Guidelines:
 """
 
 OUTPUT_TOKEN_INFO = {
-    "gpt-o3": {"max_tokens": 16000},
-    "gpt-o4-mini": {"max_tokens": 16000},
-    "gpt-o4": {"max_tokens": 16000},
+    "gpt-5": {"max_tokens": 16000},
+    "gpt-4o": {"max_tokens": 16000},
 }
 
 # Initialize session state
@@ -200,7 +199,7 @@ if "session_initialized" not in st.session_state:
     st.session_state.selected_model = (
         "gpt-4o"  # Default model selection
     )
-    st.session_state.recursion_limit = 100  # Recursion call limit, default 100
+    st.session_state.recursion_limit = 30  # Recursion call limit, default 30
 
 if "thread_id" not in st.session_state:
     st.session_state.thread_id = random_uuid()
@@ -487,7 +486,7 @@ with st.sidebar:
 
     # Model selection feature
     # Create list of available models
-    available_models = ["gpt-o4-mini", "gpt-o3", "gpt-o4"]
+    available_models = ["gpt-5", "gpt-4o"]
 
     # Check OpenAI API key
     has_openai_key = os.environ.get("OPENAI_API_KEY") is not None
@@ -522,7 +521,7 @@ with st.sidebar:
     st.session_state.timeout_seconds = st.slider(
         "⏱️ Response generation time limit (seconds)",
         min_value=60,
-        max_value=300,
+        max_value=900,
         value=st.session_state.timeout_seconds,
         step=10,
         help="Set the maximum time for the agent to generate a response. Complex tasks may require more time.",
