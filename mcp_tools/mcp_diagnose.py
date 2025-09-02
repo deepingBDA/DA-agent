@@ -69,21 +69,25 @@ def get_db_name(site: str) -> str:
 
 @mcp.tool()
 def diagnose_avg_in(start_date: str, end_date: str, site: str) -> str:
-    """[VISITOR_DIAGNOSE]
-    Diagnose **average daily visitors** and related trends (gender, age,
-    time-slot) for a given period.
-
+    """일평균 방문객 수 진단
+    
+    👥 CUSTOMER BEHAVIOR DATABASE TOOL (plusinsight only)
+    - 데이터베이스: plusinsight (매장별 개별 DB)
+    - 테이블: line_in_out_individual, detected_time (방문객 입출입 기록)
+    - 연결방식: 매장별 접속정보를 중앙 DB에서 조회 후 개별 연결
+    
+    ⚠️ IMPORTANT: 이 툴은 매장별 plusinsight DB에만 접근합니다.
+    POS 데이터(cu_revenue_total)는 접근할 수 없습니다.
+    
     Args:
         start_date: 시작 날짜 (YYYY-MM-DD)
         end_date: 종료 날짜 (YYYY-MM-DD)  
-        site: 매장명 (필수)
-
-    Trigger words (case-insensitive):
-        - "방문객 진단", "유입 진단", "visitor diagnose", "average visitors"
-        - Any request like "방문객 분석해줘", "일평균 방문객수" etc.
-
-    Use this tool when the user wants a textual diagnostic (not necessarily
-    Excel) about store visitors within a date range.
+        site: 매장명 (필수) - 해당 매장의 plusinsight DB에 연결
+        
+    Returns:
+        일평균 방문객 수, 성별/연령/시간대별 분석 결과
+        
+    🔄 조합 사용법: POS 분석과 함께 사용하려면 diagnose_purchase_conversion_rate 사용
     """
     # 파라미터 기록
     param_log = f"diagnose_avg_in 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
@@ -283,63 +287,7 @@ ORDER BY ord
 
     return answer
 
-@mcp.tool()
-def diagnose_avg_sales(start_date: str, end_date: str, site: str) -> str:
-    """일평균 판매 건수 진단
-    
-    Args:
-        start_date: 시작 날짜 (YYYY-MM-DD)
-        end_date: 종료 날짜 (YYYY-MM-DD)  
-        site: 매장명 (필수)
-    """
-    # 파라미터 기록
-    param_log = f"diagnose_avg_sales 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
-    logger.info(param_log)
-    
-    query = f"""
-    WITH daily_sales AS (
-        SELECT 
-            store_nm,
-            tran_ymd,
-            COUNT(DISTINCT (pos_no, tran_no)) as daily_receipt_count
-        FROM cu_revenue_total
-        WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
-        GROUP BY store_nm, tran_ymd
-    ),
-    avg_sales AS (
-        SELECT 
-            store_nm,
-            CONCAT(toString(toInt32(AVG(daily_receipt_count))), '건') as avg_daily_sales
-        FROM daily_sales
-        GROUP BY store_nm
-    )
-    SELECT *
-    FROM avg_sales
-    ORDER BY store_nm
-    """
-
-    try:
-        client = get_site_client(site, database='cu_base')
-        if not client:
-            return f"❌ {site}: 연결 실패"
-            
-        result = client.query(query)
-        client.close()
-
-        if len(result.result_rows) > 0:
-            answer = f"📊 **{site}** 일평균 판매 건수:"
-            for row in result.result_rows:
-                answer += f"\n  - {row[0]}: {row[1]}"
-        else:
-            answer = f"⚠️ {site}: 데이터가 없습니다."
-                
-    except Exception as e:
-        answer = f"❌ {site}: 오류 - {e}"
-
-    # log answer
-    logger.info(f"diagnose_avg_sales 답변: {answer}")
-
-    return answer
+# diagnose_avg_sales 함수는 mcp_pos.py의 pos_daily_sales_stats로 이동됨
 
 @mcp.tool()
 def check_zero_visits(start_date: str, end_date: str, site: str) -> str:
@@ -448,27 +396,114 @@ ORDER BY date"""
 
 @mcp.tool()
 def diagnose_purchase_conversion_rate(start_date: str, end_date: str, site: str) -> str:
-    """구매전환율 진단
+    """구매전환율 진단 (크로스 DB 분석)
+    
+    🔄 CROSS-DATABASE ANALYSIS TOOL
+    - 데이터베이스 1: plusinsight (매장별) → 방문객 데이터 (line_in_out_individual)
+    - 데이터베이스 2: cu_base (중앙) → POS 매출 데이터 (cu_revenue_total)
+    - 결합 분석: 방문객 수 대비 구매 건수로 전환율 계산
+    
+    ⚠️ WARNING: 이 툴은 두 개의 서로 다른 데이터베이스를 자동으로 연결합니다.
+    다른 POS 툴이나 행동 분석 툴과 함께 사용할 때 데이터베이스 접근 순서에 주의하세요.
     
     Args:
         start_date: 시작 날짜 (YYYY-MM-DD)
         end_date: 종료 날짜 (YYYY-MM-DD)  
         site: 매장명 (필수)
+        
+    Returns:
+        구매전환율 분석 결과 (방문객 수, 판매 건수, 전환율, 평가)
     """
     # 파라미터 기록
-    param_log = f"get_purchase_conversion_rate 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
+    param_log = f"diagnose_purchase_conversion_rate 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
     logger.info(param_log)
     
-    # 방문객 수와 판매 건수 조회
-    avg_in_result = diagnose_avg_in(start_date, end_date, site)
-    avg_sales_result = diagnose_avg_sales(start_date, end_date, site)
+    try:
+        # 1. 방문객 데이터 조회 (plusinsight)
+        visitor_client = get_site_client(site)
+        if not visitor_client:
+            return f"❌ {site}: 방문객 데이터 연결 실패"
+            
+        visitor_query = f"""
+        WITH df AS (
+            SELECT li.person_seq                      AS visitor_id,
+                   li.date                           AS visit_date
+            FROM line_in_out_individual li
+            LEFT JOIN line l ON li.triggered_line_id = l.id
+            WHERE li.date BETWEEN '{start_date}' AND '{end_date}'
+              AND li.is_staff = 0
+              AND li.in_out = 'IN'
+              AND l.entrance = 1
+        ),
+        daily_visitors AS (SELECT visit_date, uniqExact(visitor_id) AS daily_count FROM df GROUP BY visit_date)
+        SELECT toUInt64(round(CASE WHEN isFinite(avg(daily_count)) THEN avg(daily_count) ELSE 0 END)) AS avg_visitors
+        FROM daily_visitors
+        """
+        
+        visitor_result = visitor_client.query(visitor_query)
+        visitor_client.close()
+        
+        avg_visitors = visitor_result.result_rows[0][0] if visitor_result.result_rows else 0
+        
+        # 2. POS 판매 데이터 조회 (cu_base)
+        pos_client = get_site_client(site, database='cu_base')
+        if not pos_client:
+            return f"❌ {site}: POS 데이터 연결 실패"
+            
+        pos_query = f"""
+        WITH daily_sales AS (
+            SELECT 
+                store_nm,
+                tran_ymd,
+                COUNT(DISTINCT (pos_no, tran_no)) as daily_receipt_count
+            FROM cu_revenue_total
+            WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
+            GROUP BY store_nm, tran_ymd
+        ),
+        avg_sales AS (
+            SELECT 
+                store_nm,
+                toUInt64(round(CASE WHEN isFinite(avg(daily_receipt_count)) THEN avg(daily_receipt_count) ELSE 0 END)) AS avg_sales
+            FROM daily_sales
+            GROUP BY store_nm
+        )
+        SELECT avg_sales
+        FROM avg_sales
+        WHERE store_nm = '{site}'
+        """
+        
+        pos_result = pos_client.query(pos_query)
+        pos_client.close()
+        
+        avg_sales = pos_result.result_rows[0][0] if pos_result.result_rows else 0
+        
+        # 3. 구매전환율 계산
+        if avg_visitors > 0:
+            conversion_rate = (avg_sales / avg_visitors) * 100
+            
+            answer = f"📊 **{site}** 구매전환율 분석:\n"
+            answer += f"  • 일평균 방문객 수: {avg_visitors:,}명\n"
+            answer += f"  • 일평균 판매 건수: {avg_sales:,}건\n"
+            answer += f"  • 구매전환율: {conversion_rate:.1f}%\n\n"
+            
+            if conversion_rate > 100:
+                answer += "⚠️ **주의**: 구매전환율이 100%를 초과합니다. 방문객 수 측정에 문제가 있을 수 있습니다."
+            elif conversion_rate > 50:
+                answer += "✅ **우수**: 매우 높은 구매전환율입니다."
+            elif conversion_rate > 30:
+                answer += "👍 **양호**: 양호한 구매전환율입니다."
+            elif conversion_rate > 15:
+                answer += "📈 **보통**: 평균적인 구매전환율입니다."
+            else:
+                answer += "📉 **개선 필요**: 구매전환율이 낮습니다. 매장 운영 개선이 필요합니다."
+        else:
+            answer = f"⚠️ {site}: 방문객 데이터가 없어 구매전환율을 계산할 수 없습니다."
+            
+    except Exception as e:
+        answer = f"❌ {site}: 구매전환율 분석 오류 - {e}"
 
-    # 구매전환율 계산
-    answer = f"구매전환율 = (판매 건수 / 방문객 수) * 100 % 라는 공식이야. 일평균 방문객 수를 조회하고, 일평균 판매 건수를 조회해서, 구매전환율을 추정해줘. 구매전환율이 100%를 넘으면 방문객 수가 잘못 측정된거야. 참고해."
-    answer += f"\n일평균 방문객 수: {avg_in_result}"
-    answer += f"\n일평균 판매 건수: {avg_sales_result}"
-
-    logger.info(f"answer type : {type(answer)}")
+    # log answer
+    logger.info(f"diagnose_purchase_conversion_rate 답변: {answer}")
     
     return answer
 

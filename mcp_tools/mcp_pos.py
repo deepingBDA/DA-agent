@@ -93,6 +93,7 @@ WITH receipt_total AS (
         COUNT(DISTINCT (tran_ymd, pos_no, tran_no)) as total_receipts
     FROM cu_revenue_total
     WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
+      AND store_nm = '{site}'
     GROUP BY store_nm
 ),
 small_category_receipts AS (
@@ -104,6 +105,7 @@ small_category_receipts AS (
     FROM cu_revenue_total
     JOIN receipt_total rt USING(store_nm)
     WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
+      AND store_nm = '{site}'
     GROUP BY store_nm, small_nm, rt.total_receipts
 ),
 ranked_categories AS (
@@ -168,6 +170,7 @@ WITH store_total AS (
         SUM(sale_amt) as total_sales
     FROM cu_revenue_total
     WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
+      AND store_nm = '{site}'
     GROUP BY store_nm
 ),
 small_category_sales AS (
@@ -179,6 +182,7 @@ small_category_sales AS (
     FROM cu_revenue_total
     JOIN store_total st USING(store_nm)
     WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
+      AND store_nm = '{site}'
     GROUP BY store_nm, small_nm, st.total_sales
 ),
 ranked_categories AS (
@@ -240,6 +244,7 @@ WITH store_total AS (
         SUM(sale_qty) as total_qty
     FROM cu_revenue_total
     WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
+      AND store_nm = '{site}'
     GROUP BY store_nm
 ),
 small_category_qty AS (
@@ -251,6 +256,7 @@ small_category_qty AS (
     FROM cu_revenue_total
     JOIN store_total st USING(store_nm)
     WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
+      AND store_nm = '{site}'
     GROUP BY store_nm, small_nm, st.total_qty
 ),
 ranked_categories AS (
@@ -315,6 +321,7 @@ WITH store_metrics AS (
         COUNT(DISTINCT item_cd) as total_sku_count
     FROM cu_revenue_total
     WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
+      AND store_nm = '{site}'
     GROUP BY store_nm
 ),
 event_metrics AS (
@@ -324,7 +331,8 @@ event_metrics AS (
         COUNT(DISTINCT item_cd) as event_sku_count
     FROM cu_revenue_total
     WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
-    AND evt_nm != ''
+      AND store_nm = '{site}'
+      AND evt_nm != ''
     GROUP BY store_nm
 )
 SELECT 
@@ -365,7 +373,7 @@ def ranking_event_product(site: str) -> str:
     logger.info("ranking_event_product 호출됨")
     
     try:
-        query = """
+        query = f"""
 WITH event_popularity AS (
     SELECT 
         store_nm,
@@ -375,6 +383,7 @@ WITH event_popularity AS (
         SUM(sale_amt) AS total_sales
     FROM cu_revenue_total
     WHERE evt_nm != ''
+      AND store_nm = '{site}'
     GROUP BY store_nm, evt_nm
 ),
 ranked_events AS (
@@ -430,7 +439,7 @@ def co_purchase_trend(start_date: str, end_date: str, site: str) -> str:
     param_log = f"co_purchase_trend 호출됨: start_date={start_date}, end_date={end_date}"
     logger.info(param_log)
 
-    query = """
+    query = f"""
     WITH receipt_items AS (
         -- 각 영수증에 포함된 상품 추출
         SELECT
@@ -452,8 +461,8 @@ def co_purchase_trend(start_date: str, end_date: str, site: str) -> str:
             mid_nm
         FROM cu_revenue_total
         WHERE tran_timestamp IS NOT NULL
-        AND store_nm = '{target_store}'  -- 특정 지점만 필터링
-        AND tran_ymd BETWEEN '{start_date}' AND '{end_date}'  -- 날짜 범위 필터링
+        AND store_nm = '{site}'
+        AND tran_ymd BETWEEN '{start_date}' AND '{end_date}'
     ),
     item_pairs AS (
         -- 같은 영수증 내에서 함께 구매된 상품 쌍 생성
@@ -542,7 +551,7 @@ def co_purchase_trend(start_date: str, end_date: str, site: str) -> str:
         
         logger.info(f"co_purchase_trend 호출됨: {site}, {start_date}, {end_date}")
 
-        result = client.query(query.format(target_store=site, start_date=start_date, end_date=end_date))
+        result = client.query(query)
 
         if len(result.result_rows) > 0:
             answer = f"🛒 **{site}** 연관 구매 경향성:"
@@ -561,6 +570,76 @@ def co_purchase_trend(start_date: str, end_date: str, site: str) -> str:
         return error_msg
 
 # get_available_sites 기능은 mcp_agent_helper.py로 분리됨
+
+@mcp.tool()
+def pos_daily_sales_stats(start_date: str, end_date: str, site: str) -> str:
+    """POS 데이터 기반 일평균 판매 건수 통계
+    
+    🏪 POS DATABASE TOOL (cu_base only)
+    - 데이터베이스: cu_base (중앙 단일 DB) 
+    - 테이블: cu_revenue_total (모든 매장 POS 데이터)
+    - 필터링: store_nm = '{site}' 로 특정 매장만 조회
+    
+    ⚠️ IMPORTANT: cu_revenue_total은 중앙 cu_base DB에만 존재합니다.
+    plusinsight DB에서는 접근할 수 없습니다.
+    
+    Args:
+        start_date: 시작 날짜 (YYYY-MM-DD)
+        end_date: 종료 날짜 (YYYY-MM-DD)  
+        site: 매장명 (필수) - store_nm 컬럼과 매칭
+        
+    Returns:
+        일평균 판매 건수 통계 결과
+    """
+    # 파라미터 기록
+    param_log = f"pos_daily_sales_stats 호출됨: start_date={start_date}, end_date={end_date}, site={site}"
+    logger.info(param_log)
+    
+    query = f"""
+    WITH daily_sales AS (
+        SELECT 
+            store_nm,
+            tran_ymd,
+            COUNT(DISTINCT (pos_no, tran_no)) as daily_receipt_count
+        FROM cu_revenue_total
+        WHERE tran_ymd BETWEEN '{start_date}' AND '{end_date}'
+          AND store_nm = '{site}'
+        GROUP BY store_nm, tran_ymd
+    ),
+    avg_sales AS (
+        SELECT 
+            store_nm,
+            CONCAT(toString(toInt32(AVG(daily_receipt_count))), '건') as avg_daily_sales
+        FROM daily_sales
+        GROUP BY store_nm
+    )
+    SELECT *
+    FROM avg_sales
+    ORDER BY store_nm
+    """
+
+    try:
+        client = get_site_client(site, database='cu_base')
+        if not client:
+            return f"❌ {site}: 연결 실패"
+            
+        result = client.query(query)
+        client.close()
+
+        if len(result.result_rows) > 0:
+            answer = f"📊 **{site}** 일평균 판매 건수:"
+            for row in result.result_rows:
+                answer += f"\n  - {row[0]}: {row[1]}"
+        else:
+            answer = f"⚠️ {site}: 데이터가 없습니다."
+                
+    except Exception as e:
+        answer = f"❌ {site}: 오류 - {e}"
+
+    # log answer
+    logger.info(f"pos_daily_sales_stats 답변: {answer}")
+    
+    return answer
 
 
 if __name__ == "__main__":

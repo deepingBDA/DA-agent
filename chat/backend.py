@@ -74,22 +74,38 @@ You have direct access specialized MCP tools for comprehensive retail analytics 
 <DATABASE_SCHEMA>
 ## Database Architecture:
 
-### 🏪 Single Central POS Database (cu_base)
-**🚨 CRITICAL: Only ONE cu_base database exists - NOT per store!**
-**Location**: Single centralized ClickHouse server (uses .env connection credentials directly)
-**Connection**: Direct connection using CLICKHOUSE_HOST, CLICKHOUSE_PORT, CLICKHOUSE_USER, CLICKHOUSE_PASSWORD from .env
-**Contains**: ALL stores' POS data in ONE centralized database named "cu_base"
-**Key Table**: `cu_revenue_total` - contains transactions from ALL stores
-- store_nm: 매장명 (용산점, 강남점, etc. - filter by this column to get specific store data)
-- tran_ymd: 거래 날짜
-- small_nm: 상품명
-- sale_amt: 판매 금액
-- sale_qty: 판매 수량
-**⚠️ There is NO cu_base database per store - only ONE central cu_base database for all stores!**
+### 🏪 Central Hub Database (cu_base) - SYSTEM ARCHITECTURE
+**🚨 CRITICAL SYSTEM DESIGN:**
 
-### 👥 Store-Specific Behavior Databases (plusinsight)
-**Location**: Each store has separate database connection
-**Access**: 매장별 접속정보를 중앙 DB에서 조회 후 개별 연결
+**Step 1: Central Database Connection (.env)**
+- Primary connection: CLICKHOUSE_HOST, CLICKHOUSE_PORT, CLICKHOUSE_USER, CLICKHOUSE_PASSWORD from .env
+- Database name: "cu_base" (single centralized database)
+- Purpose: Contains BOTH store connection info AND POS sales data
+
+**Step 2: What's in the Central cu_base Database:**
+1. **Store Connection Registry** (site_db_connection_config table)
+   - Maps each store to its individual database connection info
+   - Used by database_manager.py to find how to connect to each store's behavior data
+   
+2. **Centralized POS Data** (cu_revenue_total table)
+   - Contains ALL stores' POS transaction data in ONE table
+   - store_nm: 매장명 (filter by this to get specific store data)
+   - tran_ymd: 거래 날짜
+   - small_nm: 상품명  
+   - sale_amt: 판매 금액
+   - sale_qty: 판매 수량
+
+**⚠️ KEY INSIGHT: cu_base is both the "connection hub" AND the "POS data warehouse"**
+
+### 👥 Store-Specific Behavior Databases (plusinsight) 
+**🔄 SECONDARY DATABASE CONNECTIONS:**
+
+**Step 3: How to Connect to Each Store's Behavior Data:**
+1. Query cu_base.site_db_connection_config to get store's connection info
+2. Use that info to connect to store's individual plusinsight database  
+3. Each store has its own separate database server/connection
+
+**Step 4: What's in Each Store's plusinsight Database:**
 **Key Tables per Store**:
 
 **line_in_out_individual**: 방문객 입출입 개별 기록
@@ -180,17 +196,19 @@ You have direct access specialized MCP tools for comprehensive retail analytics 
 - **POS/매출 데이터** = `cu_base` 데이터베이스 (중앙 서버) → **`pos_` 시작하는 툴만 사용**
 - **고객 행동 데이터** = `plusinsight` 데이터베이스 (매장별) → **`insight_` 또는 `diagnose_` 툴 사용**
 
-**🏪 POS Sales Data (ONE central cu_base database only):**
-**⚠️ WARNING: cu_revenue_total table is ONLY in the single central cu_base database!**
-- Database: ONE central cu_base database (direct .env connection, not store-specific)
-- Connection: Uses .env credentials directly (CLICKHOUSE_HOST, CLICKHOUSE_PORT, etc.)
-- Table: `cu_revenue_total` (contains ALL stores' POS data, filter by store_nm column)
+**🏪 POS Sales Data (Central cu_base hub only):**
+**⚠️ WORKFLOW: .env connection → cu_base database → cu_revenue_total table**
+- Connection: Direct .env credentials (CLICKHOUSE_HOST, CLICKHOUSE_PORT, etc.)
+- Database: cu_base (the central hub that also contains store connection registry)
+- Table: `cu_revenue_total` (ALL stores' POS data in one table, filter by store_nm)
 - Tools: `pos_daily_sales_stats`, `receipt_ranking`, `sales_ranking`, `volume_ranking`, `event_product_analysis`, `ranking_event_product`, `co_purchase_trend`
-**🚨 Do NOT look for cu_base in individual store connections - it's a separate central database!**
+**🚨 POS data is in the SAME central database that contains store connection info!**
 
-**👥 Customer Behavior Data (plusinsight database only):**
-**⚠️ WARNING: These tables are ONLY in store-specific plusinsight databases!**
-- Database: Store-specific plusinsight (매장별 개별 연결)
+**👥 Customer Behavior Data (Store-specific plusinsight databases):**
+**⚠️ WORKFLOW: .env connection → cu_base → site_db_connection_config → individual store's plusinsight DB**
+- Step 1: Connect to cu_base using .env credentials  
+- Step 2: Query site_db_connection_config table to get store's connection info
+- Step 3: Connect to that store's individual plusinsight database
 - Tables: `line_in_out_individual`, `customer_behavior_event`, `zone`, `sales_funnel`, `two_step_flow`, `detected_time`
 - Tools: `diagnose_*` (except purchase_conversion_rate), `insight_*`, `shelf_*`
 
