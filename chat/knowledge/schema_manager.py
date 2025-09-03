@@ -122,9 +122,42 @@ class SchemaManager:
         return results
     
     def generate_business_context_schema(self) -> str:
-        """비즈니스 컨텍스트가 포함된 상세 스키마 생성 (GPT-5 컨텍스트용)"""
+        """새로운 배열 형식의 스키마로 CREATE TABLE 형태 생성 (GPT-5 컨텍스트용)"""
+        summary_parts = []
+        summary_parts.append("# 📊 Database Schema (All Tables)\n")
         
-        # 테이블별 비즈니스 설명과 컬럼 설명 매핑
+        for db_name, schema in self.schemas.items():
+            table_count = len(schema['tables'])
+            tables = schema['tables']
+            
+            summary_parts.append(f'## {db_name} Database ({table_count} tables)\n')
+            
+            # 모든 테이블을 알파벳 순으로 정렬하여 CREATE TABLE 형태로 표시
+            sorted_tables = sorted(tables.items())
+            
+            for table_name, columns_list in sorted_tables:
+                # 컬럼 정보 수집 (새로운 배열 형식)
+                column_defs = []
+                for col_info in columns_list:
+                    col_name = col_info.get('name', '')
+                    col_type = col_info.get('type', '').split('(')[0]  # 괄호 안 내용 제거
+                    column_defs.append(f"{col_name} {col_type}")
+                
+                # CREATE TABLE 형식으로 한 줄에 표시
+                if column_defs:
+                    columns_str = ", ".join(column_defs)
+                    summary_parts.append(f"CREATE TABLE {table_name} ({columns_str});")
+                else:
+                    summary_parts.append(f"CREATE TABLE {table_name} ();")
+            
+            summary_parts.append("\n" + "="*50 + "\n")
+        
+        return "\n".join(summary_parts)
+    
+    def _generate_old_business_context_schema(self) -> str:
+        """이전 버전의 하드코딩된 비즈니스 컨텍스트 (백업용)"""
+        
+        # 테이블별 비즈니스 설명과 컬럼 설명 매핑 (이전 버전)
         table_descriptions = {
             'plusinsight': {
                 'line_in_out_individual': {

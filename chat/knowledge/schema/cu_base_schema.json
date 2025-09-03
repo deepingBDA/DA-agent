@@ -1,1173 +1,506 @@
 {
   "database": "cu_base",
-  "extracted_at": "2025-09-03T09:56:43.353175",
+  "extracted_at": "2025-09-03T10:19:52.018023",
   "tables": {
-    "category_reference": {
-      "description": "category_reference 테이블",
-      "engine": "Log",
-      "total_rows": 629,
-      "total_bytes": 13322,
-      "columns": {
-        "LARGE_NM": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "MID_NM": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "SMALL_NM": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "DETAIL_NM": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "DS_TAG": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    "category_reference": [
+      {
+        "name": "LARGE_NM",
+        "type": "String"
+      },
+      {
+        "name": "MID_NM",
+        "type": "String"
+      },
+      {
+        "name": "SMALL_NM",
+        "type": "String"
+      },
+      {
+        "name": "DETAIL_NM",
+        "type": "String"
+      },
+      {
+        "name": "DS_TAG",
+        "type": "String"
       }
-    },
-    "cu_revenue_raw_oct": {
-      "description": "cu_revenue_raw_oct 테이블",
-      "engine": "Log",
-      "total_rows": 541178,
-      "total_bytes": 15037265,
-      "columns": {
-        "STORE_CD": {
-          "type": "Int32",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "STORE_NM": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "TRAN_YMD": {
-          "type": "Date",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "POS_NO": {
-          "type": "Int32",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "TRAN_NO": {
-          "type": "Int32",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "ITEM_CD": {
-          "type": "Int32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "LARGE_NM": {
-          "type": "String",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "MID_NM": {
-          "type": "String",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "SMALL_NM": {
-          "type": "String",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "ITEM_NM": {
-          "type": "String",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "SALE_AMT": {
-          "type": "Int32",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "SALE_QTY": {
-          "type": "Int32",
-          "description": "",
-          "position": 12,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "EVT_NM": {
-          "type": "String",
-          "description": "",
-          "position": 13,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "cu_revenue_raw_oct": [
+      {
+        "name": "STORE_CD",
+        "type": "Int32"
+      },
+      {
+        "name": "STORE_NM",
+        "type": "String"
+      },
+      {
+        "name": "TRAN_YMD",
+        "type": "Date"
+      },
+      {
+        "name": "POS_NO",
+        "type": "Int32"
+      },
+      {
+        "name": "TRAN_NO",
+        "type": "Int32"
+      },
+      {
+        "name": "ITEM_CD",
+        "type": "Int32"
+      },
+      {
+        "name": "LARGE_NM",
+        "type": "String"
+      },
+      {
+        "name": "MID_NM",
+        "type": "String"
+      },
+      {
+        "name": "SMALL_NM",
+        "type": "String"
+      },
+      {
+        "name": "ITEM_NM",
+        "type": "String"
+      },
+      {
+        "name": "SALE_AMT",
+        "type": "Int32"
+      },
+      {
+        "name": "SALE_QTY",
+        "type": "Int32"
+      },
+      {
+        "name": "EVT_NM",
+        "type": "String"
       }
-    },
-    "cu_revenue_total": {
-      "description": "cu_revenue_total 테이블",
-      "engine": "Log",
-      "total_rows": 4016624,
-      "total_bytes": 106036218,
-      "columns": {
-        "store_cd": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "store_nm": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "tran_ymd": {
-          "type": "Date",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "pos_no": {
-          "type": "Int32",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "tran_no": {
-          "type": "Int32",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "item_cd": {
-          "type": "Int64",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "large_nm": {
-          "type": "String",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "mid_nm": {
-          "type": "String",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "small_nm": {
-          "type": "String",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "item_nm": {
-          "type": "String",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "sale_amt": {
-          "type": "Int32",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "sale_qty": {
-          "type": "Int32",
-          "description": "",
-          "position": 12,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "evt_nm": {
-          "type": "String",
-          "description": "",
-          "position": 13,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "tran_timestamp": {
-          "type": "Nullable(DateTime64(3))",
-          "description": "",
-          "position": 14,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "cu_revenue_total": [
+      {
+        "name": "store_cd",
+        "type": "String"
+      },
+      {
+        "name": "store_nm",
+        "type": "String"
+      },
+      {
+        "name": "tran_ymd",
+        "type": "Date"
+      },
+      {
+        "name": "pos_no",
+        "type": "Int32"
+      },
+      {
+        "name": "tran_no",
+        "type": "Int32"
+      },
+      {
+        "name": "item_cd",
+        "type": "Int64"
+      },
+      {
+        "name": "large_nm",
+        "type": "String"
+      },
+      {
+        "name": "mid_nm",
+        "type": "String"
+      },
+      {
+        "name": "small_nm",
+        "type": "String"
+      },
+      {
+        "name": "item_nm",
+        "type": "String"
+      },
+      {
+        "name": "sale_amt",
+        "type": "Int32"
+      },
+      {
+        "name": "sale_qty",
+        "type": "Int32"
+      },
+      {
+        "name": "evt_nm",
+        "type": "String"
+      },
+      {
+        "name": "tran_timestamp",
+        "type": "Nullable(DateTime64(3))"
       }
-    },
-    "cu_shelf_table": {
-      "description": "cu_shelf_table 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 13128,
-      "total_bytes": 57094,
-      "columns": {
-        "site": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shelf_type": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "shelf_name": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "target_id": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "item_cd": {
-          "type": "Nullable(Int64)",
-          "description": "",
-          "position": 6,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "item_nm": {
-          "type": "String",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "small_nm": {
-          "type": "String",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "event_nm": {
-          "type": "String",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "cu_shelf_table": [
+      {
+        "name": "site",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "shelf_type",
+        "type": "String"
+      },
+      {
+        "name": "shelf_name",
+        "type": "String"
+      },
+      {
+        "name": "target_id",
+        "type": "String"
+      },
+      {
+        "name": "item_cd",
+        "type": "Nullable(Int64)"
+      },
+      {
+        "name": "item_nm",
+        "type": "String"
+      },
+      {
+        "name": "small_nm",
+        "type": "String"
+      },
+      {
+        "name": "event_nm",
+        "type": "String"
       }
-    },
-    "cu_va_condition": {
-      "description": "cu_va_condition 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 23709,
-      "total_bytes": 548781,
-      "columns": {
-        "site": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shelf_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shelf_name": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "zone_in_sum": {
-          "type": "UInt64",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "zone_out_sum": {
-          "type": "UInt64",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "zone_in_nunique": {
-          "type": "UInt64",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "zone_out_nunique": {
-          "type": "UInt64",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "new_track": {
-          "type": "UInt64",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "new_track_ratio": {
-          "type": "Float32",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "new_track_unique_ratio": {
-          "type": "Float32",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "cu_va_condition": [
+      {
+        "name": "site",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "shelf_id",
+        "type": "String"
+      },
+      {
+        "name": "shelf_name",
+        "type": "String"
+      },
+      {
+        "name": "zone_in_sum",
+        "type": "UInt64"
+      },
+      {
+        "name": "zone_out_sum",
+        "type": "UInt64"
+      },
+      {
+        "name": "zone_in_nunique",
+        "type": "UInt64"
+      },
+      {
+        "name": "zone_out_nunique",
+        "type": "UInt64"
+      },
+      {
+        "name": "new_track",
+        "type": "UInt64"
+      },
+      {
+        "name": "new_track_ratio",
+        "type": "Float32"
+      },
+      {
+        "name": "new_track_unique_ratio",
+        "type": "Float32"
       }
-    },
-    "error_logs": {
-      "description": "error_logs 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 116,
-      "total_bytes": 1738,
-      "columns": {
-        "error_type": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "site": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "additional_info": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 4,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "error_logs": [
+      {
+        "name": "error_type",
+        "type": "String"
+      },
+      {
+        "name": "site",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "additional_info",
+        "type": "Nullable(String)"
       }
-    },
-    "revenue_raw": {
-      "description": "revenue_raw 테이블",
-      "engine": "Log",
-      "total_rows": 1184945,
-      "total_bytes": 34903462,
-      "columns": {
-        "STORE_CD": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "STORE_NM": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "TRAN_YMD": {
-          "type": "Date",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "POS_NO": {
-          "type": "Int32",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "TRAN_NO": {
-          "type": "Int32",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "ITEM_CD": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "LARGE_NM": {
-          "type": "String",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "MID_NM": {
-          "type": "String",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "SMALL_NM": {
-          "type": "String",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "ITEM_NM": {
-          "type": "String",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "SALE_AMT": {
-          "type": "UInt32",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "SALE_QTY": {
-          "type": "Int16",
-          "description": "",
-          "position": 12,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "EVT_NM": {
-          "type": "String",
-          "description": "",
-          "position": 13,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "revenue_raw": [
+      {
+        "name": "STORE_CD",
+        "type": "String"
+      },
+      {
+        "name": "STORE_NM",
+        "type": "String"
+      },
+      {
+        "name": "TRAN_YMD",
+        "type": "Date"
+      },
+      {
+        "name": "POS_NO",
+        "type": "Int32"
+      },
+      {
+        "name": "TRAN_NO",
+        "type": "Int32"
+      },
+      {
+        "name": "ITEM_CD",
+        "type": "String"
+      },
+      {
+        "name": "LARGE_NM",
+        "type": "String"
+      },
+      {
+        "name": "MID_NM",
+        "type": "String"
+      },
+      {
+        "name": "SMALL_NM",
+        "type": "String"
+      },
+      {
+        "name": "ITEM_NM",
+        "type": "String"
+      },
+      {
+        "name": "SALE_AMT",
+        "type": "UInt32"
+      },
+      {
+        "name": "SALE_QTY",
+        "type": "Int16"
+      },
+      {
+        "name": "EVT_NM",
+        "type": "String"
       }
-    },
-    "sales_funnel": {
-      "description": "sales_funnel 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 6461252,
-      "total_bytes": 61181871,
-      "columns": {
-        "site": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "hour": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age_group": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shelf_name": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "shelf_id": {
-          "type": "String",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "visit": {
-          "type": "Int32",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze1": {
-          "type": "Int32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze3": {
-          "type": "Int32",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze10": {
-          "type": "Int32",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "pickup": {
-          "type": "Nullable(Int32)",
-          "description": "",
-          "position": 12,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "sales_funnel": [
+      {
+        "name": "site",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "hour",
+        "type": "String"
+      },
+      {
+        "name": "age_group",
+        "type": "String"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "shelf_name",
+        "type": "String"
+      },
+      {
+        "name": "shelf_id",
+        "type": "String"
+      },
+      {
+        "name": "visit",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze1",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze3",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze10",
+        "type": "Int32"
+      },
+      {
+        "name": "pickup",
+        "type": "Nullable(Int32)"
       }
-    },
-    "sales_funnel_pickup": {
-      "description": "sales_funnel_pickup 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 93225,
-      "total_bytes": 1138632,
-      "columns": {
-        "site": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "hour": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age_group": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shelf_name": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "shelf_id": {
-          "type": "String",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "visit": {
-          "type": "Int32",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze1": {
-          "type": "Int32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze3": {
-          "type": "Int32",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze10": {
-          "type": "Int32",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "pickup": {
-          "type": "Nullable(Int32)",
-          "description": "",
-          "position": 12,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "pickup_count": {
-          "type": "Nullable(Int32)",
-          "description": "",
-          "position": 13,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "pickup_raw": {
-          "type": "Nullable(Int32)",
-          "description": "",
-          "position": 14,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "sales_funnel_pickup": [
+      {
+        "name": "site",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "hour",
+        "type": "String"
+      },
+      {
+        "name": "age_group",
+        "type": "String"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "shelf_name",
+        "type": "String"
+      },
+      {
+        "name": "shelf_id",
+        "type": "String"
+      },
+      {
+        "name": "visit",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze1",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze3",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze10",
+        "type": "Int32"
+      },
+      {
+        "name": "pickup",
+        "type": "Nullable(Int32)"
+      },
+      {
+        "name": "pickup_count",
+        "type": "Nullable(Int32)"
+      },
+      {
+        "name": "pickup_raw",
+        "type": "Nullable(Int32)"
       }
-    },
-    "sample_cu": {
-      "description": "sample_cu 테이블",
-      "engine": "Log",
-      "total_rows": 49,
-      "total_bytes": 2365,
-      "columns": {
-        "date": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "site": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "shelf_name": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "visit": {
-          "type": "Int32",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze1": {
-          "type": "Int32",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze3": {
-          "type": "Int32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze10": {
-          "type": "Int32",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze1/visit": {
-          "type": "Int32",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze3/visit": {
-          "type": "Int32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze10/visit": {
-          "type": "Int32",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze10/gaze3": {
-          "type": "Int32",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "sample_cu": [
+      {
+        "name": "date",
+        "type": "String"
+      },
+      {
+        "name": "site",
+        "type": "String"
+      },
+      {
+        "name": "shelf_name",
+        "type": "String"
+      },
+      {
+        "name": "visit",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze1",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze3",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze10",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze1/visit",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze3/visit",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze10/visit",
+        "type": "Int32"
+      },
+      {
+        "name": "gaze10/gaze3",
+        "type": "Int32"
       }
-    },
-    "site_db_connection_config": {
-      "description": "site_db_connection_config 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 7,
-      "total_bytes": 898,
-      "columns": {
-        "site": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "ssh_host": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 2,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "ssh_port": {
-          "type": "Nullable(Int32)",
-          "description": "",
-          "position": 3,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "db_host": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "db_port": {
-          "type": "Int32",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "db_name": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 6,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "NULL"
-        }
+    ],
+    "site_db_connection_config": [
+      {
+        "name": "site",
+        "type": "String"
+      },
+      {
+        "name": "ssh_host",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "ssh_port",
+        "type": "Nullable(Int32)"
+      },
+      {
+        "name": "db_host",
+        "type": "String"
+      },
+      {
+        "name": "db_port",
+        "type": "Int32"
+      },
+      {
+        "name": "db_name",
+        "type": "Nullable(String)"
       }
-    },
-    "zone_info": {
-      "description": "zone_info 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 1308,
-      "total_bytes": 26858,
-      "columns": {
-        "site": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "va_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "at_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "va_name": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "at_name": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "start_date": {
-          "type": "Date",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "end_date": {
-          "type": "Nullable(Date)",
-          "description": "",
-          "position": 7,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "zone_info": [
+      {
+        "name": "site",
+        "type": "String"
+      },
+      {
+        "name": "va_id",
+        "type": "String"
+      },
+      {
+        "name": "at_id",
+        "type": "String"
+      },
+      {
+        "name": "va_name",
+        "type": "String"
+      },
+      {
+        "name": "at_name",
+        "type": "String"
+      },
+      {
+        "name": "start_date",
+        "type": "Date"
+      },
+      {
+        "name": "end_date",
+        "type": "Nullable(Date)"
       }
-    }
+    ]
   }
 }

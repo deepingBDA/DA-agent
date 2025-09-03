@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Database Schema Extractor
-=========================
+Simple Database Schema Extractor
+================================
 
-ClickHouse 데이터베이스에서 전체 스키마를 추출하여 JSON 파일로 저장합니다.
-GPT-5 에이전트가 데이터베이스 구조를 이해하고 새로운 툴을 제안할 수 있도록 지원합니다.
+ClickHouse 데이터베이스에서 테이블명과 컬럼명만 추출하여 JSON 파일로 저장합니다.
 """
 
 import json
@@ -12,7 +11,7 @@ import os
 import sys
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, List
 import clickhouse_connect
 from dotenv import load_dotenv
 
@@ -24,17 +23,18 @@ sys.path.append(str(Path(__file__).parent / 'mcp_tools'))
 from database_manager import get_site_client, get_all_sites
 
 def extract_database_schema(database_name: str) -> Dict[str, Any]:
-    """데이터베이스 전체 스키마 추출"""
+    """데이터베이스의 테이블명과 컬럼명만 간단하게 추출"""
     print(f"📊 {database_name} 데이터베이스 스키마 추출 시작...")
     
+    # 간단한 스키마 구조
     schema = {
         "database": database_name,
         "extracted_at": datetime.now().isoformat(),
         "tables": {}
     }
     
+    # 데이터베이스 연결
     if database_name == "cu_base":
-        # cu_base는 중앙 DB에 직접 연결
         from database_manager import _create_config_client
         client = _create_config_client()
         if not client:
@@ -57,89 +57,48 @@ def extract_database_schema(database_name: str) -> Dict[str, Any]:
         # 1. 테이블 목록 조회
         print("🔍 테이블 목록 조회 중...")
         tables_query = f"""
-        SELECT 
-            name AS table_name,
-            engine,
-            total_rows,
-            total_bytes,
-            comment
+        SELECT name AS table_name
         FROM system.tables 
         WHERE database = '{database_name}'
-        AND name NOT LIKE '.%'  -- 숨김 테이블 제외
+        AND name NOT LIKE '.%'
         ORDER BY table_name
         """
         
         tables_result = client.query(tables_query)
         print(f"✅ {len(tables_result.result_rows)}개 테이블 발견")
         
-        # 2. 각 테이블의 컬럼 정보 조회
+        # 2. 각 테이블의 컬럼명만 조회
         print("🔍 컬럼 정보 조회 중...")
         columns_query = f"""
         SELECT 
             table,
             name AS column_name,
-            type AS data_type,
-            position,
-            default_kind,
-            default_expression,
-            comment,
-            is_in_partition_key,
-            is_in_sorting_key,
-            is_in_primary_key
+            type AS data_type
         FROM system.columns 
         WHERE database = '{database_name}'
-        AND table NOT LIKE '.%'  -- 숨김 테이블 제외
+        AND table NOT LIKE '.%'
         ORDER BY table, position
         """
         
         columns_result = client.query(columns_query)
         print(f"✅ {len(columns_result.result_rows)}개 컬럼 정보 수집")
         
-        # 3. 스키마 구조화
-        # 테이블별로 컬럼 정보 그룹화
-        columns_by_table = {}
-        for row in columns_result.result_rows:
-            table_name = row[0]
-            if table_name not in columns_by_table:
-                columns_by_table[table_name] = []
-            
-            columns_by_table[table_name].append({
-                "name": row[1],
-                "type": row[2],
-                "position": row[3],
-                "default_kind": row[4],
-                "default_expression": row[5],
-                "comment": row[6] or "",
-                "is_partition_key": bool(row[7]),
-                "is_sorting_key": bool(row[8]),
-                "is_primary_key": bool(row[9])
-            })
-        
-        # 4. 최종 스키마 구성
+        # 3. 테이블별로 컬럼 그룹화
         for row in tables_result.result_rows:
             table_name = row[0]
+            schema["tables"][table_name] = []
+        
+        # 4. 컬럼 정보 추가 (테이블명 - 컬럼명 구조)
+        for row in columns_result.result_rows:
+            table_name = row[0]
+            column_name = row[1]
+            data_type = row[2]
             
-            # 컬럼 정보를 딕셔너리 형태로 변환
-            columns_dict = {}
-            if table_name in columns_by_table:
-                for col in columns_by_table[table_name]:
-                    columns_dict[col["name"]] = {
-                        "type": col["type"],
-                        "description": col["comment"],
-                        "position": col["position"],
-                        "nullable": "Nullable" in col["type"],
-                        "is_primary_key": col["is_primary_key"],
-                        "is_sorting_key": col["is_sorting_key"],
-                        "default": col["default_expression"] if col["default_expression"] else None
-                    }
-            
-            schema["tables"][table_name] = {
-                "description": row[4] or f"{table_name} 테이블",  # comment
-                "engine": row[1],
-                "total_rows": row[2],
-                "total_bytes": row[3],
-                "columns": columns_dict
-            }
+            if table_name in schema["tables"]:
+                schema["tables"][table_name].append({
+                    "name": column_name,
+                    "type": data_type
+                })
         
         print(f"✅ {database_name} 스키마 추출 완료: {len(schema['tables'])}개 테이블")
         
@@ -187,7 +146,7 @@ def save_schema_to_json(schema: Dict[str, Any], output_dir: Path):
 
 def main():
     """메인 실행 함수"""
-    print("🚀 데이터베이스 스키마 추출 시작")
+    print("🚀 간단한 데이터베이스 스키마 추출 시작")
     
     # 출력 디렉토리 생성
     output_dir = Path(__file__).parent / "chat" / "knowledge" / "schema"
@@ -229,7 +188,7 @@ def main():
         
         print("\n📊 추출 결과 요약:")
         for db_name, info in metadata.items():
-            print(f"  - {db_name}: {info['table_count']}개 테이블 ({info['extracted_at']})")
+            print(f"  - {db_name}: {info['table_count']}개 테이블 ({info['extracted_at'][:10]})")
 
 if __name__ == "__main__":
     main()

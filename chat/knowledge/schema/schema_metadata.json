@@ -1,11 +1,11 @@
 {
   "plusinsight": {
-    "extracted_at": "2025-09-03T09:56:42.204623",
+    "extracted_at": "2025-09-03T10:19:50.982215",
     "table_count": 55,
     "file_path": "plusinsight_schema.json"
   },
   "cu_base": {
-    "extracted_at": "2025-09-03T09:56:43.353175",
+    "extracted_at": "2025-09-03T10:19:52.018023",
     "table_count": 12,
     "file_path": "cu_base_schema.json"
   }

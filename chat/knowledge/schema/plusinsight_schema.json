@@ -1,4244 +1,1804 @@
 {
   "database": "plusinsight",
-  "extracted_at": "2025-09-03T09:56:42.204623",
+  "extracted_at": "2025-09-03T10:19:50.982215",
   "tables": {
-    "action": {
-      "description": "action 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 13185830,
-      "total_bytes": 419118206,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "action_recognition": {
-          "type": "UInt16",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "x": {
-          "type": "Float64",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "y": {
-          "type": "Float64",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "zone_ids": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze_at": {
-          "type": "Array(Tuple(Float64, Float64))",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    "action": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "action_recognition",
+        "type": "UInt16"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
+      },
+      {
+        "name": "x",
+        "type": "Float64"
+      },
+      {
+        "name": "y",
+        "type": "Float64"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "zone_ids",
+        "type": "Array(String)"
+      },
+      {
+        "name": "gaze_at",
+        "type": "Array(Tuple(Float64, Float64))"
       }
-    },
-    "alembic_version": {
-      "description": "alembic_version 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 1,
-      "total_bytes": 284,
-      "columns": {
-        "version_num": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "dt": {
-          "type": "DateTime",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "now()"
-        }
+    ],
+    "alembic_version": [
+      {
+        "name": "version_num",
+        "type": "String"
+      },
+      {
+        "name": "dt",
+        "type": "DateTime"
       }
-    },
-    "attention": {
-      "description": "attention 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "at_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "va_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "attention": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "at_id",
+        "type": "String"
+      },
+      {
+        "name": "va_id",
+        "type": "String"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
       }
-    },
-    "attention_config": {
-      "description": "attention_config 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "attention_target_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "visible_area_id_list": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "window": {
-          "type": "Float64",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "threshold": {
-          "type": "Float64",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "attention_config": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "attention_target_id",
+        "type": "String"
+      },
+      {
+        "name": "visible_area_id_list",
+        "type": "String"
+      },
+      {
+        "name": "window",
+        "type": "Float64"
+      },
+      {
+        "name": "threshold",
+        "type": "Float64"
       }
-    },
-    "camera": {
-      "description": "camera 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 9,
-      "total_bytes": 30807823,
-      "columns": {
-        "cam_id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "address": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "cam_name": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "cam_model": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 4,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "format('', '')"
-        },
-        "thumbnail": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "meta": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 6,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "active": {
-          "type": "Bool",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "true"
-        }
+    ],
+    "camera": [
+      {
+        "name": "cam_id",
+        "type": "String"
+      },
+      {
+        "name": "address",
+        "type": "String"
+      },
+      {
+        "name": "cam_name",
+        "type": "String"
+      },
+      {
+        "name": "cam_model",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "thumbnail",
+        "type": "String"
+      },
+      {
+        "name": "meta",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "active",
+        "type": "Bool"
       }
-    },
-    "camera_to_minimap": {
-      "description": "camera_to_minimap 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 9,
-      "total_bytes": 3765,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "cam_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "minimap_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "intrinsic": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 4,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "homography": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 5,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "roi": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "camera_to_minimap": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "cam_id",
+        "type": "String"
+      },
+      {
+        "name": "minimap_id",
+        "type": "String"
+      },
+      {
+        "name": "intrinsic",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "homography",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "roi",
+        "type": "String"
       }
-    },
-    "combination": {
-      "description": "combination 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 122,
-      "total_bytes": 12918,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "name": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "custom_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "target_type": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "target_id": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "keywords": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "combination": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "name",
+        "type": "String"
+      },
+      {
+        "name": "custom_id",
+        "type": "String"
+      },
+      {
+        "name": "target_type",
+        "type": "String"
+      },
+      {
+        "name": "target_id",
+        "type": "String"
+      },
+      {
+        "name": "keywords",
+        "type": "Array(String)"
       }
-    },
-    "custom_event": {
-      "description": "custom_event 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 61,
-      "total_bytes": 4944,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "type": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "name": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "period_start": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "period_end": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "keywords": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "tags": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "location_name": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 8,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "location_coords": {
-          "type": "Array(Tuple(Float64, Float64))",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "order": {
-          "type": "UInt16",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "name_tag_offset_x": {
-          "type": "Nullable(Float64)",
-          "description": "",
-          "position": 12,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "name_tag_offset_y": {
-          "type": "Nullable(Float64)",
-          "description": "",
-          "position": 13,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "color": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 14,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "custom_event": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "type",
+        "type": "String"
+      },
+      {
+        "name": "name",
+        "type": "String"
+      },
+      {
+        "name": "period_start",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "period_end",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "keywords",
+        "type": "Array(String)"
+      },
+      {
+        "name": "tags",
+        "type": "Array(String)"
+      },
+      {
+        "name": "location_name",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "location_coords",
+        "type": "Array(Tuple(Float64, Float64))"
+      },
+      {
+        "name": "order",
+        "type": "UInt16"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "name_tag_offset_x",
+        "type": "Nullable(Float64)"
+      },
+      {
+        "name": "name_tag_offset_y",
+        "type": "Nullable(Float64)"
+      },
+      {
+        "name": "color",
+        "type": "Nullable(String)"
       }
-    },
-    "customer_behavior_area": {
-      "description": "customer_behavior_area 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 63,
-      "total_bytes": 7424,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "attention_target_zone_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "visible_area_zone_ids": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "customer_behavior_area": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "attention_target_zone_id",
+        "type": "String"
+      },
+      {
+        "name": "visible_area_zone_ids",
+        "type": "Array(String)"
       }
-    },
-    "customer_behavior_event": {
-      "description": "customer_behavior_event 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 184137,
-      "total_bytes": 2124749,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "event_type": {
-          "type": "UInt8",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "customer_behavior_area_id": {
-          "type": "String",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        }
+    ],
+    "customer_behavior_event": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "event_type",
+        "type": "UInt8"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "customer_behavior_area_id",
+        "type": "String"
       }
-    },
-    "date_mapping": {
-      "description": "date_mapping 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "base_period_start": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "base_period_end": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "target_period_start": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "target_period_end": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "date_mapping": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "base_period_start",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "base_period_end",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "target_period_start",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "target_period_end",
+        "type": "DateTime64(3)"
       }
-    },
-    "detected_time": {
-      "description": "detected_time 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 1865964,
-      "total_bytes": 221671261,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "person_first_detected": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "person_last_detected": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "group_id": {
-          "type": "String",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "detected_time": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "person_first_detected",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "person_last_detected",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "group_id",
+        "type": "String"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
       }
-    },
-    "dwelling_bin": {
-      "description": "dwelling_bin 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 5439945,
-      "total_bytes": 218258882,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "x": {
-          "type": "Float64",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "y": {
-          "type": "Float64",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age_group": {
-          "type": "UInt8",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "num_people": {
-          "type": "UInt32",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "sum_dwelling_sec": {
-          "type": "UInt32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "dwelling_bin": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "x",
+        "type": "Float64"
+      },
+      {
+        "name": "y",
+        "type": "Float64"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "age_group",
+        "type": "UInt8"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
+      },
+      {
+        "name": "num_people",
+        "type": "UInt32"
+      },
+      {
+        "name": "sum_dwelling_sec",
+        "type": "UInt32"
       }
-    },
-    "dwelling_bin_time": {
-      "description": "dwelling_bin_time 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 1864546,
-      "total_bytes": 71075139,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "x": {
-          "type": "Float64",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "y": {
-          "type": "Float64",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age_group": {
-          "type": "UInt8",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "num_people": {
-          "type": "UInt32",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "sum_dwelling_sec": {
-          "type": "UInt32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "hours": {
-          "type": "UInt8",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        }
+    ],
+    "dwelling_bin_time": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "x",
+        "type": "Float64"
+      },
+      {
+        "name": "y",
+        "type": "Float64"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "age_group",
+        "type": "UInt8"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
+      },
+      {
+        "name": "num_people",
+        "type": "UInt32"
+      },
+      {
+        "name": "sum_dwelling_sec",
+        "type": "UInt32"
+      },
+      {
+        "name": "hours",
+        "type": "UInt8"
       }
-    },
-    "flow": {
-      "description": "flow 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 1655605,
-      "total_bytes": 62491325,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "from": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "to": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "step": {
-          "type": "UInt32",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age_group": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "num_people": {
-          "type": "UInt32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "flow": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "from",
+        "type": "String"
+      },
+      {
+        "name": "to",
+        "type": "String"
+      },
+      {
+        "name": "step",
+        "type": "UInt32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "age_group",
+        "type": "UInt8"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
+      },
+      {
+        "name": "num_people",
+        "type": "UInt32"
       }
-    },
-    "group_type_distribution": {
-      "description": "group_type_distribution 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "group_type": {
-          "type": "UInt8",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "num_of_type": {
-          "type": "Int32",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "num_children": {
-          "type": "Int32",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "sum_children_ages": {
-          "type": "Float32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "group_type_distribution": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "group_type",
+        "type": "UInt8"
+      },
+      {
+        "name": "num_of_type",
+        "type": "Int32"
+      },
+      {
+        "name": "num_children",
+        "type": "Int32"
+      },
+      {
+        "name": "sum_children_ages",
+        "type": "Float32"
       }
-    },
-    "imported_unique_count": {
-      "description": "imported_unique_count 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "count": {
-          "type": "UInt32",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "imported_unique_count": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "count",
+        "type": "UInt32"
       }
-    },
-    "interaction": {
-      "description": "interaction 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "interaction_target_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "interaction_area_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "interaction_recognition": {
-          "type": "UInt16",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "x": {
-          "type": "Float64",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "y": {
-          "type": "Float64",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        }
+    ],
+    "interaction": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "interaction_target_id",
+        "type": "String"
+      },
+      {
+        "name": "interaction_area_id",
+        "type": "String"
+      },
+      {
+        "name": "interaction_recognition",
+        "type": "UInt16"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
+      },
+      {
+        "name": "x",
+        "type": "Float64"
+      },
+      {
+        "name": "y",
+        "type": "Float64"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
       }
-    },
-    "interaction_config": {
-      "description": "interaction_config 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "interaction_target_list": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "interaction_area_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "interaction_config": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "interaction_target_list",
+        "type": "String"
+      },
+      {
+        "name": "interaction_area_id",
+        "type": "String"
       }
-    },
-    "line": {
-      "description": "line 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 40,
-      "total_bytes": 4648,
-      "columns": {
-        "uid": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "order": {
-          "type": "Nullable(UInt32)",
-          "description": "",
-          "position": 3,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "name": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "start_x": {
-          "type": "Float64",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "start_y": {
-          "type": "Float64",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "end_x": {
-          "type": "Float64",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "end_y": {
-          "type": "Float64",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "entrance": {
-          "type": "Bool",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "keywords": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "name_tag_offset_x": {
-          "type": "Float64",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "name_tag_offset_y": {
-          "type": "Float64",
-          "description": "",
-          "position": 12,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "line": [
+      {
+        "name": "uid",
+        "type": "String"
+      },
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "order",
+        "type": "Nullable(UInt32)"
+      },
+      {
+        "name": "name",
+        "type": "String"
+      },
+      {
+        "name": "start_x",
+        "type": "Float64"
+      },
+      {
+        "name": "start_y",
+        "type": "Float64"
+      },
+      {
+        "name": "end_x",
+        "type": "Float64"
+      },
+      {
+        "name": "end_y",
+        "type": "Float64"
+      },
+      {
+        "name": "entrance",
+        "type": "Bool"
+      },
+      {
+        "name": "keywords",
+        "type": "Array(String)"
+      },
+      {
+        "name": "name_tag_offset_x",
+        "type": "Float64"
+      },
+      {
+        "name": "name_tag_offset_y",
+        "type": "Float64"
       }
-    },
-    "line_in_out_group": {
-      "description": "line_in_out_group 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "triggered_line_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "in_out": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "group_id": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "group_type": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "ages": {
-          "type": "Array(Float32)",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "today_flag": {
-          "type": "Bool",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "false"
-        }
+    ],
+    "line_in_out_group": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "triggered_line_id",
+        "type": "String"
+      },
+      {
+        "name": "in_out",
+        "type": "String"
+      },
+      {
+        "name": "group_id",
+        "type": "String"
+      },
+      {
+        "name": "group_type",
+        "type": "UInt8"
+      },
+      {
+        "name": "ages",
+        "type": "Array(Float32)"
+      },
+      {
+        "name": "today_flag",
+        "type": "Bool"
       }
-    },
-    "line_in_out_individual": {
-      "description": "line_in_out_individual 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 8631172,
-      "total_bytes": 449446704,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "triggered_line_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "in_out": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "group_id": {
-          "type": "String",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "today_flag": {
-          "type": "Bool",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "false"
-        }
+    ],
+    "line_in_out_individual": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "triggered_line_id",
+        "type": "String"
+      },
+      {
+        "name": "in_out",
+        "type": "String"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "group_id",
+        "type": "String"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
+      },
+      {
+        "name": "today_flag",
+        "type": "Bool"
       }
-    },
-    "line_pedestrian": {
-      "description": "line_pedestrian 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "triggered_line_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "in_out": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "line_pedestrian": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "triggered_line_id",
+        "type": "String"
+      },
+      {
+        "name": "in_out",
+        "type": "String"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
       }
-    },
-    "minimap": {
-      "description": "minimap 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 1,
-      "total_bytes": 38919,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "thumbnail": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "minimap_width_in_meter": {
-          "type": "Float64",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "points": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 4,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "minimap": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "thumbnail",
+        "type": "String"
+      },
+      {
+        "name": "minimap_width_in_meter",
+        "type": "Float64"
+      },
+      {
+        "name": "points",
+        "type": "Nullable(String)"
       }
-    },
-    "occupancy_range": {
-      "description": "occupancy_range 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shape_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "start_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "end_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "occupancy_range": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "shape_id",
+        "type": "String"
+      },
+      {
+        "name": "start_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "end_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
       }
-    },
-    "occupancy_raw": {
-      "description": "occupancy_raw 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "person_seq": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 3,
-          "nullable": true,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shape_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "orig_person_seq": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 5,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "similarity": {
-          "type": "Nullable(Float32)",
-          "description": "",
-          "position": 6,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "occupancy_raw": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "person_seq",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "shape_id",
+        "type": "String"
+      },
+      {
+        "name": "orig_person_seq",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "similarity",
+        "type": "Nullable(Float32)"
       }
-    },
-    "opening_hours": {
-      "description": "opening_hours 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 469,
-      "total_bytes": 9582,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "is_open": {
-          "type": "Bool",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "opening_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "closing_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "opening_hours": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "is_open",
+        "type": "Bool"
+      },
+      {
+        "name": "opening_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "closing_time",
+        "type": "DateTime64(3)"
       }
-    },
-    "postprocessor_last_run": {
-      "description": "postprocessor_last_run 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 1840299,
-      "total_bytes": 15090721,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "postprocessor_last_run": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime"
       }
-    },
-    "queueing_pedestrian": {
-      "description": "queueing_pedestrian 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "cam_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "frame_id": {
-          "type": "UInt64",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "queueing_pedestrian": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "cam_id",
+        "type": "String"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "frame_id",
+        "type": "UInt64"
       }
-    },
-    "queueing_status": {
-      "description": "queueing_status 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "number_of_people": {
-          "type": "UInt32",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "x": {
-          "type": "Float64",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "y": {
-          "type": "Float64",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "frame_id": {
-          "type": "UInt64",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "queue_minutes": {
-          "type": "Float64",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "queueing_status": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "number_of_people",
+        "type": "UInt32"
+      },
+      {
+        "name": "x",
+        "type": "Float64"
+      },
+      {
+        "name": "y",
+        "type": "Float64"
+      },
+      {
+        "name": "frame_id",
+        "type": "UInt64"
+      },
+      {
+        "name": "queue_minutes",
+        "type": "Float64"
       }
-    },
-    "raw": {
-      "description": "raw 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 88486069,
-      "total_bytes": 7358668086,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "group_id": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "x": {
-          "type": "Float64",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "y": {
-          "type": "Float64",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender_conf_top": {
-          "type": "Nullable(Float64)",
-          "description": "",
-          "position": 10,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender_conf_top_cam": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 11,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "opp_gender_conf_top": {
-          "type": "Nullable(Float64)",
-          "description": "",
-          "position": 12,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "opp_gender_conf_top_cam": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 13,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "staff_category": {
-          "type": "Nullable(UInt8)",
-          "description": "",
-          "position": 14,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "staff_recognition": {
-          "type": "Array(Float64)",
-          "description": "",
-          "position": 15,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze": {
-          "type": "Nullable(Float64)",
-          "description": "",
-          "position": 16,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "action_recognition": {
-          "type": "UInt16",
-          "description": "",
-          "position": 17,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age_conf_top": {
-          "type": "Float64",
-          "description": "",
-          "position": 18,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "raw": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "group_id",
+        "type": "String"
+      },
+      {
+        "name": "x",
+        "type": "Float64"
+      },
+      {
+        "name": "y",
+        "type": "Float64"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender_conf_top",
+        "type": "Nullable(Float64)"
+      },
+      {
+        "name": "gender_conf_top_cam",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "opp_gender_conf_top",
+        "type": "Nullable(Float64)"
+      },
+      {
+        "name": "opp_gender_conf_top_cam",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "staff_category",
+        "type": "Nullable(UInt8)"
+      },
+      {
+        "name": "staff_recognition",
+        "type": "Array(Float64)"
+      },
+      {
+        "name": "gaze",
+        "type": "Nullable(Float64)"
+      },
+      {
+        "name": "action_recognition",
+        "type": "UInt16"
+      },
+      {
+        "name": "age_conf_top",
+        "type": "Float64"
       }
-    },
-    "raw_postprocess": {
-      "description": "raw_postprocess 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 79581573,
-      "total_bytes": 6639226135,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "group_id": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "x": {
-          "type": "Float64",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "y": {
-          "type": "Float64",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender_conf_top": {
-          "type": "Nullable(Float64)",
-          "description": "",
-          "position": 9,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender_conf_top_cam": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 10,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "opp_gender_conf_top": {
-          "type": "Nullable(Float64)",
-          "description": "",
-          "position": 11,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "opp_gender_conf_top_cam": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 12,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 13,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age_conf_top": {
-          "type": "Float64",
-          "description": "",
-          "position": 14,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze": {
-          "type": "Nullable(Float64)",
-          "description": "",
-          "position": 15,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "staff_category": {
-          "type": "UInt8",
-          "description": "",
-          "position": 16,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "staff_recognition": {
-          "type": "Array(Float64)",
-          "description": "",
-          "position": 17,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "action_recognition": {
-          "type": "UInt16",
-          "description": "",
-          "position": 18,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "raw_postprocess": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "group_id",
+        "type": "String"
+      },
+      {
+        "name": "x",
+        "type": "Float64"
+      },
+      {
+        "name": "y",
+        "type": "Float64"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "gender_conf_top",
+        "type": "Nullable(Float64)"
+      },
+      {
+        "name": "gender_conf_top_cam",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "opp_gender_conf_top",
+        "type": "Nullable(Float64)"
+      },
+      {
+        "name": "opp_gender_conf_top_cam",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "age_conf_top",
+        "type": "Float64"
+      },
+      {
+        "name": "gaze",
+        "type": "Nullable(Float64)"
+      },
+      {
+        "name": "staff_category",
+        "type": "UInt8"
+      },
+      {
+        "name": "staff_recognition",
+        "type": "Array(Float64)"
+      },
+      {
+        "name": "action_recognition",
+        "type": "UInt16"
       }
-    },
-    "realtime_zone_count": {
-      "description": "realtime_zone_count 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 92,
-      "total_bytes": 2433,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "count": {
-          "type": "Int32",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "realtime_zone_count": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "count",
+        "type": "Int32"
       }
-    },
-    "restart_history": {
-      "description": "restart_history 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "type": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "created_at": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "now64()"
-        }
+    ],
+    "restart_history": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "type",
+        "type": "String"
+      },
+      {
+        "name": "created_at",
+        "type": "DateTime64(3)"
       }
-    },
-    "sales_funnel": {
-      "description": "sales_funnel 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 127008,
-      "total_bytes": 515195,
-      "columns": {
-        "site": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "hour": {
-          "type": "UInt8",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "area_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shelf_id": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shelf_name": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age_group": {
-          "type": "String",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "visit": {
-          "type": "UInt32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze1": {
-          "type": "UInt32",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze3": {
-          "type": "UInt32",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze10": {
-          "type": "UInt32",
-          "description": "",
-          "position": 12,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "pickup": {
-          "type": "UInt32",
-          "description": "",
-          "position": 13,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "sales_funnel": [
+      {
+        "name": "site",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "hour",
+        "type": "UInt8"
+      },
+      {
+        "name": "area_id",
+        "type": "String"
+      },
+      {
+        "name": "shelf_id",
+        "type": "String"
+      },
+      {
+        "name": "shelf_name",
+        "type": "String"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "age_group",
+        "type": "String"
+      },
+      {
+        "name": "visit",
+        "type": "UInt32"
+      },
+      {
+        "name": "gaze1",
+        "type": "UInt32"
+      },
+      {
+        "name": "gaze3",
+        "type": "UInt32"
+      },
+      {
+        "name": "gaze10",
+        "type": "UInt32"
+      },
+      {
+        "name": "pickup",
+        "type": "UInt32"
       }
-    },
-    "setting_general": {
-      "description": "setting_general 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 119,
-      "total_bytes": 126610,
-      "columns": {
-        "uid": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "category": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "name": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "value": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "type": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "target_username": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 6,
-          "nullable": true,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        }
+    ],
+    "setting_general": [
+      {
+        "name": "uid",
+        "type": "String"
+      },
+      {
+        "name": "category",
+        "type": "String"
+      },
+      {
+        "name": "name",
+        "type": "String"
+      },
+      {
+        "name": "value",
+        "type": "String"
+      },
+      {
+        "name": "type",
+        "type": "String"
+      },
+      {
+        "name": "target_username",
+        "type": "Nullable(String)"
       }
-    },
-    "shape": {
-      "description": "shape 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "uid": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "cam_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "shape_type": {
-          "type": "Enum8('line' = 1, 'polygon' = 2)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "shape_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "shape_name": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "points": {
-          "type": "Array(Tuple(Float64, Float64))",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "keywords": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "shape": [
+      {
+        "name": "uid",
+        "type": "String"
+      },
+      {
+        "name": "cam_id",
+        "type": "String"
+      },
+      {
+        "name": "shape_type",
+        "type": "Enum8('line' = 1, 'polygon' = 2)"
+      },
+      {
+        "name": "shape_id",
+        "type": "String"
+      },
+      {
+        "name": "shape_name",
+        "type": "String"
+      },
+      {
+        "name": "points",
+        "type": "Array(Tuple(Float64, Float64))"
+      },
+      {
+        "name": "keywords",
+        "type": "Array(String)"
       }
-    },
-    "shared_config": {
-      "description": "shared_config 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "topic": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "name": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "value": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "shared_config": [
+      {
+        "name": "topic",
+        "type": "String"
+      },
+      {
+        "name": "name",
+        "type": "String"
+      },
+      {
+        "name": "value",
+        "type": "String"
       }
-    },
-    "stay": {
-      "description": "stay 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 2628717,
-      "total_bytes": 756149292,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "x": {
-          "type": "Float64",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "y": {
-          "type": "Float64",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "start_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "end_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "zone_ids": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gaze_at": {
-          "type": "Array(Tuple(Nullable(Float64), Nullable(Float64)))",
-          "description": "",
-          "position": 12,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "stay": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "x",
+        "type": "Float64"
+      },
+      {
+        "name": "y",
+        "type": "Float64"
+      },
+      {
+        "name": "start_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "end_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "zone_ids",
+        "type": "Array(String)"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
+      },
+      {
+        "name": "gaze_at",
+        "type": "Array(Tuple(Nullable(Float64), Nullable(Float64)))"
       }
-    },
-    "touch_point": {
-      "description": "touch_point 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 138,
-      "total_bytes": 30286,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "staff_stay_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "customer_stay_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "start_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "end_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "coords": {
-          "type": "Tuple(Float64, Float64)",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "zone_ids": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "customer_age": {
-          "type": "Float32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "customer_gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "touch_point": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "staff_stay_id",
+        "type": "String"
+      },
+      {
+        "name": "customer_stay_id",
+        "type": "String"
+      },
+      {
+        "name": "start_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "end_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "coords",
+        "type": "Tuple(Float64, Float64)"
+      },
+      {
+        "name": "zone_ids",
+        "type": "Array(String)"
+      },
+      {
+        "name": "customer_age",
+        "type": "Float32"
+      },
+      {
+        "name": "customer_gender",
+        "type": "UInt8"
       }
-    },
-    "two_step_flow": {
-      "description": "two_step_flow 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 76660,
-      "total_bytes": 441333,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age_group": {
-          "type": "UInt8",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "zone1_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "zone2_id": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "zone3_id": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "num_people": {
-          "type": "UInt32",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "two_step_flow": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "age_group",
+        "type": "UInt8"
+      },
+      {
+        "name": "zone1_id",
+        "type": "String"
+      },
+      {
+        "name": "zone2_id",
+        "type": "String"
+      },
+      {
+        "name": "zone3_id",
+        "type": "String"
+      },
+      {
+        "name": "num_people",
+        "type": "UInt32"
       }
-    },
-    "user_login": {
-      "description": "user_login 테이블",
-      "engine": "MergeTree",
-      "total_rows": 4,
-      "total_bytes": 946,
-      "columns": {
-        "login_id": {
-          "type": "UUID",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "user_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "user_role": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "user_agent": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "login_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "now64()"
-        }
+    ],
+    "user_login": [
+      {
+        "name": "login_id",
+        "type": "UUID"
+      },
+      {
+        "name": "user_id",
+        "type": "String"
+      },
+      {
+        "name": "user_role",
+        "type": "String"
+      },
+      {
+        "name": "user_agent",
+        "type": "String"
+      },
+      {
+        "name": "login_time",
+        "type": "DateTime64(3)"
       }
-    },
-    "user_page_visit": {
-      "description": "user_page_visit 테이블",
-      "engine": "MergeTree",
-      "total_rows": 81,
-      "total_bytes": 3577,
-      "columns": {
-        "visit_id": {
-          "type": "UUID",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "generateUUIDv4()"
-        },
-        "user_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "page_url": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "referrer_url": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "user_agent": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "visit_timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "now64()"
-        }
+    ],
+    "user_page_visit": [
+      {
+        "name": "visit_id",
+        "type": "UUID"
+      },
+      {
+        "name": "user_id",
+        "type": "String"
+      },
+      {
+        "name": "page_url",
+        "type": "String"
+      },
+      {
+        "name": "referrer_url",
+        "type": "String"
+      },
+      {
+        "name": "user_agent",
+        "type": "String"
+      },
+      {
+        "name": "visit_timestamp",
+        "type": "DateTime64(3)"
       }
-    },
-    "vehicle": {
-      "description": "vehicle 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "cam_name": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "direction": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 4,
-          "nullable": true,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "mean_speed": {
-          "type": "Float32",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "count": {
-          "type": "UInt32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "image": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 7,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "vehicle": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "cam_name",
+        "type": "String"
+      },
+      {
+        "name": "direction",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "mean_speed",
+        "type": "Float32"
+      },
+      {
+        "name": "count",
+        "type": "UInt32"
+      },
+      {
+        "name": "image",
+        "type": "Nullable(String)"
       }
-    },
-    "vision": {
-      "description": "vision 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "view_name": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "frame_id": {
-          "type": "Int32",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "track_id": {
-          "type": "Int32",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "unique_track_id": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "bbox_left": {
-          "type": "Float32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "bbox_top": {
-          "type": "Float32",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "bbox_width": {
-          "type": "Float32",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "bbox_height": {
-          "type": "Float32",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "bbox_ppg_x": {
-          "type": "Float32",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "bbox_ppg_y": {
-          "type": "Float32",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "bbox_confidence": {
-          "type": "Float32",
-          "description": "",
-          "position": 12,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "attr_age": {
-          "type": "Nullable(Float32)",
-          "description": "",
-          "position": 13,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "attr_age_conf": {
-          "type": "Nullable(Float32)",
-          "description": "",
-          "position": 14,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "attr_gender": {
-          "type": "Nullable(Enum8('GENDER_MALE' = 0, 'GENDER_FEMALE' = 1, 'GENDER_UNKNOWN' = 2))",
-          "description": "",
-          "position": 15,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "attr_gender_conf": {
-          "type": "Nullable(Float32)",
-          "description": "",
-          "position": 16,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "attr_gaze": {
-          "type": "Nullable(Float32)",
-          "description": "",
-          "position": 17,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "attr_action_recognition": {
-          "type": "Array(Nullable(Float32))",
-          "description": "",
-          "position": 18,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "attr_staff_recognition": {
-          "type": "Array(Nullable(Float32))",
-          "description": "",
-          "position": 19,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "attr_reid_features": {
-          "type": "Array(Nullable(Float32))",
-          "description": "",
-          "position": 20,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "is_in_roi": {
-          "type": "Bool",
-          "description": "",
-          "position": 21,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "'true'"
-        },
-        "is_ghost": {
-          "type": "Bool",
-          "description": "",
-          "position": 22,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "'false'"
-        },
-        "attr_pose": {
-          "type": "Array(Float32)",
-          "description": "",
-          "position": 23,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "vision": [
+      {
+        "name": "view_name",
+        "type": "String"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "frame_id",
+        "type": "Int32"
+      },
+      {
+        "name": "track_id",
+        "type": "Int32"
+      },
+      {
+        "name": "unique_track_id",
+        "type": "String"
+      },
+      {
+        "name": "bbox_left",
+        "type": "Float32"
+      },
+      {
+        "name": "bbox_top",
+        "type": "Float32"
+      },
+      {
+        "name": "bbox_width",
+        "type": "Float32"
+      },
+      {
+        "name": "bbox_height",
+        "type": "Float32"
+      },
+      {
+        "name": "bbox_ppg_x",
+        "type": "Float32"
+      },
+      {
+        "name": "bbox_ppg_y",
+        "type": "Float32"
+      },
+      {
+        "name": "bbox_confidence",
+        "type": "Float32"
+      },
+      {
+        "name": "attr_age",
+        "type": "Nullable(Float32)"
+      },
+      {
+        "name": "attr_age_conf",
+        "type": "Nullable(Float32)"
+      },
+      {
+        "name": "attr_gender",
+        "type": "Nullable(Enum8('GENDER_MALE' = 0, 'GENDER_FEMALE' = 1, 'GENDER_UNKNOWN' = 2))"
+      },
+      {
+        "name": "attr_gender_conf",
+        "type": "Nullable(Float32)"
+      },
+      {
+        "name": "attr_gaze",
+        "type": "Nullable(Float32)"
+      },
+      {
+        "name": "attr_action_recognition",
+        "type": "Array(Nullable(Float32))"
+      },
+      {
+        "name": "attr_staff_recognition",
+        "type": "Array(Nullable(Float32))"
+      },
+      {
+        "name": "attr_reid_features",
+        "type": "Array(Nullable(Float32))"
+      },
+      {
+        "name": "is_in_roi",
+        "type": "Bool"
+      },
+      {
+        "name": "is_ghost",
+        "type": "Bool"
+      },
+      {
+        "name": "attr_pose",
+        "type": "Array(Float32)"
       }
-    },
-    "vision_raw_mapping": {
-      "description": "vision_raw_mapping 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "unique_track_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "vision_raw_mapping": [
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "unique_track_id",
+        "type": "String"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
       }
-    },
-    "vstr": {
-      "description": "vstr 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "d_type": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "d_level": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 4,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "count": {
-          "type": "UInt32",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "image": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 6,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "vstr": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "d_type",
+        "type": "String"
+      },
+      {
+        "name": "d_level",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "count",
+        "type": "UInt32"
+      },
+      {
+        "name": "image",
+        "type": "Nullable(String)"
       }
-    },
-    "zone": {
-      "description": "zone 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 274,
-      "total_bytes": 45560,
-      "columns": {
-        "uid": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "order": {
-          "type": "Nullable(UInt32)",
-          "description": "",
-          "position": 3,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "name": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "coords": {
-          "type": "Array(Tuple(Float64, Float64))",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "start_date": {
-          "type": "Date",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "'2021-03-20'"
-        },
-        "end_date": {
-          "type": "Date",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "'2099-12-31'"
-        },
-        "keywords": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "meta": {
-          "type": "Map(String, String)",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "name_tag_offset_x": {
-          "type": "Float64",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "name_tag_offset_y": {
-          "type": "Float64",
-          "description": "",
-          "position": 11,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "color": {
-          "type": "String",
-          "description": "",
-          "position": 12,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "tags": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 13,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "'[]'"
-        },
-        "entrance": {
-          "type": "Bool",
-          "description": "",
-          "position": 14,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": "false"
-        }
+    ],
+    "zone": [
+      {
+        "name": "uid",
+        "type": "String"
+      },
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "order",
+        "type": "Nullable(UInt32)"
+      },
+      {
+        "name": "name",
+        "type": "String"
+      },
+      {
+        "name": "coords",
+        "type": "Array(Tuple(Float64, Float64))"
+      },
+      {
+        "name": "start_date",
+        "type": "Date"
+      },
+      {
+        "name": "end_date",
+        "type": "Date"
+      },
+      {
+        "name": "keywords",
+        "type": "Array(String)"
+      },
+      {
+        "name": "meta",
+        "type": "Map(String, String)"
+      },
+      {
+        "name": "name_tag_offset_x",
+        "type": "Float64"
+      },
+      {
+        "name": "name_tag_offset_y",
+        "type": "Float64"
+      },
+      {
+        "name": "color",
+        "type": "String"
+      },
+      {
+        "name": "tags",
+        "type": "Array(String)"
+      },
+      {
+        "name": "entrance",
+        "type": "Bool"
       }
-    },
-    "zone_dwell_range": {
-      "description": "zone_dwell_range 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 4413075,
-      "total_bytes": 137368269,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "triggered_zone_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "start_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "end_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "zone_dwell_range": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "triggered_zone_id",
+        "type": "String"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "start_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "end_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
       }
-    },
-    "zone_in_out_group": {
-      "description": "zone_in_out_group 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "triggered_zone_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "in_out": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "group_id": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "group_type": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "ages": {
-          "type": "Array(Float32)",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "today_flag": {
-          "type": "Bool",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "false"
-        }
+    ],
+    "zone_in_out_group": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "triggered_zone_id",
+        "type": "String"
+      },
+      {
+        "name": "in_out",
+        "type": "String"
+      },
+      {
+        "name": "group_id",
+        "type": "String"
+      },
+      {
+        "name": "group_type",
+        "type": "UInt8"
+      },
+      {
+        "name": "ages",
+        "type": "Array(Float32)"
+      },
+      {
+        "name": "today_flag",
+        "type": "Bool"
       }
-    },
-    "zone_in_out_individual": {
-      "description": "zone_in_out_individual 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 28696899,
-      "total_bytes": 1879229914,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "triggered_zone_id": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "in_out": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 8,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "group_id": {
-          "type": "String",
-          "description": "",
-          "position": 9,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "is_staff": {
-          "type": "Bool",
-          "description": "",
-          "position": 10,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "pair_doc_id": {
-          "type": "Nullable(String)",
-          "description": "",
-          "position": 11,
-          "nullable": true,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "today_flag": {
-          "type": "Bool",
-          "description": "",
-          "position": 12,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": "false"
-        }
+    ],
+    "zone_in_out_individual": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "triggered_zone_id",
+        "type": "String"
+      },
+      {
+        "name": "in_out",
+        "type": "String"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
+      },
+      {
+        "name": "group_id",
+        "type": "String"
+      },
+      {
+        "name": "is_staff",
+        "type": "Bool"
+      },
+      {
+        "name": "pair_doc_id",
+        "type": "Nullable(String)"
+      },
+      {
+        "name": "today_flag",
+        "type": "Bool"
       }
-    },
-    "zone_mapping": {
-      "description": "zone_mapping 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "id": {
-          "type": "String",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "base_zone_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "target_zone_ids": {
-          "type": "Array(String)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "zone_mapping": [
+      {
+        "name": "id",
+        "type": "String"
+      },
+      {
+        "name": "base_zone_id",
+        "type": "String"
+      },
+      {
+        "name": "target_zone_ids",
+        "type": "Array(String)"
       }
-    },
-    "zone_occupancy_minute": {
-      "description": "zone_occupancy_minute 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "zone_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "minute_timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "occupancy_count": {
-          "type": "UInt32",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "zone_occupancy_minute": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "zone_id",
+        "type": "String"
+      },
+      {
+        "name": "minute_timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "occupancy_count",
+        "type": "UInt32"
       }
-    },
-    "zone_occupancy_session": {
-      "description": "zone_occupancy_session 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "zone_id": {
-          "type": "String",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "start_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "end_time": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "average_occupancy_count": {
-          "type": "Float64",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "zone_occupancy_session": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "zone_id",
+        "type": "String"
+      },
+      {
+        "name": "start_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "end_time",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "average_occupancy_count",
+        "type": "Float64"
       }
-    },
-    "zone_pedestrian": {
-      "description": "zone_pedestrian 테이블",
-      "engine": "ReplacingMergeTree",
-      "total_rows": 0,
-      "total_bytes": 0,
-      "columns": {
-        "date": {
-          "type": "Date",
-          "description": "",
-          "position": 1,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "timestamp": {
-          "type": "DateTime64(3)",
-          "description": "",
-          "position": 2,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "polygon_id": {
-          "type": "String",
-          "description": "",
-          "position": 3,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "in_out": {
-          "type": "String",
-          "description": "",
-          "position": 4,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "person_seq": {
-          "type": "String",
-          "description": "",
-          "position": 5,
-          "nullable": false,
-          "is_primary_key": true,
-          "is_sorting_key": true,
-          "default": null
-        },
-        "age": {
-          "type": "Float32",
-          "description": "",
-          "position": 6,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        },
-        "gender": {
-          "type": "UInt8",
-          "description": "",
-          "position": 7,
-          "nullable": false,
-          "is_primary_key": false,
-          "is_sorting_key": false,
-          "default": null
-        }
+    ],
+    "zone_pedestrian": [
+      {
+        "name": "date",
+        "type": "Date"
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime64(3)"
+      },
+      {
+        "name": "polygon_id",
+        "type": "String"
+      },
+      {
+        "name": "in_out",
+        "type": "String"
+      },
+      {
+        "name": "person_seq",
+        "type": "String"
+      },
+      {
+        "name": "age",
+        "type": "Float32"
+      },
+      {
+        "name": "gender",
+        "type": "UInt8"
       }
-    }
+    ]
   }
 }
