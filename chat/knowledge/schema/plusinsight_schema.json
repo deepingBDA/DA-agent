@@ -1,0 +1,4244 @@
+{
+  "database": "plusinsight",
+  "extracted_at": "2025-09-03T09:56:42.204623",
+  "tables": {
+    "action": {
+      "description": "action 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 13185830,
+      "total_bytes": 419118206,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "action_recognition": {
+          "type": "UInt16",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "x": {
+          "type": "Float64",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "y": {
+          "type": "Float64",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "zone_ids": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gaze_at": {
+          "type": "Array(Tuple(Float64, Float64))",
+          "description": "",
+          "position": 11,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "alembic_version": {
+      "description": "alembic_version 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 1,
+      "total_bytes": 284,
+      "columns": {
+        "version_num": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "dt": {
+          "type": "DateTime",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "now()"
+        }
+      }
+    },
+    "attention": {
+      "description": "attention 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "at_id": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "va_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "attention_config": {
+      "description": "attention_config 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "attention_target_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "visible_area_id_list": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "window": {
+          "type": "Float64",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "threshold": {
+          "type": "Float64",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "camera": {
+      "description": "camera 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 9,
+      "total_bytes": 30807823,
+      "columns": {
+        "cam_id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "address": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "cam_name": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "cam_model": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 4,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "format('', '')"
+        },
+        "thumbnail": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "meta": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 6,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "active": {
+          "type": "Bool",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "true"
+        }
+      }
+    },
+    "camera_to_minimap": {
+      "description": "camera_to_minimap 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 9,
+      "total_bytes": 3765,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "cam_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "minimap_id": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "intrinsic": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 4,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "homography": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 5,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "roi": {
+          "type": "String",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "combination": {
+      "description": "combination 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 122,
+      "total_bytes": 12918,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "name": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "custom_id": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "target_type": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "target_id": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "keywords": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "custom_event": {
+      "description": "custom_event 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 61,
+      "total_bytes": 4944,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "type": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "name": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "period_start": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "period_end": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "keywords": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "tags": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "location_name": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 8,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "location_coords": {
+          "type": "Array(Tuple(Float64, Float64))",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "order": {
+          "type": "UInt16",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 11,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "name_tag_offset_x": {
+          "type": "Nullable(Float64)",
+          "description": "",
+          "position": 12,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "name_tag_offset_y": {
+          "type": "Nullable(Float64)",
+          "description": "",
+          "position": 13,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "color": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 14,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "customer_behavior_area": {
+      "description": "customer_behavior_area 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 63,
+      "total_bytes": 7424,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "attention_target_zone_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "visible_area_zone_ids": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "customer_behavior_event": {
+      "description": "customer_behavior_event 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 184137,
+      "total_bytes": 2124749,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "event_type": {
+          "type": "UInt8",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "customer_behavior_area_id": {
+          "type": "String",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        }
+      }
+    },
+    "date_mapping": {
+      "description": "date_mapping 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "base_period_start": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "base_period_end": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "target_period_start": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "target_period_end": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "detected_time": {
+      "description": "detected_time 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 1865964,
+      "total_bytes": 221671261,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "person_first_detected": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "person_last_detected": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "group_id": {
+          "type": "String",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "dwelling_bin": {
+      "description": "dwelling_bin 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 5439945,
+      "total_bytes": 218258882,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "x": {
+          "type": "Float64",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "y": {
+          "type": "Float64",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age_group": {
+          "type": "UInt8",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "num_people": {
+          "type": "UInt32",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "sum_dwelling_sec": {
+          "type": "UInt32",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "dwelling_bin_time": {
+      "description": "dwelling_bin_time 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 1864546,
+      "total_bytes": 71075139,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "x": {
+          "type": "Float64",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "y": {
+          "type": "Float64",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age_group": {
+          "type": "UInt8",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "num_people": {
+          "type": "UInt32",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "sum_dwelling_sec": {
+          "type": "UInt32",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "hours": {
+          "type": "UInt8",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        }
+      }
+    },
+    "flow": {
+      "description": "flow 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 1655605,
+      "total_bytes": 62491325,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "from": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "to": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "step": {
+          "type": "UInt32",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age_group": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "num_people": {
+          "type": "UInt32",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "group_type_distribution": {
+      "description": "group_type_distribution 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "group_type": {
+          "type": "UInt8",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "num_of_type": {
+          "type": "Int32",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "num_children": {
+          "type": "Int32",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "sum_children_ages": {
+          "type": "Float32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "imported_unique_count": {
+      "description": "imported_unique_count 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "count": {
+          "type": "UInt32",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "interaction": {
+      "description": "interaction 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "interaction_target_id": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "interaction_area_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "interaction_recognition": {
+          "type": "UInt16",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "x": {
+          "type": "Float64",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "y": {
+          "type": "Float64",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 11,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        }
+      }
+    },
+    "interaction_config": {
+      "description": "interaction_config 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "interaction_target_list": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "interaction_area_id": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "line": {
+      "description": "line 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 40,
+      "total_bytes": 4648,
+      "columns": {
+        "uid": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "order": {
+          "type": "Nullable(UInt32)",
+          "description": "",
+          "position": 3,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "name": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "start_x": {
+          "type": "Float64",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "start_y": {
+          "type": "Float64",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "end_x": {
+          "type": "Float64",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "end_y": {
+          "type": "Float64",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "entrance": {
+          "type": "Bool",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "keywords": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "name_tag_offset_x": {
+          "type": "Float64",
+          "description": "",
+          "position": 11,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "name_tag_offset_y": {
+          "type": "Float64",
+          "description": "",
+          "position": 12,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "line_in_out_group": {
+      "description": "line_in_out_group 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "triggered_line_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "in_out": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "group_id": {
+          "type": "String",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "group_type": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "ages": {
+          "type": "Array(Float32)",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "today_flag": {
+          "type": "Bool",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "false"
+        }
+      }
+    },
+    "line_in_out_individual": {
+      "description": "line_in_out_individual 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 8631172,
+      "total_bytes": 449446704,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "triggered_line_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "in_out": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "group_id": {
+          "type": "String",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "today_flag": {
+          "type": "Bool",
+          "description": "",
+          "position": 11,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "false"
+        }
+      }
+    },
+    "line_pedestrian": {
+      "description": "line_pedestrian 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "triggered_line_id": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "in_out": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "minimap": {
+      "description": "minimap 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 1,
+      "total_bytes": 38919,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "thumbnail": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "minimap_width_in_meter": {
+          "type": "Float64",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "points": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 4,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "occupancy_range": {
+      "description": "occupancy_range 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "shape_id": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "start_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "end_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "occupancy_raw": {
+      "description": "occupancy_raw 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "person_seq": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 3,
+          "nullable": true,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "shape_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "orig_person_seq": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 5,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "similarity": {
+          "type": "Nullable(Float32)",
+          "description": "",
+          "position": 6,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "opening_hours": {
+      "description": "opening_hours 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 469,
+      "total_bytes": 9582,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "is_open": {
+          "type": "Bool",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "opening_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "closing_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "postprocessor_last_run": {
+      "description": "postprocessor_last_run 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 1840299,
+      "total_bytes": 15090721,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "queueing_pedestrian": {
+      "description": "queueing_pedestrian 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "cam_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "frame_id": {
+          "type": "UInt64",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "queueing_status": {
+      "description": "queueing_status 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "number_of_people": {
+          "type": "UInt32",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "x": {
+          "type": "Float64",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "y": {
+          "type": "Float64",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "frame_id": {
+          "type": "UInt64",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "queue_minutes": {
+          "type": "Float64",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "raw": {
+      "description": "raw 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 88486069,
+      "total_bytes": 7358668086,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "group_id": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "x": {
+          "type": "Float64",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "y": {
+          "type": "Float64",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender_conf_top": {
+          "type": "Nullable(Float64)",
+          "description": "",
+          "position": 10,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender_conf_top_cam": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 11,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "opp_gender_conf_top": {
+          "type": "Nullable(Float64)",
+          "description": "",
+          "position": 12,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "opp_gender_conf_top_cam": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 13,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "staff_category": {
+          "type": "Nullable(UInt8)",
+          "description": "",
+          "position": 14,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "staff_recognition": {
+          "type": "Array(Float64)",
+          "description": "",
+          "position": 15,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gaze": {
+          "type": "Nullable(Float64)",
+          "description": "",
+          "position": 16,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "action_recognition": {
+          "type": "UInt16",
+          "description": "",
+          "position": 17,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age_conf_top": {
+          "type": "Float64",
+          "description": "",
+          "position": 18,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "raw_postprocess": {
+      "description": "raw_postprocess 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 79581573,
+      "total_bytes": 6639226135,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "group_id": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "x": {
+          "type": "Float64",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "y": {
+          "type": "Float64",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender_conf_top": {
+          "type": "Nullable(Float64)",
+          "description": "",
+          "position": 9,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender_conf_top_cam": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 10,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "opp_gender_conf_top": {
+          "type": "Nullable(Float64)",
+          "description": "",
+          "position": 11,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "opp_gender_conf_top_cam": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 12,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 13,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age_conf_top": {
+          "type": "Float64",
+          "description": "",
+          "position": 14,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gaze": {
+          "type": "Nullable(Float64)",
+          "description": "",
+          "position": 15,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "staff_category": {
+          "type": "UInt8",
+          "description": "",
+          "position": 16,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "staff_recognition": {
+          "type": "Array(Float64)",
+          "description": "",
+          "position": 17,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "action_recognition": {
+          "type": "UInt16",
+          "description": "",
+          "position": 18,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "realtime_zone_count": {
+      "description": "realtime_zone_count 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 92,
+      "total_bytes": 2433,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "count": {
+          "type": "Int32",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "restart_history": {
+      "description": "restart_history 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "type": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "created_at": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "now64()"
+        }
+      }
+    },
+    "sales_funnel": {
+      "description": "sales_funnel 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 127008,
+      "total_bytes": 515195,
+      "columns": {
+        "site": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "hour": {
+          "type": "UInt8",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "area_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "shelf_id": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "shelf_name": {
+          "type": "String",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age_group": {
+          "type": "String",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "visit": {
+          "type": "UInt32",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gaze1": {
+          "type": "UInt32",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gaze3": {
+          "type": "UInt32",
+          "description": "",
+          "position": 11,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gaze10": {
+          "type": "UInt32",
+          "description": "",
+          "position": 12,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "pickup": {
+          "type": "UInt32",
+          "description": "",
+          "position": 13,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "setting_general": {
+      "description": "setting_general 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 119,
+      "total_bytes": 126610,
+      "columns": {
+        "uid": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "category": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "name": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "value": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "type": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "target_username": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 6,
+          "nullable": true,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        }
+      }
+    },
+    "shape": {
+      "description": "shape 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "uid": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "cam_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "shape_type": {
+          "type": "Enum8('line' = 1, 'polygon' = 2)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "shape_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "shape_name": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "points": {
+          "type": "Array(Tuple(Float64, Float64))",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "keywords": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "shared_config": {
+      "description": "shared_config 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "topic": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "name": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "value": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "stay": {
+      "description": "stay 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 2628717,
+      "total_bytes": 756149292,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "x": {
+          "type": "Float64",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "y": {
+          "type": "Float64",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "start_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "end_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "zone_ids": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 11,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gaze_at": {
+          "type": "Array(Tuple(Nullable(Float64), Nullable(Float64)))",
+          "description": "",
+          "position": 12,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "touch_point": {
+      "description": "touch_point 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 138,
+      "total_bytes": 30286,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "staff_stay_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "customer_stay_id": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "start_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "end_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "coords": {
+          "type": "Tuple(Float64, Float64)",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "zone_ids": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "customer_age": {
+          "type": "Float32",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "customer_gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "two_step_flow": {
+      "description": "two_step_flow 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 76660,
+      "total_bytes": 441333,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age_group": {
+          "type": "UInt8",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "zone1_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "zone2_id": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "zone3_id": {
+          "type": "String",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "num_people": {
+          "type": "UInt32",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "user_login": {
+      "description": "user_login 테이블",
+      "engine": "MergeTree",
+      "total_rows": 4,
+      "total_bytes": 946,
+      "columns": {
+        "login_id": {
+          "type": "UUID",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "user_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "user_role": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "user_agent": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "login_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "now64()"
+        }
+      }
+    },
+    "user_page_visit": {
+      "description": "user_page_visit 테이블",
+      "engine": "MergeTree",
+      "total_rows": 81,
+      "total_bytes": 3577,
+      "columns": {
+        "visit_id": {
+          "type": "UUID",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "generateUUIDv4()"
+        },
+        "user_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "page_url": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "referrer_url": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "user_agent": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "visit_timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "now64()"
+        }
+      }
+    },
+    "vehicle": {
+      "description": "vehicle 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "cam_name": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "direction": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 4,
+          "nullable": true,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "mean_speed": {
+          "type": "Float32",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "count": {
+          "type": "UInt32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "image": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 7,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "vision": {
+      "description": "vision 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "view_name": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "frame_id": {
+          "type": "Int32",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "track_id": {
+          "type": "Int32",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "unique_track_id": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "bbox_left": {
+          "type": "Float32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "bbox_top": {
+          "type": "Float32",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "bbox_width": {
+          "type": "Float32",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "bbox_height": {
+          "type": "Float32",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "bbox_ppg_x": {
+          "type": "Float32",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "bbox_ppg_y": {
+          "type": "Float32",
+          "description": "",
+          "position": 11,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "bbox_confidence": {
+          "type": "Float32",
+          "description": "",
+          "position": 12,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "attr_age": {
+          "type": "Nullable(Float32)",
+          "description": "",
+          "position": 13,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "attr_age_conf": {
+          "type": "Nullable(Float32)",
+          "description": "",
+          "position": 14,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "attr_gender": {
+          "type": "Nullable(Enum8('GENDER_MALE' = 0, 'GENDER_FEMALE' = 1, 'GENDER_UNKNOWN' = 2))",
+          "description": "",
+          "position": 15,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "attr_gender_conf": {
+          "type": "Nullable(Float32)",
+          "description": "",
+          "position": 16,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "attr_gaze": {
+          "type": "Nullable(Float32)",
+          "description": "",
+          "position": 17,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "attr_action_recognition": {
+          "type": "Array(Nullable(Float32))",
+          "description": "",
+          "position": 18,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "attr_staff_recognition": {
+          "type": "Array(Nullable(Float32))",
+          "description": "",
+          "position": 19,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "attr_reid_features": {
+          "type": "Array(Nullable(Float32))",
+          "description": "",
+          "position": 20,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "is_in_roi": {
+          "type": "Bool",
+          "description": "",
+          "position": 21,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "'true'"
+        },
+        "is_ghost": {
+          "type": "Bool",
+          "description": "",
+          "position": 22,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "'false'"
+        },
+        "attr_pose": {
+          "type": "Array(Float32)",
+          "description": "",
+          "position": 23,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "vision_raw_mapping": {
+      "description": "vision_raw_mapping 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "unique_track_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "vstr": {
+      "description": "vstr 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "d_type": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "d_level": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 4,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "count": {
+          "type": "UInt32",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "image": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 6,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "zone": {
+      "description": "zone 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 274,
+      "total_bytes": 45560,
+      "columns": {
+        "uid": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "order": {
+          "type": "Nullable(UInt32)",
+          "description": "",
+          "position": 3,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "name": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "coords": {
+          "type": "Array(Tuple(Float64, Float64))",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "start_date": {
+          "type": "Date",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "'2021-03-20'"
+        },
+        "end_date": {
+          "type": "Date",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "'2099-12-31'"
+        },
+        "keywords": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "meta": {
+          "type": "Map(String, String)",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "name_tag_offset_x": {
+          "type": "Float64",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "name_tag_offset_y": {
+          "type": "Float64",
+          "description": "",
+          "position": 11,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "color": {
+          "type": "String",
+          "description": "",
+          "position": 12,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "tags": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 13,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "'[]'"
+        },
+        "entrance": {
+          "type": "Bool",
+          "description": "",
+          "position": 14,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": "false"
+        }
+      }
+    },
+    "zone_dwell_range": {
+      "description": "zone_dwell_range 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 4413075,
+      "total_bytes": 137368269,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "triggered_zone_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "start_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "end_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "zone_in_out_group": {
+      "description": "zone_in_out_group 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "triggered_zone_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "in_out": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "group_id": {
+          "type": "String",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "group_type": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "ages": {
+          "type": "Array(Float32)",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "today_flag": {
+          "type": "Bool",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "false"
+        }
+      }
+    },
+    "zone_in_out_individual": {
+      "description": "zone_in_out_individual 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 28696899,
+      "total_bytes": 1879229914,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "triggered_zone_id": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "in_out": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 8,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "group_id": {
+          "type": "String",
+          "description": "",
+          "position": 9,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "is_staff": {
+          "type": "Bool",
+          "description": "",
+          "position": 10,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "pair_doc_id": {
+          "type": "Nullable(String)",
+          "description": "",
+          "position": 11,
+          "nullable": true,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "today_flag": {
+          "type": "Bool",
+          "description": "",
+          "position": 12,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": "false"
+        }
+      }
+    },
+    "zone_mapping": {
+      "description": "zone_mapping 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "id": {
+          "type": "String",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "base_zone_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "target_zone_ids": {
+          "type": "Array(String)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "zone_occupancy_minute": {
+      "description": "zone_occupancy_minute 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "zone_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "minute_timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "occupancy_count": {
+          "type": "UInt32",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "zone_occupancy_session": {
+      "description": "zone_occupancy_session 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "zone_id": {
+          "type": "String",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "start_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "end_time": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "average_occupancy_count": {
+          "type": "Float64",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    },
+    "zone_pedestrian": {
+      "description": "zone_pedestrian 테이블",
+      "engine": "ReplacingMergeTree",
+      "total_rows": 0,
+      "total_bytes": 0,
+      "columns": {
+        "date": {
+          "type": "Date",
+          "description": "",
+          "position": 1,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "timestamp": {
+          "type": "DateTime64(3)",
+          "description": "",
+          "position": 2,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "polygon_id": {
+          "type": "String",
+          "description": "",
+          "position": 3,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "in_out": {
+          "type": "String",
+          "description": "",
+          "position": 4,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "person_seq": {
+          "type": "String",
+          "description": "",
+          "position": 5,
+          "nullable": false,
+          "is_primary_key": true,
+          "is_sorting_key": true,
+          "default": null
+        },
+        "age": {
+          "type": "Float32",
+          "description": "",
+          "position": 6,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        },
+        "gender": {
+          "type": "UInt8",
+          "description": "",
+          "position": 7,
+          "nullable": false,
+          "is_primary_key": false,
+          "is_sorting_key": false,
+          "default": null
+        }
+      }
+    }
+  }
+}

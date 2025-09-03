@@ -22,6 +22,9 @@ from utils import astream_graph, random_uuid
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.runnables import RunnableConfig
 
+# 스키마 관리자 import
+from knowledge.schema_manager import get_compact_schema_summary
+
 # 멀티 에이전트 시스템 import
 try:
     from workflows.multi_agent_workflow import MultiAgentWorkflow
@@ -56,8 +59,28 @@ ABSOLUTE_UPLOAD_DIR = os.path.join(BASE_DIR, UPLOAD_DIR)
 if not os.path.exists(ABSOLUTE_UPLOAD_DIR):
     os.makedirs(ABSOLUTE_UPLOAD_DIR)
 
-# 시스템 프롬프트
-SYSTEM_PROMPT = """<ROLE>
+def build_dynamic_system_prompt() -> str:
+    """동적으로 스키마 정보를 포함한 시스템 프롬프트 생성"""
+    try:
+        # 스키마 요약 정보 가져오기
+        schema_summary = get_compact_schema_summary()
+        
+        # 기본 프롬프트 + 동적 스키마 정보 결합
+        return f"""{BASE_SYSTEM_PROMPT}
+
+----
+
+<DETAILED_DATABASE_SCHEMA>
+{schema_summary}
+</DETAILED_DATABASE_SCHEMA>
+
+{SYSTEM_PROMPT_FOOTER}"""
+    except Exception as e:
+        print(f"⚠️ 스키마 로딩 실패, 기본 프롬프트 사용: {e}")
+        return f"{BASE_SYSTEM_PROMPT}\n\n{SYSTEM_PROMPT_FOOTER}"
+
+# 기본 시스템 프롬프트 (스키마 부분 제외)
+BASE_SYSTEM_PROMPT = """<ROLE>
 You are an expert Retail Analytics Intelligence AI powered by GPT-5, specializing in offline store data analysis.
 You have direct access specialized MCP tools for comprehensive retail analytics and business intelligence.
 
@@ -139,8 +162,9 @@ You have direct access specialized MCP tools for comprehensive retail analytics 
 - person_seq: 고객 ID
 - age: 추정 연령
 - gender: 성별 (0: 남성, 1: 여성)
-</DATABASE_SCHEMA>
+</DATABASE_SCHEMA>"""
 
+SYSTEM_PROMPT_FOOTER = """
 ----
 
 <BUSINESS_CONTEXT>
@@ -250,6 +274,11 @@ You have direct access specialized MCP tools for comprehensive retail analytics 
 
 Remember: You have direct access to comprehensive retail analytics data. Use the MCP tools effectively to provide accurate, data-driven insights that help optimize store performance.
 """
+
+# 동적 시스템 프롬프트 생성
+def get_system_prompt() -> str:
+    """현재 시스템 프롬프트 반환 (동적 스키마 포함)"""
+    return build_dynamic_system_prompt()
 
 # 모델 토큰 정보
 OUTPUT_TOKEN_INFO = {
@@ -444,7 +473,7 @@ async def initialize_agent(thread_id: str, model: str = "gpt-4o", mcp_config=Non
             llm,
             tools,
             checkpointer=MemorySaver(),
-            prompt=SYSTEM_PROMPT,
+            prompt=get_system_prompt(),
         )
         
         # 클라이언트와 에이전트 저장
