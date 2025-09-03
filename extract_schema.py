@@ -56,29 +56,54 @@ def extract_database_schema(database_name: str) -> Dict[str, Any]:
     try:
         # 1. 테이블 목록 조회
         print("🔍 테이블 목록 조회 중...")
-        tables_query = f"""
-        SELECT name AS table_name
-        FROM system.tables 
-        WHERE database = '{database_name}'
-        AND name NOT LIKE '.%'
-        ORDER BY table_name
-        """
+        if database_name == "cu_base":
+            # cu_base는 cu_revenue_total만 필요
+            tables_query = f"""
+            SELECT name AS table_name
+            FROM system.tables 
+            WHERE database = '{database_name}'
+            AND name = 'cu_revenue_total'
+            ORDER BY table_name
+            """
+        else:
+            # plusinsight는 모든 테이블
+            tables_query = f"""
+            SELECT name AS table_name
+            FROM system.tables 
+            WHERE database = '{database_name}'
+            AND name NOT LIKE '.%'
+            ORDER BY table_name
+            """
         
         tables_result = client.query(tables_query)
         print(f"✅ {len(tables_result.result_rows)}개 테이블 발견")
         
         # 2. 각 테이블의 컬럼명만 조회
         print("🔍 컬럼 정보 조회 중...")
-        columns_query = f"""
-        SELECT 
-            table,
-            name AS column_name,
-            type AS data_type
-        FROM system.columns 
-        WHERE database = '{database_name}'
-        AND table NOT LIKE '.%'
-        ORDER BY table, position
-        """
+        if database_name == "cu_base":
+            # cu_base는 cu_revenue_total만 조회
+            columns_query = f"""
+            SELECT 
+                table,
+                name AS column_name,
+                type AS data_type
+            FROM system.columns 
+            WHERE database = '{database_name}'
+            AND table = 'cu_revenue_total'
+            ORDER BY table, position
+            """
+        else:
+            # plusinsight는 모든 테이블
+            columns_query = f"""
+            SELECT 
+                table,
+                name AS column_name,
+                type AS data_type
+            FROM system.columns 
+            WHERE database = '{database_name}'
+            AND table NOT LIKE '.%'
+            ORDER BY table, position
+            """
         
         columns_result = client.query(columns_query)
         print(f"✅ {len(columns_result.result_rows)}개 컬럼 정보 수집")
