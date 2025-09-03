@@ -122,73 +122,36 @@ class SchemaManager:
         return results
     
     def generate_compact_schema_summary(self) -> str:
-        """핵심 테이블만 DDL 스타일로 요약 생성 (GPT-5 컨텍스트용)"""
+        """모든 테이블을 간단한 CREATE TABLE 형식으로 요약 생성 (GPT-5 컨텍스트용)"""
         summary_parts = []
         
-        summary_parts.append("# 📊 Database Schema (Key Tables)\n")
-        
-        # 핵심 테이블 정의 (데이터베이스별)
-        key_tables = {
-            'plusinsight': [
-                'line_in_out_individual', 'customer_behavior_event', 'zone', 
-                'sales_funnel', 'two_step_flow', 'detected_time', 'dwelling_bin',
-                'zone_dwell_range', 'stay', 'action'
-            ],
-            'cu_base': [
-                'cu_revenue_total', 'site_db_connection_config', 'sales_funnel',
-                'customer_behavior_summary', 'visitor_time_analysis'
-            ]
-        }
+        summary_parts.append("# 📊 Database Schema (All Tables)\n")
         
         for db_name, schema in self.schemas.items():
             table_count = len(schema['tables'])
             tables = schema['tables']
             
-            summary_parts.append(f"## {db_name} Database ({table_count} total tables)")
+            summary_parts.append(f"## {db_name} Database ({table_count} tables)")
+            summary_parts.append("")
             
-            # 핵심 테이블만 표시
-            selected_tables = key_tables.get(db_name, [])
+            # 모든 테이블을 알파벳 순으로 정렬하여 표시
+            sorted_tables = sorted(tables.items())
             
-            # 실제 존재하는 테이블만 필터링
-            existing_key_tables = [(name, info) for name, info in tables.items() 
-                                 if name in selected_tables]
-            
-            # 핵심 테이블이 없으면 상위 5개 테이블 선택
-            if not existing_key_tables:
-                existing_key_tables = sorted(
-                    tables.items(), 
-                    key=lambda x: x[1].get('total_rows', 0), 
-                    reverse=True
-                )[:5]
-            
-            summary_parts.append(f"*Showing {len(existing_key_tables)} key tables*\n")
-            
-            for table_name, table_info in existing_key_tables:
-                summary_parts.append(f"### {table_name}")
-                
-                # 컬럼 정의만 간단히 (DDL 없이)
+            for table_name, table_info in sorted_tables:
+                # 컬럼 정보 수집
                 columns = table_info.get('columns', {})
-                column_info = []
-                for col_name, col_info in list(columns.items())[:8]:  # 최대 8개 컬럼만
-                    col_type = col_info.get('type', '').split('(')[0]
-                    column_info.append(f"{col_name}({col_type})")
+                column_defs = []
                 
-                if column_info:
-                    summary_parts.append("- " + ", ".join(column_info))
-                    if len(columns) > 8:
-                        summary_parts.append(f"- ... and {len(columns) - 8} more columns")
+                for col_name, col_info in columns.items():
+                    col_type = col_info.get('type', '').split('(')[0]  # 괄호 안 내용 제거
+                    column_defs.append(f"{col_name} {col_type}")
                 
-                summary_parts.append("")  # 빈 줄
-            
-            # 나머지 테이블 목록만 표시
-            remaining_tables = [name for name in sorted(tables.keys()) 
-                              if name not in [t[0] for t in existing_key_tables]]
-            
-            if remaining_tables:
-                summary_parts.append(f"**Other tables ({len(remaining_tables)}):** " + 
-                                   ", ".join(remaining_tables[:15]))
-                if len(remaining_tables) > 15:
-                    summary_parts.append(f" ... and {len(remaining_tables) - 15} more")
+                # CREATE TABLE 형식으로 한 줄에 표시
+                if column_defs:
+                    columns_str = ", ".join(column_defs)
+                    summary_parts.append(f"CREATE TABLE {table_name} ({columns_str});")
+                else:
+                    summary_parts.append(f"CREATE TABLE {table_name} ();")
             
             summary_parts.append("\n" + "="*50 + "\n")
         
