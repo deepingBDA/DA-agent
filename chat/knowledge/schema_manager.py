@@ -121,41 +121,204 @@ class SchemaManager:
         
         return results
     
-    def generate_compact_schema_summary(self) -> str:
-        """모든 테이블을 간단한 CREATE TABLE 형식으로 요약 생성 (GPT-5 컨텍스트용)"""
-        summary_parts = []
+    def generate_business_context_schema(self) -> str:
+        """비즈니스 컨텍스트가 포함된 상세 스키마 생성 (GPT-5 컨텍스트용)"""
         
-        summary_parts.append("# 📊 Database Schema (All Tables)\n")
+        # 테이블별 비즈니스 설명과 컬럼 설명 매핑
+        table_descriptions = {
+            'plusinsight': {
+                'line_in_out_individual': {
+                    'description': '방문객 입출입 개별 기록',
+                    'business_meaning': '매장 방문 패턴과 체류 시간 분석의 기초 데이터',
+                    'columns': {
+                        'person_seq': '개별 방문객 고유 ID',
+                        'date': '방문 날짜', 
+                        'timestamp': '정확한 입출입 시각',
+                        'in_out': '입장(IN) 또는 퇴장(OUT)',
+                        'is_staff': '직원 여부 (0: 고객, 1: 직원)',
+                        'triggered_line_id': '감지된 라인 ID',
+                        'id': '레코드 고유 ID',
+                        'age': '추정 연령',
+                        'gender': '성별 (0: 남성, 1: 여성)',
+                        'group_id': '그룹 ID'
+                    }
+                },
+                'customer_behavior_event': {
+                    'description': '고객의 매장 내 행동 이벤트',
+                    'business_meaning': '고객의 실제 관심도와 구매 의도를 파악하는 핵심 데이터',
+                    'columns': {
+                        'person_seq': '방문객 ID',
+                        'event_type': '행동 유형 (1: 픽업, 2: 시선, 3: 체류)',
+                        'timestamp': '행동 발생 시각',
+                        'customer_behavior_area_id': '행동 발생 구역 ID',
+                        'date': '이벤트 발생 날짜',
+                        'age': '추정 연령',
+                        'gender': '성별 (0: 남성, 1: 여성)',
+                        'is_staff': '직원 여부 (0: 고객, 1: 직원)'
+                    }
+                },
+                'zone': {
+                    'description': '매장 내 구역 정보',
+                    'business_meaning': '매장 레이아웃과 동선 최적화의 기준',
+                    'columns': {
+                        'id': '구역 고유 ID',
+                        'name': '구역명 (예: 음료, 과자, 시식대)',
+                        'coords': '구역의 물리적 좌표',
+                        'uid': '유니크 ID',
+                        'order': '구역 순서',
+                        'start_date': '구역 설정 시작일',
+                        'end_date': '구역 설정 종료일',
+                        'keywords': '구역 키워드',
+                        'color': '구역 표시 색상'
+                    }
+                },
+                'sales_funnel': {
+                    'description': '방문-노출-픽업 퍼널 분석',
+                    'business_meaning': '상품의 매력도와 진열 효과성을 측정',
+                    'columns': {
+                        'shelf_name': '진열대명',
+                        'date': '분석 날짜',
+                        'visit': '방문 수',
+                        'gaze1': '노출 수 (시선 집중)',
+                        'pickup': '픽업 수 (실제 집어든 행동)',
+                        'site': '매장 사이트',
+                        'hour': '시간대',
+                        'area_id': '구역 ID',
+                        'shelf_id': '진열대 ID',
+                        'gender': '성별',
+                        'age_group': '연령 그룹',
+                        'conversion_rate': '전환율'
+                    }
+                },
+                'two_step_flow': {
+                    'description': '고객 동선 패턴 (3단계 이동 경로)',
+                    'business_meaning': '고객 세그먼트별 매장 내 이동 패턴과 선호도 분석',
+                    'columns': {
+                        'gender': '성별 (0: 남성, 1: 여성)',
+                        'age_group': '연령대',
+                        'zone1_id': '첫 번째 방문 구역',
+                        'zone2_id': '두 번째 방문 구역',
+                        'zone3_id': '세 번째 방문 구역',
+                        'num_people': '해당 패턴을 보인 고객 수',
+                        'date': '분석 날짜'
+                    }
+                },
+                'detected_time': {
+                    'description': 'AI가 감지한 고객 속성 정보',
+                    'business_meaning': '인구통계학적 세분화 분석의 기초',
+                    'columns': {
+                        'person_seq': '고객 ID',
+                        'age': '추정 연령',
+                        'gender': '성별 (0: 남성, 1: 여성)',
+                        'id': '레코드 고유 ID',
+                        'date': '감지 날짜',
+                        'timestamp': '감지 시각',
+                        'person_first_detected': '최초 감지 시각',
+                        'person_last_detected': '마지막 감지 시각',
+                        'group_id': '그룹 ID',
+                        'is_staff': '직원 여부'
+                    }
+                }
+            },
+            'cu_base': {
+                'cu_revenue_total': {
+                    'description': '편의점 매출 상세 데이터',
+                    'business_meaning': '실제 매출과 고객 행동 데이터 간의 연관성 분석',
+                    'columns': {
+                        'store_nm': '매장명',
+                        'tran_ymd': '거래 날짜',
+                        'pos_no': 'POS 번호',
+                        'tran_no': '거래 번호',
+                        'small_nm': '소분류 상품명',
+                        'sale_amt': '판매 금액',
+                        'sale_qty': '판매 수량',
+                        'store_cd': '매장 코드',
+                        'item_cd': '상품 코드',
+                        'large_nm': '대분류명',
+                        'mid_nm': '중분류명',
+                        'small_cd': '소분류 코드',
+                        'unit_price': '단가',
+                        'discount_amt': '할인 금액'
+                    }
+                }
+            }
+        }
+        
+        summary_parts = []
+        summary_parts.append("# 📊 Database Schema with Business Context\n")
         
         for db_name, schema in self.schemas.items():
             table_count = len(schema['tables'])
             tables = schema['tables']
             
-            summary_parts.append(f"## {db_name} Database ({table_count} tables)")
-            summary_parts.append("")
+            summary_parts.append(f'## {db_name} Database ({table_count} tables)\n')
             
-            # 모든 테이블을 알파벳 순으로 정렬하여 표시
+            # 알파벳 순으로 정렬된 테이블들
             sorted_tables = sorted(tables.items())
             
-            for table_name, table_info in sorted_tables:
-                # 컬럼 정보 수집
-                columns = table_info.get('columns', {})
-                column_defs = []
-                
-                for col_name, col_info in columns.items():
-                    col_type = col_info.get('type', '').split('(')[0]  # 괄호 안 내용 제거
-                    column_defs.append(f"{col_name} {col_type}")
-                
-                # CREATE TABLE 형식으로 한 줄에 표시
-                if column_defs:
-                    columns_str = ", ".join(column_defs)
-                    summary_parts.append(f"CREATE TABLE {table_name} ({columns_str});")
-                else:
-                    summary_parts.append(f"CREATE TABLE {table_name} ();")
+            # 상세 설명이 있는 핵심 테이블들과 기본 테이블들 분리
+            detailed_tables = []
+            basic_tables = []
             
-            summary_parts.append("\n" + "="*50 + "\n")
+            for table_name, table_info in sorted_tables:
+                table_context = table_descriptions.get(db_name, {}).get(table_name, {})
+                if table_context:  # 상세 설명이 있는 테이블
+                    detailed_tables.append((table_name, table_info, table_context))
+                else:  # 기본 테이블
+                    basic_tables.append((table_name, table_info))
+            
+            # 핵심 테이블들 상세 표시
+            if detailed_tables:
+                summary_parts.append("### 📋 Core Business Tables")
+                for table_name, table_info, table_context in detailed_tables:
+                    description = table_context.get('description', f'{table_name} 테이블')
+                    business_meaning = table_context.get('business_meaning', '')
+                    column_descriptions = table_context.get('columns', {})
+                    
+                    summary_parts.append(f'**{table_name}**: {description}')
+                    if business_meaning:
+                        summary_parts.append(f'  - *비즈니스 의미*: {business_meaning}')
+                    
+                    # 실제 테이블의 모든 컬럼 표시 (간단히)
+                    columns = table_info.get('columns', {})
+                    detailed_cols = []
+                    for col_name, col_info in columns.items():
+                        col_type = col_info.get('type', '').split('(')[0]
+                        col_desc = column_descriptions.get(col_name, '')
+                        if col_desc:
+                            detailed_cols.append(f"{col_name}({col_type}): {col_desc}")
+                        else:
+                            detailed_cols.append(f"{col_name}({col_type})")
+                    
+                    summary_parts.append(f'  - *컬럼*: {", ".join(detailed_cols[:6])}' + 
+                                        (f', ... ({len(detailed_cols)-6} more)' if len(detailed_cols) > 6 else ''))
+                    summary_parts.append('')
+            
+            # 기본 테이블들 간단 표시
+            if basic_tables:
+                summary_parts.append("### 📊 Other Tables")
+                for table_name, table_info in basic_tables:
+                    columns = table_info.get('columns', {})
+                    col_list = []
+                    for col_name, col_info in list(columns.items())[:4]:  # 처음 4개만
+                        col_type = col_info.get('type', '').split('(')[0]
+                        col_list.append(f"{col_name}({col_type})")
+                    
+                    col_summary = ", ".join(col_list)
+                    if len(columns) > 4:
+                        col_summary += f", ... ({len(columns)-4} more)"
+                    
+                    summary_parts.append(f'- **{table_name}**: {col_summary}')
+                
+                summary_parts.append('')
+            
+            summary_parts.append("="*50 + "\n")
         
         return "\n".join(summary_parts)
+    
+    def generate_compact_schema_summary(self) -> str:
+        """비즈니스 컨텍스트 포함된 상세 스키마 반환"""
+        return self.generate_business_context_schema()
     
     def generate_detailed_table_info(self, database: str, table: str) -> str:
         """특정 테이블의 상세 정보 생성"""
