@@ -236,12 +236,17 @@ def get_site_connection_info(site: str) -> Optional[Dict[str, Any]]:
 
 def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
     """특정 매장의 ClickHouse 클라이언트 생성"""
-    debug_print(f"🔍 [DEBUG] 매장 '{site}' 연결 시도 시작")
+    debug_print(f"🔍 [DEBUG] 매장 '{site}' 연결 시도 시작 (database: {database})")
     
     # 매장 연결 시도 로그
     log_connection_attempt("SITE_CONNECTION_START", site=site, details={
         "requested_database": database
     })
+    
+    # cu_base 데이터베이스 요청 시 중앙 DB 사용
+    if database == 'cu_base':
+        debug_print(f"🏪 [DEBUG] cu_base 요청됨 - 중앙 DB 연결 사용")
+        return _create_config_client()
     
     conn_info = get_site_connection_info(site)
     if not conn_info:
@@ -324,7 +329,7 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
     print(f"  - Port: {port}")
     print(f"  - Username: {os.getenv('CLICKHOUSE_USER', 'None')}")
     print(f"  - Password: {'***' if os.getenv('CLICKHOUSE_PASSWORD') else 'None'}")
-    print(f"  - Database: plusinsight")
+    print(f"  - Database: {database}")
     
     try:
         # ClickHouse 연결 시도 (타임아웃 설정)
@@ -333,7 +338,7 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
             port=port,
             username=os.getenv("CLICKHOUSE_USER"),
             password=os.getenv("CLICKHOUSE_PASSWORD"),
-            database='plusinsight',
+            database=database,
             # 연결 타임아웃 설정
             connect_timeout=10,
             send_receive_timeout=30
@@ -347,7 +352,7 @@ def get_site_client(site: str, database: str = 'plusinsight') -> Optional[Any]:
         log_connection_attempt("SITE_CONNECTION_SUCCESS", site=site, details={
             "final_host": host,
             "final_port": port,
-            "database": "plusinsight"
+            "database": database
         })
         
         return client

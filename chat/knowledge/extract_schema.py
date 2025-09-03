@@ -19,10 +19,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # 이미 구현된 database_manager 사용
-sys.path.append(str(Path(__file__).parent / 'mcp_tools'))
+sys.path.insert(0, 'mcp_tools')
 from database_manager import get_site_client, get_all_sites
 
-def extract_database_schema(database_name: str) -> Dict[str, Any]:
+def extract_simple_schema(database_name: str) -> Dict[str, Any]:
     """데이터베이스의 테이블명과 컬럼명만 간단하게 추출"""
     print(f"📊 {database_name} 데이터베이스 스키마 추출 시작...")
     
@@ -57,7 +57,6 @@ def extract_database_schema(database_name: str) -> Dict[str, Any]:
         # 1. 테이블 목록 조회
         print("🔍 테이블 목록 조회 중...")
         if database_name == "cu_base":
-            # cu_base는 cu_revenue_total만 필요
             tables_query = f"""
             SELECT name AS table_name
             FROM system.tables 
@@ -66,7 +65,6 @@ def extract_database_schema(database_name: str) -> Dict[str, Any]:
             ORDER BY table_name
             """
         else:
-            # plusinsight는 모든 테이블
             tables_query = f"""
             SELECT name AS table_name
             FROM system.tables 
@@ -81,7 +79,6 @@ def extract_database_schema(database_name: str) -> Dict[str, Any]:
         # 2. 각 테이블의 컬럼명만 조회
         print("🔍 컬럼 정보 조회 중...")
         if database_name == "cu_base":
-            # cu_base는 cu_revenue_total만 조회
             columns_query = f"""
             SELECT 
                 table,
@@ -93,7 +90,6 @@ def extract_database_schema(database_name: str) -> Dict[str, Any]:
             ORDER BY table, position
             """
         else:
-            # plusinsight는 모든 테이블
             columns_query = f"""
             SELECT 
                 table,
@@ -148,33 +144,13 @@ def save_schema_to_json(schema: Dict[str, Any], output_dir: Path):
         json.dump(schema, f, ensure_ascii=False, indent=2)
     
     print(f"✅ {output_file} 저장 완료 ({len(schema['tables'])}개 테이블)")
-    
-    # 메타정보 파일 업데이트
-    metadata_file = output_dir / "schema_metadata.json"
-    
-    # 기존 메타데이터 로드 (있다면)
-    metadata = {}
-    if metadata_file.exists():
-        with open(metadata_file, 'r', encoding='utf-8') as f:
-            metadata = json.load(f)
-    
-    # 현재 데이터베이스 메타정보 업데이트
-    metadata[database_name] = {
-        "extracted_at": schema["extracted_at"],
-        "table_count": len(schema["tables"]),
-        "file_path": f"{database_name}_schema.json"
-    }
-    
-    # 메타데이터 저장
-    with open(metadata_file, 'w', encoding='utf-8') as f:
-        json.dump(metadata, f, ensure_ascii=False, indent=2)
 
 def main():
     """메인 실행 함수"""
     print("🚀 간단한 데이터베이스 스키마 추출 시작")
     
     # 출력 디렉토리 생성
-    output_dir = Path(__file__).parent / "chat" / "knowledge" / "schema"
+    output_dir = Path(__file__).parent / "schema"
     output_dir.mkdir(parents=True, exist_ok=True)
     print(f"📁 출력 디렉토리: {output_dir}")
     
@@ -182,13 +158,13 @@ def main():
     databases = ["plusinsight", "cu_base"]
     
     for database in databases:
-        print(f"\n{'='*50}")
+        print(f"\\n{'='*50}")
         print(f"📊 {database} 데이터베이스 처리 중...")
         print(f"{'='*50}")
         
         try:
             # 스키마 추출
-            schema = extract_database_schema(database)
+            schema = extract_simple_schema(database)
             
             if schema["tables"]:
                 # JSON 파일로 저장
@@ -202,18 +178,8 @@ def main():
             traceback.print_exc()
             continue
     
-    print(f"\n🎉 스키마 추출 완료!")
+    print(f"\\n🎉 스키마 추출 완료!")
     print(f"📁 결과 파일: {output_dir}")
-    
-    # 결과 요약
-    metadata_file = output_dir / "schema_metadata.json"
-    if metadata_file.exists():
-        with open(metadata_file, 'r', encoding='utf-8') as f:
-            metadata = json.load(f)
-        
-        print("\n📊 추출 결과 요약:")
-        for db_name, info in metadata.items():
-            print(f"  - {db_name}: {info['table_count']}개 테이블 ({info['extracted_at'][:10]})")
 
 if __name__ == "__main__":
     main()

@@ -10,6 +10,7 @@ tmp*
 branch_clean.sh
 .vscode
 mcp_tools/tests
+.claude/
 
 chat/frontend/node_modules
 

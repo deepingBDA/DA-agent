@@ -3,104 +3,100 @@ Schema Context & Business Intelligence
 =====================================
 
 오프라인 매장 데이터 스키마와 비즈니스 컨텍스트를 정의합니다.
-GPT-5 에이전트가 데이터를 이해하고 의미 있는 인사이트를 생성하는데 사용됩니다.
+JSON 스키마 파일들을 읽어서 동적으로 컨텍스트를 생성합니다.
 """
 
+import json
 from typing import Dict, Any, List
-from dataclasses import dataclass
+from pathlib import Path
 
 # =============================================================================
-# 데이터베이스 스키마 정의
+# 스키마 로더
 # =============================================================================
 
-SCHEMA_CONTEXT = {
-    "databases": {
-        "plusinsight": {
-            "description": "메인 고객 행동 분석 데이터베이스",
-            "tables": {
-                "line_in_out_individual": {
-                    "description": "방문객 입출입 개별 기록",
-                    "key_fields": {
-                        "person_seq": "개별 방문객 고유 ID",
-                        "date": "방문 날짜",
-                        "timestamp": "정확한 입출입 시각", 
-                        "in_out": "입장(IN) 또는 퇴장(OUT)",
-                        "is_staff": "직원 여부 (0: 고객, 1: 직원)"
-                    },
-                    "business_meaning": "매장 방문 패턴과 체류 시간 분석의 기초 데이터"
-                },
-                "customer_behavior_event": {
-                    "description": "고객의 매장 내 행동 이벤트",
-                    "key_fields": {
-                        "person_seq": "방문객 ID",
-                        "event_type": "행동 유형 (1: 픽업, 2: 시선, 3: 체류)",
-                        "timestamp": "행동 발생 시각",
-                        "customer_behavior_area_id": "행동 발생 구역 ID"
-                    },
-                    "business_meaning": "고객의 실제 관심도와 구매 의도를 파악하는 핵심 데이터"
-                },
-                "zone": {
-                    "description": "매장 내 구역 정보",
-                    "key_fields": {
-                        "id": "구역 고유 ID",
-                        "name": "구역명 (예: '음료', '과자', '시식대')",
-                        "coords": "구역의 물리적 좌표"
-                    },
-                    "business_meaning": "매장 레이아웃과 동선 최적화의 기준"
-                },
-                "sales_funnel": {
-                    "description": "방문-노출-픽업 퍼널 분석",
-                    "key_fields": {
-                        "shelf_name": "진열대명",
-                        "date": "분석 날짜",
-                        "visit": "방문 수",
-                        "gaze1": "노출 수 (시선 집중)",
-                        "pickup": "픽업 수 (실제 집어든 행동)"
-                    },
-                    "business_meaning": "상품의 매력도와 진열 효과성을 측정"
-                },
-                "two_step_flow": {
-                    "description": "고객 동선 패턴 (3단계 이동 경로)",
-                    "key_fields": {
-                        "gender": "성별 (0: 남성, 1: 여성)",
-                        "age_group": "연령대",
-                        "zone1_id": "첫 번째 방문 구역",
-                        "zone2_id": "두 번째 방문 구역", 
-                        "zone3_id": "세 번째 방문 구역",
-                        "num_people": "해당 패턴을 보인 고객 수"
-                    },
-                    "business_meaning": "고객 세그먼트별 매장 내 이동 패턴과 선호도 분석"
-                },
-                "detected_time": {
-                    "description": "AI가 감지한 고객 속성 정보",
-                    "key_fields": {
-                        "person_seq": "고객 ID",
-                        "age": "추정 연령",
-                        "gender": "성별 (0: 남성, 1: 여성)"
-                    },
-                    "business_meaning": "인구통계학적 세분화 분석의 기초"
+def load_database_schemas() -> Dict[str, Any]:
+    """JSON 스키마 파일들을 읽어서 데이터베이스 스키마 컨텍스트 생성"""
+    schema_dir = Path(__file__).parent / "schema"
+    schemas = {}
+    
+    # JSON 파일들 읽기
+    for schema_file in schema_dir.glob("*_schema.json"):
+        try:
+            with open(schema_file, 'r', encoding='utf-8') as f:
+                schema_data = json.load(f)
+                db_name = schema_data["database"]
+                schemas[db_name] = {
+                    "description": _get_database_description(db_name),
+                    "extracted_at": schema_data["extracted_at"],
+                    "tables": {}
                 }
-            }
+                
+                # 테이블 정보 처리
+                for table_name, columns in schema_data["tables"].items():
+                    schemas[db_name]["tables"][table_name] = {
+                        "description": _get_table_description(db_name, table_name),
+                        "columns": columns,
+                        "business_meaning": _get_business_meaning(db_name, table_name)
+                    }
+        except Exception as e:
+            print(f"스키마 파일 로딩 오류 {schema_file}: {e}")
+    
+    return schemas
+
+def _get_database_description(db_name: str) -> str:
+    """데이터베이스별 설명"""
+    descriptions = {
+        "plusinsight": "메인 고객 행동 분석 데이터베이스 - AI 카메라를 통한 매장 내 고객 행동, 동선, 관심도 분석",
+        "cu_base": "POS 매출 데이터베이스 - 실제 거래 및 매출 데이터"
+    }
+    return descriptions.get(db_name, f"{db_name} 데이터베이스")
+
+def _get_table_description(db_name: str, table_name: str) -> str:
+    """테이블별 설명 (핵심 테이블들만)"""
+    descriptions = {
+        "plusinsight": {
+            "line_in_out_individual": "방문객 입출입 개별 기록",
+            "customer_behavior_event": "고객의 매장 내 행동 이벤트",
+            "zone": "매장 내 구역 정보",
+            "sales_funnel": "방문-노출-픽업 퍼널 분석",
+            "two_step_flow": "고객 동선 패턴 (3단계 이동 경로)",
+            "detected_time": "AI가 감지한 고객 속성 정보",
+            "action": "고객 행동 인식 데이터",
+            "stay": "고객 체류 정보",
+            "zone_in_out_individual": "구역별 개별 출입 기록",
+            "zone_dwell_range": "구역별 체류 시간 범위",
+            "dwelling_bin": "위치별 체류 집계 데이터"
         },
         "cu_base": {
-            "description": "POS 매출 데이터베이스",
-            "tables": {
-                "cu_revenue_total": {
-                    "description": "편의점 매출 상세 데이터",
-                    "key_fields": {
-                        "store_nm": "매장명",
-                        "tran_ymd": "거래 날짜",
-                        "pos_no": "POS 번호",
-                        "tran_no": "거래 번호",
-                        "small_nm": "소분류 상품명",
-                        "sale_amt": "판매 금액",
-                        "sale_qty": "판매 수량"
-                    },
-                    "business_meaning": "실제 매출과 고객 행동 데이터 간의 연관성 분석"
-                }
-            }
+            "cu_revenue_total": "편의점 매출 상세 데이터 - 거래별 상품 판매 정보"
         }
     }
+    return descriptions.get(db_name, {}).get(table_name, f"{table_name} 테이블")
+
+def _get_business_meaning(db_name: str, table_name: str) -> str:
+    """테이블의 비즈니스 의미"""
+    meanings = {
+        "plusinsight": {
+            "line_in_out_individual": "매장 방문 패턴과 체류 시간 분석의 기초 데이터",
+            "customer_behavior_event": "고객의 실제 관심도와 구매 의도를 파악하는 핵심 데이터",
+            "zone": "매장 레이아웃과 동선 최적화의 기준",
+            "sales_funnel": "상품의 매력도와 진열 효과성을 측정",
+            "two_step_flow": "고객 세그먼트별 매장 내 이동 패턴과 선호도 분석",
+            "detected_time": "인구통계학적 세분화 분석의 기초",
+            "action": "고객의 실제 행동 패턴과 상품 관심도 분석",
+            "stay": "고객 체류 패턴과 관심 구역 분석",
+            "zone_in_out_individual": "구역별 트래픽과 인기도 측정",
+            "zone_dwell_range": "구역별 고객 만족도와 매력도 지표"
+        },
+        "cu_base": {
+            "cu_revenue_total": "실제 매출과 고객 행동 데이터 간의 연관성 분석"
+        }
+    }
+    return meanings.get(db_name, {}).get(table_name, f"{table_name}의 비즈니스 활용 데이터")
+
+# 전역 스키마 컨텍스트 로드
+SCHEMA_CONTEXT = {
+    "databases": load_database_schemas()
 }
 
 # =============================================================================
@@ -336,9 +332,12 @@ def build_analysis_context(query_type: str, tables_used: List[str]) -> str:
     for table in tables_used:
         table_ctx = get_table_context(table)
         if table_ctx:
-            context_parts.append(f"**{table}**: {table_ctx['table_info']['description']}\n")
-            context_parts.append(f"핵심 필드: {list(table_ctx['table_info']['key_fields'].keys())}\n")
-            context_parts.append(f"비즈니스 의미: {table_ctx['table_info']['business_meaning']}\n\n")
+            table_info = table_ctx['table_info']
+            context_parts.append(f"**{table}**: {table_info['description']}\n")
+            context_parts.append(f"비즈니스 의미: {table_info['business_meaning']}\n")
+            if 'columns' in table_info:
+                column_names = [col['name'] for col in table_info['columns']]
+                context_parts.append(f"주요 컬럼: {', '.join(column_names[:10])}\n\n")
     
     # 관련 메트릭과 임계값
     context_parts.append("## 주요 성과 지표:\n")
@@ -350,7 +349,32 @@ def build_analysis_context(query_type: str, tables_used: List[str]) -> str:
     
     return "".join(context_parts)
 
+def get_full_schema_context() -> str:
+    """전체 스키마 컨텍스트를 문자열로 반환 (시스템 프롬프트용)"""
+    context_parts = ["# 데이터베이스 스키마 컨텍스트\n\n"]
+    
+    for db_name, db_info in SCHEMA_CONTEXT["databases"].items():
+        context_parts.append(f"## {db_name} 데이터베이스\n")
+        context_parts.append(f"{db_info['description']}\n\n")
+        
+        context_parts.append("### 테이블 목록:\n")
+        for table_name, table_info in db_info["tables"].items():
+            context_parts.append(f"**{table_name}**: {table_info['description']}\n")
+            
+            # 주요 컬럼들 (처음 10개만)
+            if 'columns' in table_info and table_info['columns']:
+                columns = [f"{col['name']}({col['type']})" for col in table_info['columns'][:10]]
+                context_parts.append(f"  - 주요 컬럼: {', '.join(columns)}\n")
+            
+            context_parts.append(f"  - 비즈니스 의미: {table_info['business_meaning']}\n\n")
+    
+    return "".join(context_parts)
+
 if __name__ == "__main__":
     # 테스트용 컨텍스트 생성
+    print("=== 전체 스키마 컨텍스트 ===")
+    print(get_full_schema_context())
+    
+    print("\n=== 특정 분석 컨텍스트 ===")
     context = build_analysis_context("conversion_analysis", ["sales_funnel", "customer_behavior_event"])
     print(context)

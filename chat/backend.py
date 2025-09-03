@@ -23,7 +23,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.runnables import RunnableConfig
 
 # 스키마 관리자 import
-from knowledge.schema_manager import get_compact_schema_summary
+from knowledge.schema_context import get_full_schema_context
 
 # 멀티 에이전트 시스템 import
 try:
@@ -62,8 +62,8 @@ if not os.path.exists(ABSOLUTE_UPLOAD_DIR):
 def build_dynamic_system_prompt() -> str:
     """동적으로 스키마 정보를 포함한 시스템 프롬프트 생성"""
     try:
-        # 스키마 요약 정보 가져오기
-        schema_summary = get_compact_schema_summary()
+        # JSON 스키마 파일들에서 스키마 정보 가져오기
+        schema_context = get_full_schema_context()
         
         # 기본 프롬프트 + 동적 스키마 정보 결합
         return f"""{BASE_SYSTEM_PROMPT}
@@ -71,7 +71,7 @@ def build_dynamic_system_prompt() -> str:
 ----
 
 <DETAILED_DATABASE_SCHEMA>
-{schema_summary}
+{schema_context}
 </DETAILED_DATABASE_SCHEMA>
 
 {SYSTEM_PROMPT_FOOTER}"""
