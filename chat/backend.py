@@ -47,6 +47,15 @@ nest_asyncio.apply()
 # 환경 변수 로드
 load_dotenv(override=True)
 
+# LangSmith 추적 설정
+import os
+os.environ.setdefault("LANGCHAIN_TRACING_V2", "true")
+if os.getenv("LANGSMITH_API_KEY"):
+    print("✅ LangSmith 추적이 활성화되었습니다.")
+    print(f"📊 프로젝트: {os.getenv('LANGCHAIN_PROJECT', 'da-agent')}")
+else:
+    print("⚠️  LangSmith API 키가 설정되지 않았습니다.")
+
 # 설정 파일 경로
 CONFIG_FILE_PATH = "config.json"
 UPLOAD_DIR = "uploads"  # 업로드 파일 저장 디렉토리
